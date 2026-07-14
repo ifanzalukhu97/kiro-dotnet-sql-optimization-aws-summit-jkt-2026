@@ -1,0 +1,37 @@
+.dashboard-page {
+  padding: 1.5rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  .card-value {
+    margin-top: 0.25rem;
+  }
+
+  .card-value--text {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    word-break: break-word;
+  }
+}
+
+.chart-section {
+  margin-top: 1rem;
+}
+
+.chart-title {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+}
+
+.chart-wrapper {
+  height: 320px;
+  position: relative;
+}

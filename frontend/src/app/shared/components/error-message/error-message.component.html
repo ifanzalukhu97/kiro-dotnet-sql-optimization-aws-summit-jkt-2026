@@ -1,0 +1,10 @@
+<div *ngIf="visible" class="error-message" role="alert">
+  <span class="error-message__text">{{ displayMessage }}</span>
+  <button
+    class="error-message__dismiss"
+    (click)="dismiss()"
+    aria-label="Dismiss error message"
+    type="button">
+    &times;
+  </button>
+</div>

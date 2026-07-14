@@ -1,0 +1,12 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=YOUR_RDS_ENDPOINT_HERE;Database=WideWorldImporters;User Id=YOUR_USERNAME_HERE;Password=YOUR_PASSWORD_HERE;Connection Timeout=10;"
+  }
+}

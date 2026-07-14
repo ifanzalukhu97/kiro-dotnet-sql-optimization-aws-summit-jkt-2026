@@ -1,0 +1,137 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Customers</h1>
+    <app-response-time-badge
+      [timeMs]="responseTime"
+      [error]="requestFailed">
+    </app-response-time-badge>
+  </div>
+
+  <app-error-message [message]="errorMessage"></app-error-message>
+
+  <div class="table-section">
+    <div class="data-table-wrapper" *ngIf="!loading && customers.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of columns">{{ col.header }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of customers"
+              class="clickable-row"
+              (click)="onRowClick(row)"
+              [class.selected]="selectedCustomer?.customerId === row.customerId">
+            <td>{{ row.customerName }}</td>
+            <td>{{ row.orderCount | number }}</td>
+            <td>{{ row.lastOrderDate ? (row.lastOrderDate | date:'mediumDate') : '—' }}</td>
+            <td>{{ row.outstandingBalance | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ row.creditLimit !== null ? (row.creditLimit | currency:'USD':'symbol':'1.2-2') : '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button (click)="onPageChange(page - 1)" [disabled]="page <= 1" aria-label="Previous page">‹</button>
+        <button *ngFor="let p of visiblePages"
+                [class.active]="p === page"
+                (click)="onPageChange(p)"
+                [attr.aria-label]="'Page ' + p"
+                [attr.aria-current]="p === page ? 'page' : null">
+          {{ p }}
+        </button>
+        <button (click)="onPageChange(page + 1)" [disabled]="page >= totalPages" aria-label="Next page">›</button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-spinner" *ngIf="loading">
+      <span>Loading data...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && customers.length === 0 && !errorMessage">
+      <span>No customers found.</span>
+    </div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" *ngIf="selectedCustomer || detailLoading">
+    <div class="detail-header">
+      <h2>{{ selectedCustomer?.customerName || 'Loading...' }}</h2>
+      <button class="close-btn" (click)="closeDetail()" aria-label="Close detail panel">&times;</button>
+    </div>
+
+    <div class="detail-loading" *ngIf="detailLoading">
+      <span>Loading customer details...</span>
+    </div>
+
+    <div class="detail-content" *ngIf="selectedCustomer && !detailLoading">
+      <div class="detail-summary">
+        <div class="summary-item">
+          <span class="label">Credit Limit</span>
+          <span class="value">{{ selectedCustomer.creditLimit !== null ? (selectedCustomer.creditLimit | currency:'USD':'symbol':'1.2-2') : '—' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Orders</span>
+          <span class="value">{{ selectedCustomer.orderCount | number }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Invoices</span>
+          <span class="value">{{ selectedCustomer.invoiceCount | number }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Outstanding Balance</span>
+          <span class="value">{{ selectedCustomer.outstandingBalance | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section" *ngIf="selectedCustomer.recentOrders?.length">
+        <h3>Recent Orders</h3>
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Order Date</th>
+              <th>Expected Delivery</th>
+              <th>Lines</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of selectedCustomer.recentOrders">
+              <td>{{ order.orderId }}</td>
+              <td>{{ order.orderDate | date:'mediumDate' }}</td>
+              <td>{{ order.expectedDeliveryDate | date:'mediumDate' }}</td>
+              <td>{{ order.lineCount }}</td>
+              <td>{{ order.totalAmount | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="detail-section" *ngIf="selectedCustomer.recentTransactions?.length">
+        <h3>Recent Transactions</h3>
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tx of selectedCustomer.recentTransactions">
+              <td>{{ tx.customerTransactionId }}</td>
+              <td>{{ tx.transactionDate | date:'mediumDate' }}</td>
+              <td>{{ tx.transactionAmount | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td>{{ tx.outstandingBalance | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

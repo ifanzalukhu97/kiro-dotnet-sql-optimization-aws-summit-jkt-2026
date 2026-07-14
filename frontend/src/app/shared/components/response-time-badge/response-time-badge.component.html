@@ -1,0 +1,8 @@
+<span
+  *ngIf="timeMs !== null || error"
+  class="response-time-badge"
+  [class.highlight]="highlight"
+  [class.error]="error"
+  (animationend)="highlight = false">
+  {{ displayText }}
+</span>

@@ -1,0 +1,66 @@
+<!-- Loading State -->
+<div class="loading-spinner" *ngIf="loading">
+  <span>Loading data...</span>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" *ngIf="!loading && data.length === 0">
+  <span>No data</span>
+</div>
+
+<!-- Data Table -->
+<div class="data-table-wrapper" *ngIf="!loading && data.length > 0">
+  <table>
+    <thead>
+      <tr>
+        <th
+          *ngFor="let col of columns"
+          [style.width]="col.width || 'auto'"
+          [class.sortable]="col.sortable"
+          (click)="onSort(col)"
+        >
+          <span class="header-content">
+            {{ col.header }}
+            <span class="sort-indicator" *ngIf="col.sortable">{{ getSortIndicator(col) }}</span>
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of data" (click)="onRowClick(row)" class="clickable-row">
+        <td *ngFor="let col of columns" [style.width]="col.width || 'auto'">
+          {{ formatValue(row[col.key], col.format) }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button
+      (click)="previousPage()"
+      [disabled]="page <= 1"
+      aria-label="Previous page"
+    >
+      ‹
+    </button>
+
+    <button
+      *ngFor="let p of visiblePages"
+      [class.active]="p === page"
+      (click)="goToPage(p)"
+      [attr.aria-label]="'Page ' + p"
+      [attr.aria-current]="p === page ? 'page' : null"
+    >
+      {{ p }}
+    </button>
+
+    <button
+      (click)="nextPage()"
+      [disabled]="page >= totalPages"
+      aria-label="Next page"
+    >
+      ›
+    </button>
+  </div>
+</div>

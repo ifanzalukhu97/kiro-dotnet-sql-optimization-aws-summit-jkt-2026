@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.data-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  thead {
+    th {
+      cursor: default;
+      user-select: none;
+
+      &.sortable {
+        cursor: pointer;
+
+        &:hover {
+          color: var(--color-text);
+        }
+      }
+
+      .header-content {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .sort-indicator {
+        font-size: 0.7rem;
+        opacity: 0.5;
+        transition: opacity 0.2s;
+      }
+
+      &.sortable:hover .sort-indicator {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.clickable-row {
+  cursor: pointer;
+
+  &:hover {
+    background: #333333;
+  }
+}

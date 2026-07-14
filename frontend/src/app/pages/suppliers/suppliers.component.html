@@ -1,0 +1,100 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Suppliers</h1>
+    <app-response-time-badge
+      [timeMs]="responseTime"
+      [error]="requestFailed">
+    </app-response-time-badge>
+  </div>
+
+  <div class="filter-bar">
+    <app-dropdown-filter
+      [options]="categories"
+      placeholder="All Categories"
+      label="Category"
+      (selectionChange)="onCategoryChange($event)">
+    </app-dropdown-filter>
+  </div>
+
+  <app-error-message
+    [message]="errorMessage"
+    [show]="!!errorMessage">
+  </app-error-message>
+
+  <app-data-table
+    [columns]="columns"
+    [data]="suppliers"
+    [loading]="loading"
+    [page]="page"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount"
+    (pageChange)="onPageChange($event)"
+    (rowClick)="onRowClick($event)">
+  </app-data-table>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" *ngIf="selectedSupplier || detailLoading">
+    <div class="detail-header">
+      <h2>{{ selectedSupplier?.supplierName || 'Loading...' }}</h2>
+      <button class="close-btn" (click)="closeDetail()" aria-label="Close detail panel">&times;</button>
+    </div>
+
+    <div class="detail-loading" *ngIf="detailLoading">
+      <span>Loading supplier details...</span>
+    </div>
+
+    <div class="detail-content" *ngIf="selectedSupplier && !detailLoading">
+      <div class="detail-summary">
+        <div class="summary-item">
+          <span class="label">Category</span>
+          <span class="value">{{ selectedSupplier.categoryName || '—' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Purchase Orders</span>
+          <span class="value">{{ selectedSupplier.recentPurchaseOrders.length }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Stock Items</span>
+          <span class="value">{{ selectedSupplier.stockItems.length }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section" *ngIf="selectedSupplier.recentPurchaseOrders.length">
+        <h3>Recent Purchase Orders</h3>
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>PO ID</th>
+              <th>Order Date</th>
+              <th>Expected Delivery</th>
+              <th>Lines</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let po of selectedSupplier.recentPurchaseOrders">
+              <td>{{ po.purchaseOrderId }}</td>
+              <td>{{ po.orderDate | date:'mediumDate' }}</td>
+              <td>{{ po.expectedDeliveryDate | date:'mediumDate' }}</td>
+              <td>{{ po.lineCount }}</td>
+              <td>
+                <span class="status-badge" [class.finalized]="po.isOrderFinalized">
+                  {{ po.isOrderFinalized ? 'Finalized' : 'Pending' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="detail-section" *ngIf="selectedSupplier.stockItems.length">
+        <h3>Stock Items</h3>
+        <div class="stock-items-list">
+          <span class="stock-item-chip" *ngFor="let item of selectedSupplier.stockItems">
+            {{ item.name }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

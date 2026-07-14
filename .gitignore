@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+.vs/
+
+# ASP.NET Core - sensitive configuration
+appsettings.Development.json
+appsettings.Production.json
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Angular environment files with real values
+frontend/src/environments/environment.ts
+frontend/src/environments/environment.prod.ts
+
+# IDE
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

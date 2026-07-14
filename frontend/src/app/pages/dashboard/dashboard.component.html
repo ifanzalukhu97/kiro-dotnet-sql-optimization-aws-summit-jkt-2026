@@ -1,0 +1,73 @@
+<div class="dashboard-page">
+  <!-- Header with title and response time badge -->
+  <div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <app-response-time-badge
+      [timeMs]="responseTime"
+      [error]="requestFailed">
+    </app-response-time-badge>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-spinner">
+    Loading dashboard data...
+  </div>
+
+  <!-- KPI Summary Cards -->
+  <div *ngIf="kpiData" class="kpi-grid">
+    <div class="card kpi-card">
+      <div class="card-header">Total Orders</div>
+      <div class="card-value">{{ formatNumber(kpiData.totalOrders) }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Total Customers</div>
+      <div class="card-value">{{ formatNumber(kpiData.totalCustomers) }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Total Revenue</div>
+      <div class="card-value">{{ formatCurrency(kpiData.totalRevenue) }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Total Stock Items</div>
+      <div class="card-value">{{ formatNumber(kpiData.totalStockItems) }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Average Order Value</div>
+      <div class="card-value">{{ formatCurrency(kpiData.averageOrderValue) }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Top Customer</div>
+      <div class="card-value card-value--text">{{ kpiData.topCustomerByRevenue }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Recent Orders (30d)</div>
+      <div class="card-value">{{ formatNumber(kpiData.recentOrderCount) }}</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="card-header">Pending Deliveries</div>
+      <div class="card-value">{{ formatNumber(kpiData.pendingDeliveries) }}</div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div *ngIf="kpiData" class="chart-section">
+    <div class="chart-container">
+      <h3 class="chart-title">Key Metrics Overview</h3>
+      <div class="chart-wrapper">
+        <canvas #kpiChart></canvas>
+      </div>
+    </div>
+  </div>
+</div>

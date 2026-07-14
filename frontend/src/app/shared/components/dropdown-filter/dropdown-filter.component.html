@@ -1,0 +1,13 @@
+<div class="dropdown-filter">
+  <label *ngIf="label" class="dropdown-filter__label">{{ label }}</label>
+  <select
+    class="dropdown-filter__select"
+    [value]="selectedValue"
+    (change)="onSelectionChange($event)"
+    [attr.aria-label]="label || placeholder">
+    <option value="">{{ placeholder }}</option>
+    <option *ngFor="let option of options" [value]="option.id">
+      {{ option.name }}
+    </option>
+  </select>
+</div>

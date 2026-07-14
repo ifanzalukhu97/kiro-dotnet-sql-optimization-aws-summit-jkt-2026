@@ -1,0 +1,60 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Product Search</h1>
+    <app-response-time-badge
+      [timeMs]="responseTime"
+      [error]="requestFailed">
+    </app-response-time-badge>
+  </div>
+
+  <div class="filter-bar">
+    <app-dropdown-filter
+      [options]="suppliers"
+      [placeholder]="'All Suppliers'"
+      [label]="'Supplier'"
+      (selectionChange)="onSupplierChange($event)">
+    </app-dropdown-filter>
+
+    <app-dropdown-filter
+      [options]="stockGroups"
+      [placeholder]="'All Stock Groups'"
+      [label]="'Stock Group'"
+      (selectionChange)="onStockGroupChange($event)">
+    </app-dropdown-filter>
+
+    <div class="price-filter">
+      <label class="filter-label">Min Price</label>
+      <input
+        type="number"
+        class="price-input"
+        placeholder="Min"
+        [value]="minPrice"
+        (change)="onMinPriceChange($event)" />
+    </div>
+
+    <div class="price-filter">
+      <label class="filter-label">Max Price</label>
+      <input
+        type="number"
+        class="price-input"
+        placeholder="Max"
+        [value]="maxPrice"
+        (change)="onMaxPriceChange($event)" />
+    </div>
+  </div>
+
+  <app-error-message
+    [message]="errorMessage"
+    [show]="errorMessage !== null">
+  </app-error-message>
+
+  <app-data-table
+    [columns]="columns"
+    [data]="data"
+    [loading]="loading"
+    [page]="page"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount"
+    (pageChange)="onPageChange($event)">
+  </app-data-table>
+</div>

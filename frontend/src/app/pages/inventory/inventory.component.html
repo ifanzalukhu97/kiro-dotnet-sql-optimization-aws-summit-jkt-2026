@@ -1,0 +1,108 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Inventory / Stock</h1>
+    <app-response-time-badge
+      [timeMs]="responseTime"
+      [error]="requestFailed">
+    </app-response-time-badge>
+  </div>
+
+  <div class="filter-bar">
+    <app-dropdown-filter
+      [options]="suppliers"
+      placeholder="All Suppliers"
+      label="Supplier"
+      (selectionChange)="onSupplierChange($event)">
+    </app-dropdown-filter>
+    <app-dropdown-filter
+      [options]="categories"
+      placeholder="All Categories"
+      label="Category"
+      (selectionChange)="onCategoryChange($event)">
+    </app-dropdown-filter>
+  </div>
+
+  <app-error-message
+    [message]="errorMessage"
+    [show]="!!errorMessage">
+  </app-error-message>
+
+  <app-data-table
+    [columns]="columns"
+    [data]="stockItems"
+    [loading]="loading"
+    [page]="page"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount"
+    (pageChange)="onPageChange($event)"
+    (rowClick)="onRowClick($event)">
+  </app-data-table>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" *ngIf="selectedStockItem || detailLoading">
+    <div class="detail-header">
+      <h2>{{ selectedStockItem?.stockItemName || 'Loading...' }}</h2>
+      <button class="close-btn" (click)="closeDetail()" aria-label="Close detail panel">&times;</button>
+    </div>
+
+    <div class="detail-loading" *ngIf="detailLoading">
+      <span>Loading stock item details...</span>
+    </div>
+
+    <div class="detail-content" *ngIf="selectedStockItem && !detailLoading">
+      <div class="detail-summary">
+        <div class="summary-item">
+          <span class="label">Supplier</span>
+          <span class="value">{{ selectedStockItem.supplierName || '—' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Unit Price</span>
+          <span class="value">{{ selectedStockItem.unitPrice | currency }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Retail Price</span>
+          <span class="value">{{ selectedStockItem.recommendedRetailPrice | currency }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Qty On Hand</span>
+          <span class="value">{{ selectedStockItem.quantityOnHand }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Reorder Level</span>
+          <span class="value">{{ selectedStockItem.reorderLevel }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Target Stock</span>
+          <span class="value">{{ selectedStockItem.targetStockLevel }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Additional Info</h3>
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>Tax Rate</th>
+              <th>Weight/Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ selectedStockItem.taxRate }}%</td>
+              <td>{{ selectedStockItem.typicalWeightPerUnit }} kg</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="detail-section" *ngIf="selectedStockItem.stockGroups.length">
+        <h3>Stock Groups</h3>
+        <div class="stock-groups-list">
+          <span class="stock-group-chip" *ngFor="let group of selectedStockItem.stockGroups">
+            {{ group }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,10 @@
     "14.3 Write property test for pagination invariant": {
       "status": "passed",
       "lastRunTimestamp": 1784449859025
+    },
+    "14.4 Write property test for detail endpoint returns related data": {
+      "status": "passed",
+      "lastRunTimestamp": 1784460325993
     }
   },
   "executionHistory": {
@@ -1015,6 +1019,25 @@
         "executionId": "3b1d5225-c9c4-4190-ab9c-3f1acdfad5d2",
         "chatSessionId": "sess_6247da70-613e-419a-aeb7-710535c48790",
         "timestamp": 1784447886928
+      }
+    ],
+    "14.4 Write property test for detail endpoint returns related data": [
+      {
+        "executionId": "e703f530-dbd9-4beb-b883-4c7d260ac57a",
+        "chatSessionId": "sess_a5511be2-2ee9-4fa8-950e-3f40fe2941f4",
+        "timestamp": 1784459532579
+      },
+      {
+        "executionId": "e703f530-dbd9-4beb-b883-4c7d260ac57a",
+        "chatSessionId": "sess_a5511be2-2ee9-4fa8-950e-3f40fe2941f4",
+        "timestamp": 1784459751884
+      }
+    ],
+    "14.5 Write property test for 404 on non-existent identifiers": [
+      {
+        "executionId": "fe2cc87e-3615-4320-8c38-e91ddd59b7a1",
+        "chatSessionId": "sess_04b77782-3986-4f75-8d4b-3b43f9126ded",
+        "timestamp": 1784461120740
       }
     ]
   }

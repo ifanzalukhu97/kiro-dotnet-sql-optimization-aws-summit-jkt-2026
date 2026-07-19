@@ -198,6 +198,26 @@ The reset script:
 4. Use Kiro AI to analyze and fix performance issues
 5. Refresh the frontend to see improved response times via the green badges
 
+## Kiro AI Configuration
+
+The `.kiro/` directory contains AI-assisted development configuration:
+
+```
+.kiro/
+├── steering/          # Always-on context for Kiro sessions
+│   ├── tech.md        # Tech stack, build commands, SDK verification rules
+│   ├── structure.md   # Project structure and architecture patterns
+│   ├── product.md     # Product overview and demo flow context
+│   └── ponytail.md    # Coding style (lazy senior dev — minimal, efficient)
+└── skills/            # On-demand skills activated by request matching
+    ├── run-tests/     # Detect platform + run dotnet test correctly
+    ├── code-testing-agent/  # Generate unit tests via research-plan-implement pipeline
+    ├── test-gap-analysis/   # Pseudo-mutation analysis to find weak tests
+    └── dotnet-webapi/       # ASP.NET Core endpoint patterns and HTTP semantics
+```
+
+**Steering** files load automatically every session to provide project context. **Skills** activate on-demand when your request matches their description (e.g., asking to "run tests" triggers the `run-tests` skill).
+
 ## Architecture
 
 - **Backend**: ASP.NET Core 5 Web API with EF Core, 12 controllers (some with intentionally naive query patterns for demo purposes)

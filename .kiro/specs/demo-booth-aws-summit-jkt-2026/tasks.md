@@ -326,13 +326,13 @@ This plan implements a monorepo application demonstrating SQL Server query optim
     - Verify data array length ≤ pageSize, response contains page/pageSize/totalCount
     - **Validates: Requirements 3.2, 13.5**
 
-  - [ ] 14.4 Write property test for detail endpoint returns related data
+  - [x] 14.4 Write property test for detail endpoint returns related data
     - **Property 2: Detail endpoint returns entity with related data**
     - Random valid IDs from each controller's domain
     - Verify HTTP 200 with entity fields plus related entities
     - **Validates: Requirements 3.3, 13.6**
 
-  - [ ] 14.5 Write property test for 404 on non-existent identifiers
+  - [x] 14.5 Write property test for 404 on non-existent identifiers
     - **Property 3: Error response consistency for not-found identifiers**
     - Random large integers (> max existing ID) across all controllers
     - Verify HTTP 404 with error field containing resource type and identifier

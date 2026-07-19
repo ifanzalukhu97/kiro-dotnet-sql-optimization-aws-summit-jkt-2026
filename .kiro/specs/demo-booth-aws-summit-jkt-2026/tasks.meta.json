@@ -7,6 +7,22 @@
     "14.4 Write property test for detail endpoint returns related data": {
       "status": "passed",
       "lastRunTimestamp": 1784460325993
+    },
+    "14.6 Write property test for 400 on malformed identifiers": {
+      "status": "passed",
+      "lastRunTimestamp": 1784463525344
+    },
+    "14.7 Write property test for lookup endpoint constraints": {
+      "status": "passed",
+      "lastRunTimestamp": 1784463699331
+    },
+    "14.9 Write property test for health check connectivity": {
+      "status": "not_run",
+      "lastRunTimestamp": 1784463927699
+    },
+    "14.8 Write property test for 503 when database unavailable": {
+      "status": "not_run",
+      "lastRunTimestamp": 1784463933943
     }
   },
   "executionHistory": {
@@ -1038,6 +1054,200 @@
         "executionId": "fe2cc87e-3615-4320-8c38-e91ddd59b7a1",
         "chatSessionId": "sess_04b77782-3986-4f75-8d4b-3b43f9126ded",
         "timestamp": 1784461120740
+      }
+    ],
+    "14.6 Write property test for 400 on malformed identifiers": [
+      {
+        "executionId": "41937816-8cf1-4d6e-b153-f174ad8ca0e4",
+        "chatSessionId": "sess_622449dc-b617-4805-9128-f7b4e3bd9e4e",
+        "timestamp": 1784463251708
+      },
+      {
+        "executionId": "41937816-8cf1-4d6e-b153-f174ad8ca0e4",
+        "chatSessionId": "sess_622449dc-b617-4805-9128-f7b4e3bd9e4e",
+        "timestamp": 1784463547002
+      }
+    ],
+    "14.7 Write property test for lookup endpoint constraints": [
+      {
+        "executionId": "34012927-6272-4852-9938-47d4976d33f9",
+        "chatSessionId": "sess_7fceae13-fe51-4c03-abc4-a812d1591a9c",
+        "timestamp": 1784463610492
+      },
+      {
+        "executionId": "34012927-6272-4852-9938-47d4976d33f9",
+        "chatSessionId": "sess_7fceae13-fe51-4c03-abc4-a812d1591a9c",
+        "timestamp": 1784463713004
+      }
+    ],
+    "14.8 Write property test for 503 when database unavailable": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767262
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463843384
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463972865
+      }
+    ],
+    "14.9 Write property test for health check connectivity": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767343
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463844235
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463973514
+      }
+    ],
+    "14.10 Write property test for demo reset idempotence": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767376
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463845263
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463974762
+      }
+    ],
+    "16.2 Implement navigation E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767409
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463981052
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464138638
+      }
+    ],
+    "16.3 Implement data loading E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767440
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463981948
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464139192
+      }
+    ],
+    "16.4 Implement filter interaction E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767472
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463982774
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464140053
+      }
+    ],
+    "16.5 Implement response time badge E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767535
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463983650
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464141070
+      }
+    ],
+    "16.6 Implement theme verification E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767569
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463984544
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464141950
+      }
+    ],
+    "16.7 Implement error handling E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767597
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464148021
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464229400
+      }
+    ],
+    "16.8 Implement dashboard E2E tests": [
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784463767627
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464148744
+      },
+      {
+        "executionId": "00bb90d1-2b65-49a6-9863-99df1ab2aff0",
+        "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
+        "timestamp": 1784464230742
       }
     ]
   }

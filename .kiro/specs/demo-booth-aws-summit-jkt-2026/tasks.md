@@ -338,30 +338,30 @@ This plan implements a monorepo application demonstrating SQL Server query optim
     - Verify HTTP 404 with error field containing resource type and identifier
     - **Validates: Requirements 3.4, 13.7**
 
-  - [ ] 14.6 Write property test for 400 on malformed identifiers
+  - [x] 14.6 Write property test for 400 on malformed identifiers
     - **Property 4: Error response consistency for malformed identifiers**
     - Random non-numeric strings (alpha, special chars, empty) across all controllers
     - Verify HTTP 400 with error field describing validation failure
     - **Validates: Requirements 3.5, 13.8**
 
-  - [ ] 14.7 Write property test for lookup endpoint constraints
+  - [x] 14.7 Write property test for lookup endpoint constraints
     - **Property 5: Lookup endpoint size and shape constraint**
     - Iterate all lookup endpoints
     - Verify JSON array ≤ 1000 items, each with numeric id and non-empty string name
     - **Validates: Requirements 3.6, 13.10**
 
-  - [ ] 14.8 Write property test for 503 when database unavailable
+  - [x] 14.8 Write property test for 503 when database unavailable
     - **Property 6: Database unavailability produces 503 for all endpoints**
     - Random endpoint selection with DB connection severed
     - Verify HTTP 503 with errorCode and message fields
     - **Validates: Requirements 2.3, 2.4, 13.9**
 
-  - [ ] 14.9 Write property test for health check connectivity
+  - [x] 14.9 Write property test for health check connectivity
     - **Property 7: Health check reflects live database connectivity**
     - Toggle DB connectivity, verify health endpoint response matches state
     - **Validates: Requirements 2.4**
 
-  - [ ] 14.10 Write property test for demo reset idempotence
+  - [x] 14.10 Write property test for demo reset idempotence
     - **Property 11: Demo reset script idempotence**
     - Run reset script N times (random N between 1-5), verify no errors
     - **Validates: Requirements 7.4**
@@ -376,37 +376,37 @@ This plan implements a monorepo application demonstrating SQL Server query optim
     - Install Playwright dependencies in `package.json`
     - _Requirements: 14.1, 14.2_
 
-  - [ ] 16.2 Implement navigation E2E tests
+  - [x] 16.2 Implement navigation E2E tests
     - Create `e2e/navigation.spec.ts`
     - Verify all 12 pages reachable via nav menu links
     - _Requirements: 14.3_
 
-  - [ ] 16.3 Implement data loading E2E tests
+  - [x] 16.3 Implement data loading E2E tests
     - Create `e2e/data-loading.spec.ts`
     - Verify data appears in tables/lists within 10 seconds of navigation
     - _Requirements: 14.4_
 
-  - [ ] 16.4 Implement filter interaction E2E tests
+  - [x] 16.4 Implement filter interaction E2E tests
     - Create `e2e/filters.spec.ts`
     - Test dropdown selection triggers data refresh on at least 3 pages
     - _Requirements: 14.5_
 
-  - [ ] 16.5 Implement response time badge E2E tests
+  - [x] 16.5 Implement response time badge E2E tests
     - Create `e2e/response-time.spec.ts`
     - Verify badge visible with "Loaded in {number}ms" pattern on all data pages
     - _Requirements: 14.6_
 
-  - [ ] 16.6 Implement theme verification E2E tests
+  - [x] 16.6 Implement theme verification E2E tests
     - Create `e2e/theme.spec.ts`
     - Verify background `#121212`, accent `#aaff00`, surface `#2a2a2a`
     - _Requirements: 14.7_
 
-  - [ ] 16.7 Implement error handling E2E tests
+  - [x] 16.7 Implement error handling E2E tests
     - Create `e2e/error-handling.spec.ts`
     - Verify error message when backend unavailable, previous data retained
     - _Requirements: 14.8_
 
-  - [ ] 16.8 Implement dashboard E2E tests
+  - [x] 16.8 Implement dashboard E2E tests
     - Create `e2e/dashboard.spec.ts`
     - Verify KPI cards with numeric values and chart DOM element presence
     - _Requirements: 14.9_

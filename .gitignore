@@ -26,3 +26,6 @@ frontend/src/environments/environment.prod.ts
 # OS
 .DS_Store
 Thumbs.db
+
+# direnv (local dev)
+.envrc

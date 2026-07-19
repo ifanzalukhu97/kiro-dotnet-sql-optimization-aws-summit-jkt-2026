@@ -1,0 +1,11 @@
+# direnv configuration for .NET SDK path override
+# Copy this file to .envrc and adjust paths for your machine:
+#   cp .envrc.example .envrc
+#   direnv allow .
+#
+# This is useful on Apple Silicon Macs where .NET 5 requires the x86_64 SDK.
+# On other platforms (Windows, Linux, Intel Mac), this is typically not needed
+# if .NET 5 SDK is installed normally.
+
+export DOTNET_ROOT="$HOME/.dotnet/x86_64"
+PATH_add "$HOME/.dotnet/x86_64"

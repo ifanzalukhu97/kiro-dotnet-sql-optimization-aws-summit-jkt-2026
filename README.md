@@ -40,11 +40,43 @@ A demonstration application for AWS Summit Jakarta 2026 showcasing SQL Server qu
 | Node.js | 18+ | Build and run the frontend |
 | Angular CLI | 18.x | Frontend development (`npm install -g @angular/cli`) |
 
+## Development Environment Setup
+
+### .NET SDK Version
+
+This project pins .NET SDK 5.0.408 via `global.json`. Any .NET 5.0.4xx SDK will work thanks to the `rollForward: latestPatch` policy.
+
+### Apple Silicon (M1/M2/M3) Macs
+
+.NET 5 does not have native arm64 support. If you have the x86_64 .NET SDK installed (e.g., at `~/.dotnet/x86_64`), you can use [direnv](https://direnv.net/) to automatically set the correct path when working in this project:
+
+```bash
+# Install direnv (if not already installed)
+brew install direnv
+
+# Hook direnv into your shell (add to ~/.zshrc)
+eval "$(direnv hook zsh)"
+
+# Copy the example and adjust if needed
+cp .envrc.example .envrc
+
+# Allow direnv to load the config
+direnv allow .
+```
+
+This ensures `dotnet` commands in this folder use the x86_64 SDK. When you `cd` out of the project, your shell reverts to the default SDK.
+
+> **Note**: `.envrc` is gitignored since paths vary per machine. The `.envrc.example` file is committed as a reference template.
+
+### Windows / Linux / Intel Mac
+
+No extra setup needed. Install [.NET 5 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/5.0) and the `global.json` will ensure the correct version is used.
+
 ## Getting Started
 
 ### 1. Database Setup
 
-The project uses a Docker container running SQL Server 2019 with the WideWorldImporters sample database.
+The project uses a Docker container running SQL Server 2022 with the WideWorldImporters sample database.
 
 ```bash
 # Start the SQL Server container
@@ -55,6 +87,9 @@ docker-compose ps
 ```
 
 Place the `WideWorldImporters-Full.bak` backup file in the container's data directory. The init script at `scripts/init/restore-database.sh` handles the restore automatically on first startup.
+
+> **Note**: Download `WideWorldImporters-Full.bak` from the official Microsoft SQL Server samples release:
+> https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0
 
 The database will be accessible at `localhost:1433` with the default credentials defined in `docker-compose.yml`.
 
@@ -167,5 +202,5 @@ The reset script:
 
 - **Backend**: ASP.NET Core 5 Web API with EF Core, 12 controllers (some with intentionally naive query patterns for demo purposes)
 - **Frontend**: Angular 18 with dark-mode UI (`#121212` background, `#aaff00` accent), response time badges, dropdown filters
-- **Database**: SQL Server 2019 with WideWorldImporters (Full backup, 200K+ rows in key tables)
+- **Database**: SQL Server 2022 with WideWorldImporters (Full backup, 200K+ rows in key tables)
 - **Testing**: xUnit + FsCheck (backend), Jasmine + Karma (frontend unit), Playwright (E2E)

@@ -10,7 +10,7 @@ This plan implements a monorepo application demonstrating SQL Server query optim
   - [x] 1.1 Create monorepo folder structure and root configuration files
     - Create `backend/`, `frontend/`, `scripts/audit/`, `scripts/reset/` directories
     - Create root `.gitignore` with entries for `appsettings.Development.json`, `appsettings.Production.json`, Angular real environment files, `node_modules/`, `bin/`, `obj/`, `.vs/`, `dist/`
-    - Create root `docker-compose.yml` with SQL Server 2019 service (port 1433, volume persistence, healthcheck)
+    - Create root `docker-compose.yml` with SQL Server 2022 service (port 1433, volume persistence, healthcheck)
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 9.5_
 
   - [x] 1.2 Create Docker initialization script for WideWorldImporters restore
@@ -320,48 +320,48 @@ This plan implements a monorepo application demonstrating SQL Server query optim
     - Test database unavailable scenario (HTTP 503 with errorCode and message)
     - _Requirements: 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 13.10_
 
-  - [ ]* 14.3 Write property test for pagination invariant
+  - [x] 14.3 Write property test for pagination invariant
     - **Property 1: Pagination invariant**
     - Random page (1-50), random pageSize (1-100), random controller selection
     - Verify data array length ≤ pageSize, response contains page/pageSize/totalCount
     - **Validates: Requirements 3.2, 13.5**
 
-  - [ ]* 14.4 Write property test for detail endpoint returns related data
+  - [ ] 14.4 Write property test for detail endpoint returns related data
     - **Property 2: Detail endpoint returns entity with related data**
     - Random valid IDs from each controller's domain
     - Verify HTTP 200 with entity fields plus related entities
     - **Validates: Requirements 3.3, 13.6**
 
-  - [ ]* 14.5 Write property test for 404 on non-existent identifiers
+  - [ ] 14.5 Write property test for 404 on non-existent identifiers
     - **Property 3: Error response consistency for not-found identifiers**
     - Random large integers (> max existing ID) across all controllers
     - Verify HTTP 404 with error field containing resource type and identifier
     - **Validates: Requirements 3.4, 13.7**
 
-  - [ ]* 14.6 Write property test for 400 on malformed identifiers
+  - [ ] 14.6 Write property test for 400 on malformed identifiers
     - **Property 4: Error response consistency for malformed identifiers**
     - Random non-numeric strings (alpha, special chars, empty) across all controllers
     - Verify HTTP 400 with error field describing validation failure
     - **Validates: Requirements 3.5, 13.8**
 
-  - [ ]* 14.7 Write property test for lookup endpoint constraints
+  - [ ] 14.7 Write property test for lookup endpoint constraints
     - **Property 5: Lookup endpoint size and shape constraint**
     - Iterate all lookup endpoints
     - Verify JSON array ≤ 1000 items, each with numeric id and non-empty string name
     - **Validates: Requirements 3.6, 13.10**
 
-  - [ ]* 14.8 Write property test for 503 when database unavailable
+  - [ ] 14.8 Write property test for 503 when database unavailable
     - **Property 6: Database unavailability produces 503 for all endpoints**
     - Random endpoint selection with DB connection severed
     - Verify HTTP 503 with errorCode and message fields
     - **Validates: Requirements 2.3, 2.4, 13.9**
 
-  - [ ]* 14.9 Write property test for health check connectivity
+  - [ ] 14.9 Write property test for health check connectivity
     - **Property 7: Health check reflects live database connectivity**
     - Toggle DB connectivity, verify health endpoint response matches state
     - **Validates: Requirements 2.4**
 
-  - [ ]* 14.10 Write property test for demo reset idempotence
+  - [ ] 14.10 Write property test for demo reset idempotence
     - **Property 11: Demo reset script idempotence**
     - Run reset script N times (random N between 1-5), verify no errors
     - **Validates: Requirements 7.4**
@@ -376,37 +376,37 @@ This plan implements a monorepo application demonstrating SQL Server query optim
     - Install Playwright dependencies in `package.json`
     - _Requirements: 14.1, 14.2_
 
-  - [ ]* 16.2 Implement navigation E2E tests
+  - [ ] 16.2 Implement navigation E2E tests
     - Create `e2e/navigation.spec.ts`
     - Verify all 12 pages reachable via nav menu links
     - _Requirements: 14.3_
 
-  - [ ]* 16.3 Implement data loading E2E tests
+  - [ ] 16.3 Implement data loading E2E tests
     - Create `e2e/data-loading.spec.ts`
     - Verify data appears in tables/lists within 10 seconds of navigation
     - _Requirements: 14.4_
 
-  - [ ]* 16.4 Implement filter interaction E2E tests
+  - [ ] 16.4 Implement filter interaction E2E tests
     - Create `e2e/filters.spec.ts`
     - Test dropdown selection triggers data refresh on at least 3 pages
     - _Requirements: 14.5_
 
-  - [ ]* 16.5 Implement response time badge E2E tests
+  - [ ] 16.5 Implement response time badge E2E tests
     - Create `e2e/response-time.spec.ts`
     - Verify badge visible with "Loaded in {number}ms" pattern on all data pages
     - _Requirements: 14.6_
 
-  - [ ]* 16.6 Implement theme verification E2E tests
+  - [ ] 16.6 Implement theme verification E2E tests
     - Create `e2e/theme.spec.ts`
     - Verify background `#121212`, accent `#aaff00`, surface `#2a2a2a`
     - _Requirements: 14.7_
 
-  - [ ]* 16.7 Implement error handling E2E tests
+  - [ ] 16.7 Implement error handling E2E tests
     - Create `e2e/error-handling.spec.ts`
     - Verify error message when backend unavailable, previous data retained
     - _Requirements: 14.8_
 
-  - [ ]* 16.8 Implement dashboard E2E tests
+  - [ ] 16.8 Implement dashboard E2E tests
     - Create `e2e/dashboard.spec.ts`
     - Verify KPI cards with numeric values and chart DOM element presence
     - _Requirements: 14.9_

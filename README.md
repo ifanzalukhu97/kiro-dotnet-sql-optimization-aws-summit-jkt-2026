@@ -2,6 +2,8 @@
 
 A demonstration application for AWS Summit Jakarta 2026 showcasing SQL Server query optimization on .NET Core, assisted by Kiro AI. The app features an ASP.NET Core Web API backend connected to the WideWorldImporters database and an Angular 18 frontend with a dark-mode UI that displays query performance before and after optimization.
 
+This project is a companion demo for the article: [Kiro as AI Partner for MS SQL Server Optimization on .NET Core: What Used to Take Days Now Takes Hours](https://builder.aws.com/content/2yf2sol4ZERViP1ZrJtOMHQBTat/kiro-as-ai-partner-for-ms-sql-server-optimization-on-net-core-what-used-to-take-days-now-takes-hours)
+
 ## Screenshots
 
 ### Dashboard

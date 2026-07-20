@@ -7,13 +7,15 @@ namespace WideWorldImporters.Api.Models.Entities
     {
         public int InvoiceID { get; set; }
         public int CustomerID { get; set; }
-        public int? DeliveredByPersonID { get; set; }
+        public int SalespersonPersonID { get; set; }
+        public int PackedByPersonID { get; set; }
         public DateTime InvoiceDate { get; set; }
-        public decimal TotalDryItems { get; set; }
-        public decimal TotalChillerItems { get; set; }
+        public int TotalDryItems { get; set; }
+        public int TotalChillerItems { get; set; }
 
         public Customer Customer { get; set; }
-        public Person DeliveredByPerson { get; set; }
+        public Person SalespersonPerson { get; set; }
+        public Person PackedByPerson { get; set; }
         public ICollection<InvoiceLine> InvoiceLines { get; set; }
     }
 }

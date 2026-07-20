@@ -76,9 +76,14 @@ namespace WideWorldImporters.Api.Data
                     .HasForeignKey(e => e.CustomerID)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(e => e.DeliveredByPerson)
+                entity.HasOne(e => e.SalespersonPerson)
                     .WithMany()
-                    .HasForeignKey(e => e.DeliveredByPersonID)
+                    .HasForeignKey(e => e.SalespersonPersonID)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.PackedByPerson)
+                    .WithMany()
+                    .HasForeignKey(e => e.PackedByPersonID)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasMany(e => e.InvoiceLines)

@@ -38,7 +38,14 @@ namespace WideWorldImporters.IntegrationTests.Controllers
         [Fact]
         public async Task GetPayment_WithValidId_ReturnsOkWithCorrectFields()
         {
-            var response = await _client.GetAsync("/api/payment/1");
+            // First, get a valid ID from the list endpoint
+            var listResponse = await _client.GetAsync("/api/payment?page=1&pageSize=1");
+            var listContent = await listResponse.Content.ReadAsStringAsync();
+            using var listDoc = JsonDocument.Parse(listContent);
+            var firstItem = listDoc.RootElement.GetProperty("data")[0];
+            var validId = firstItem.GetProperty("customerTransactionId").GetInt32();
+
+            var response = await _client.GetAsync($"/api/payment/{validId}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

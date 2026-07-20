@@ -19,8 +19,8 @@ namespace WideWorldImporters.Api.Models.Dtos
         public string CustomerName { get; set; }
         public string DriverName { get; set; }
         public DateTime InvoiceDate { get; set; }
-        public decimal TotalDryItems { get; set; }
-        public decimal TotalChillerItems { get; set; }
+        public int TotalDryItems { get; set; }
+        public int TotalChillerItems { get; set; }
         public List<InvoiceLineDto> Lines { get; set; }
     }
 }

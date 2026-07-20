@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using WideWorldImporters.Api.Data;
 using Xunit;
 
 namespace WideWorldImporters.IntegrationTests.Controllers
@@ -46,18 +43,20 @@ namespace WideWorldImporters.IntegrationTests.Controllers
                 .WithWebHostBuilder(builder =>
                 {
                     builder.UseEnvironment("Development");
-                    builder.ConfigureServices(services =>
+                    builder.ConfigureAppConfiguration((context, config) =>
                     {
-                        // Remove the existing DbContext registration
-                        var descriptor = new ServiceDescriptor(
-                            typeof(DbContextOptions<WideWorldImportersContext>),
-                            typeof(DbContextOptions<WideWorldImportersContext>),
-                            ServiceLifetime.Singleton);
-
-                        // Re-register DbContext with an invalid connection string
-                        services.AddDbContext<WideWorldImportersContext>(options =>
-                            options.UseSqlServer("Server=invalid_host_that_does_not_exist;Database=WideWorldImporters;User Id=sa;Password=test;Connection Timeout=1;"));
+                        config.Sources.Clear();
+                        config.AddInMemoryCollection(new[]
+                        {
+                            new System.Collections.Generic.KeyValuePair<string, string>(
+                                "ConnectionStrings:DefaultConnection",
+                                "Server=invalid_host_that_does_not_exist;Database=WideWorldImporters;User Id=sa;Password=test;Connection Timeout=1;")
+                        });
                     });
+
+                    // Clear environment variables that could override the bad connection string
+                    System.Environment.SetEnvironmentVariable("CONNECTION_STRING", null);
+                    System.Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", null);
                 });
 
             var client = unhealthyFactory.CreateClient();

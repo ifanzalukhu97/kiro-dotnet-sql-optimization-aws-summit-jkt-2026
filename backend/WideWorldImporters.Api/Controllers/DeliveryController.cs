@@ -34,13 +34,13 @@ namespace WideWorldImporters.Api.Controllers
 
             var query = _context.Invoices
                 .Include(i => i.Customer)
-                .Include(i => i.DeliveredByPerson)
+                .Include(i => i.SalespersonPerson)
                 .Include(i => i.InvoiceLines)
                 .AsQueryable();
 
             if (driverId.HasValue)
             {
-                query = query.Where(i => i.DeliveredByPersonID == driverId.Value);
+                query = query.Where(i => i.SalespersonPersonID == driverId.Value);
             }
 
             if (startDate.HasValue)
@@ -65,7 +65,7 @@ namespace WideWorldImporters.Api.Controllers
             {
                 InvoiceId = invoice.InvoiceID,
                 CustomerName = invoice.Customer?.CustomerName ?? string.Empty,
-                DriverName = invoice.DeliveredByPerson?.FullName ?? string.Empty,
+                DriverName = invoice.SalespersonPerson?.FullName ?? string.Empty,
                 InvoiceDate = invoice.InvoiceDate,
                 LineCount = invoice.InvoiceLines?.Count ?? 0,
                 TotalAmount = invoice.InvoiceLines?.Sum(il => il.ExtendedPrice) ?? 0
@@ -90,7 +90,7 @@ namespace WideWorldImporters.Api.Controllers
 
             var invoice = await _context.Invoices
                 .Include(i => i.Customer)
-                .Include(i => i.DeliveredByPerson)
+                .Include(i => i.SalespersonPerson)
                 .Include(i => i.InvoiceLines)
                 .FirstOrDefaultAsync(i => i.InvoiceID == invoiceId);
 
@@ -103,7 +103,7 @@ namespace WideWorldImporters.Api.Controllers
             {
                 InvoiceId = invoice.InvoiceID,
                 CustomerName = invoice.Customer?.CustomerName ?? string.Empty,
-                DriverName = invoice.DeliveredByPerson?.FullName ?? string.Empty,
+                DriverName = invoice.SalespersonPerson?.FullName ?? string.Empty,
                 InvoiceDate = invoice.InvoiceDate,
                 TotalDryItems = invoice.TotalDryItems,
                 TotalChillerItems = invoice.TotalChillerItems,

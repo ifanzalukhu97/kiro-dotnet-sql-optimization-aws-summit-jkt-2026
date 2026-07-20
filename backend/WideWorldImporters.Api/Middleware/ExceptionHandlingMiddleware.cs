@@ -45,6 +45,14 @@ namespace WideWorldImporters.Api.Middleware
                     message = "Unable to connect to the database. Please try again later."
                 });
             }
+            catch (Exception ex) when (GetSqlConnectionException(ex) != null)
+            {
+                await WriteJsonResponse(context, (int)HttpStatusCode.ServiceUnavailable, new
+                {
+                    errorCode = "DATABASE_UNAVAILABLE",
+                    message = "Unable to connect to the database. Please try again later."
+                });
+            }
             catch (Exception)
             {
                 await WriteJsonResponse(context, (int)HttpStatusCode.InternalServerError, new
@@ -58,6 +66,7 @@ namespace WideWorldImporters.Api.Middleware
         private static bool IsConnectionError(SqlException ex)
         {
             // SQL Server connection-related error numbers:
+            // 0: TCP Provider could not open connection
             // -2: Timeout expired
             // 2: Connection error
             // 53: Named pipe/network path not found
@@ -68,6 +77,7 @@ namespace WideWorldImporters.Api.Middleware
             // 40613: Database unavailable (Azure)
             switch (ex.Number)
             {
+                case 0:
                 case -2:
                 case 2:
                 case 53:
@@ -78,8 +88,22 @@ namespace WideWorldImporters.Api.Middleware
                 case 40613:
                     return true;
                 default:
-                    return false;
+                    // Class >= 20 indicates severe/connection-level errors
+                    return ex.Class >= 20;
             }
+        }
+
+        private static SqlException GetSqlConnectionException(Exception ex)
+        {
+            // Walk the InnerException chain to find a SqlException that is a connection error
+            var inner = ex.InnerException;
+            while (inner != null)
+            {
+                if (inner is SqlException sqlEx && IsConnectionError(sqlEx))
+                    return sqlEx;
+                inner = inner.InnerException;
+            }
+            return null;
         }
 
         private static async Task WriteJsonResponse(HttpContext context, int statusCode, object body)

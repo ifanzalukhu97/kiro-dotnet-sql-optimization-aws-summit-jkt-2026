@@ -29,3 +29,6 @@ Thumbs.db
 
 # direnv (local dev)
 .envrc
+
+# Large database backup files (download separately, see README)
+*.bak

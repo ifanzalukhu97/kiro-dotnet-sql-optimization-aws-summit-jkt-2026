@@ -74,7 +74,32 @@ No extra setup needed. Install [.NET 5 SDK](https://dotnet.microsoft.com/en-us/d
 
 ## Getting Started
 
-### 1. Database Setup
+### Clone the Repository
+
+```bash
+git clone https://github.com/ifanzalukhu97/kiro-dotnet-sql-optimization-aws-summit-jkt-2026.git
+cd kiro-dotnet-sql-optimization-aws-summit-jkt-2026
+```
+
+### 1. Download Database Backup
+
+Download the WideWorldImporters sample database backup and place it in `scripts/init/`:
+
+**Option A: Terminal**
+
+```bash
+curl -L -o scripts/init/WideWorldImporters-Full.bak \
+  https://github.com/Microsoft/sql-server-samples/releases/download/wide-world-importers-v1.0/WideWorldImporters-Full.bak
+```
+
+**Option B: Manual Download**
+
+1. Download from: https://github.com/Microsoft/sql-server-samples/releases/download/wide-world-importers-v1.0/WideWorldImporters-Full.bak
+2. Move the downloaded file to `scripts/init/WideWorldImporters-Full.bak`
+
+> **Note**: The file is ~120 MB and is excluded from the git repository via `.gitignore`.
+
+### 2. Database Setup
 
 The project uses a Docker container running SQL Server 2022 with the WideWorldImporters sample database.
 
@@ -88,12 +113,9 @@ docker-compose ps
 
 Place the `WideWorldImporters-Full.bak` backup file in the container's data directory. The init script at `scripts/init/restore-database.sh` handles the restore automatically on first startup.
 
-> **Note**: Download `WideWorldImporters-Full.bak` from the official Microsoft SQL Server samples release:
-> https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0
-
 The database will be accessible at `localhost:1433` with the default credentials defined in `docker-compose.yml`.
 
-### 2. Backend Setup
+### 3. Backend Setup
 
 ```bash
 cd backend
@@ -111,7 +133,7 @@ dotnet run --project WideWorldImporters.Api
 
 The backend exposes 12 API controllers at `/api/{resource}` and a health check at `/health`.
 
-### 3. Frontend Setup
+### 4. Frontend Setup
 
 ```bash
 cd frontend

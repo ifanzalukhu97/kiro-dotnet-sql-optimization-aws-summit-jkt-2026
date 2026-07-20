@@ -113,7 +113,7 @@ export class CustomersComponent implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.apiService.getList<CustomerListItem>('api/customers', {
+    this.apiService.getList<CustomerListItem>('customers', {
       page: this.page,
       pageSize: this.pageSize
     }).subscribe({
@@ -138,7 +138,7 @@ export class CustomersComponent implements OnInit {
     this.detailLoading = true;
     this.selectedCustomer = null;
 
-    this.apiService.getDetail<CustomerDetail>('api/customers', row.customerId).subscribe({
+    this.apiService.getDetail<CustomerDetail>('customers', row.customerId).subscribe({
       next: (detail) => {
         this.selectedCustomer = detail;
         this.detailLoading = false;

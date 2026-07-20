@@ -66,12 +66,12 @@ export class ProductSearchComponent implements OnInit {
   }
 
   loadLookups(): void {
-    this.apiService.getLookup('api/productsearch/suppliers-lookup').subscribe({
+    this.apiService.getLookup('productsearch/suppliers-lookup').subscribe({
       next: (items) => this.suppliers = items,
       error: () => {}
     });
 
-    this.apiService.getLookup('api/productsearch/stockgroups-lookup').subscribe({
+    this.apiService.getLookup('productsearch/stockgroups-lookup').subscribe({
       next: (items) => this.stockGroups = items,
       error: () => {}
     });
@@ -99,7 +99,7 @@ export class ProductSearchComponent implements OnInit {
       params['maxPrice'] = this.maxPrice;
     }
 
-    this.apiService.getList<ProductSearchItem>('api/productsearch', params).subscribe({
+    this.apiService.getList<ProductSearchItem>('productsearch', params).subscribe({
       next: (response: PaginatedResponse<ProductSearchItem>) => {
         this.data = response.data;
         this.totalCount = response.totalCount;

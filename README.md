@@ -2,6 +2,18 @@
 
 A demonstration application for AWS Summit Jakarta 2026 showcasing SQL Server query optimization on .NET Core, assisted by Kiro AI. The app features an ASP.NET Core Web API backend connected to the WideWorldImporters database and an Angular 18 frontend with a dark-mode UI that displays query performance before and after optimization.
 
+## Screenshots
+
+### Dashboard
+KPI summary cards showing key business metrics with response time badge — notice "Loaded in 3362ms" indicating the intentionally naive query pattern (before optimization).
+
+![Dashboard](docs/images/dashboard.png)
+
+### Invoices
+Data table with customer dropdown filter and date range pickers. Response time badge shows "Loaded in 146ms" — one of the optimized endpoints for comparison.
+
+![Invoices](docs/images/invoices.png)
+
 ## Folder Structure
 
 ```

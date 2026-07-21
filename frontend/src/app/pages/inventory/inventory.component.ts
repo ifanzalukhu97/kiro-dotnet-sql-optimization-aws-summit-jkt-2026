@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem } from '../../core/models/lookup-item';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 export interface StockItemListItem {
   stockItemId: number;
@@ -50,14 +52,24 @@ export class InventoryComponent implements OnInit {
   pageSize = 20;
   totalCount = 0;
   loading = false;
+  sortBy = '';
+  sortDirection = '';
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
   detailLoading = false;
 
-  private supplierId: number | null = null;
-  private categoryId: number | null = null;
+  search = '';
+
+  private selectedSupplierIds: number[] = [];
+  private selectedCategoryIds: number[] = [];
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedSupplierIds.length) params['supplierId'] = this.selectedSupplierIds.join(',');
+    return this.apiService.getList<StockItemListItem>('stockitems', params).pipe(map(r => r.data));
+  };
 
   constructor(
     private apiService: ApiService,
@@ -86,8 +98,15 @@ export class InventoryComponent implements OnInit {
       pageSize: this.pageSize
     };
 
-    if (this.supplierId) {
-      params['supplierId'] = this.supplierId;
+    if (this.selectedSupplierIds.length) {
+      params['supplierId'] = this.selectedSupplierIds.join(',');
+    }
+    if (this.search) {
+      params['search'] = this.search;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<StockItemListItem>('stockitems', params).subscribe({
@@ -125,15 +144,22 @@ export class InventoryComponent implements OnInit {
     });
   }
 
-  onSupplierChange(supplierId: number | null): void {
-    this.supplierId = supplierId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
     this.closeDetail();
     this.loadStockItems();
   }
 
-  onCategoryChange(categoryId: number | null): void {
-    this.categoryId = categoryId;
+  onSupplierChange(supplierIds: number[]): void {
+    this.selectedSupplierIds = supplierIds;
+    this.page = 1;
+    this.closeDetail();
+    this.loadStockItems();
+  }
+
+  onCategoryChange(categoryIds: number[]): void {
+    this.selectedCategoryIds = categoryIds;
     this.page = 1;
     this.closeDetail();
     this.loadStockItems();
@@ -141,6 +167,14 @@ export class InventoryComponent implements OnInit {
 
   onPageChange(page: number): void {
     this.page = page;
+    this.closeDetail();
+    this.loadStockItems();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.closeDetail();
     this.loadStockItems();
   }

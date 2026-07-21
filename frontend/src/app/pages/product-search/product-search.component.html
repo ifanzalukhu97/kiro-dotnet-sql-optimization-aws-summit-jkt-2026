@@ -1,25 +1,35 @@
 <div class="page-container">
   <div class="page-header">
     <h1>Product Search</h1>
-    <app-response-time-badge
-      [timeMs]="responseTime"
-      [error]="requestFailed">
-    </app-response-time-badge>
+    <div class="header-actions">
+      <app-export-csv-button
+        [resourceName]="'product-search'"
+        [columns]="columns"
+        [fetchFn]="exportFn">
+      </app-export-csv-button>
+      <app-response-time-badge
+        [timeMs]="responseTime"
+        [error]="requestFailed">
+      </app-response-time-badge>
+    </div>
   </div>
 
   <div class="filter-bar">
+    <app-search-input (searchChange)="onSearchChange($event)"></app-search-input>
     <app-dropdown-filter
       [options]="suppliers"
       [placeholder]="'All Suppliers'"
       [label]="'Supplier'"
-      (selectionChange)="onSupplierChange($event)">
+      [multiple]="true"
+      (multiSelectionChange)="onSupplierChange($event)">
     </app-dropdown-filter>
 
     <app-dropdown-filter
       [options]="stockGroups"
       [placeholder]="'All Stock Groups'"
       [label]="'Stock Group'"
-      (selectionChange)="onStockGroupChange($event)">
+      [multiple]="true"
+      (multiSelectionChange)="onStockGroupChange($event)">
     </app-dropdown-filter>
 
     <div class="price-filter">
@@ -55,6 +65,7 @@
     [page]="page"
     [pageSize]="pageSize"
     [totalCount]="totalCount"
-    (pageChange)="onPageChange($event)">
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)">
   </app-data-table>
 </div>

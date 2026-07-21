@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -23,7 +25,10 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<PurchaseOrderListDto>>> GetPurchaseOrders(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? supplierId = null)
+            [FromQuery] string supplierId = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
@@ -34,15 +39,27 @@ namespace WideWorldImporters.Api.Controllers
                 .Include(po => po.PurchaseOrderLines)
                 .AsQueryable();
 
-            if (supplierId.HasValue)
+            if (!string.IsNullOrWhiteSpace(supplierId))
             {
-                query = query.Where(po => po.SupplierID == supplierId.Value);
+                var ids = supplierId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(po => ids.Contains(po.SupplierID));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(po => po.Supplier.SupplierName.Contains(search) || po.PurchaseOrderLines.Any(pol => pol.StockItem.StockItemName.Contains(search)));
             }
 
             var totalCount = await query.CountAsync();
 
-            var purchaseOrders = await query
-                .OrderByDescending(po => po.OrderDate)
+            var purchaseOrders = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(po => new PurchaseOrderListDto
@@ -103,6 +120,21 @@ namespace WideWorldImporters.Api.Controllers
             };
 
             return Ok(dto);
+        }
+
+        private static IQueryable<PurchaseOrder> ApplySort(IQueryable<PurchaseOrder> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", System.StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "purchaseorderid" => desc ? query.OrderByDescending(po => po.PurchaseOrderID) : query.OrderBy(po => po.PurchaseOrderID),
+                "orderdate" => desc ? query.OrderByDescending(po => po.OrderDate) : query.OrderBy(po => po.OrderDate),
+                "expecteddeliverydate" => desc ? query.OrderByDescending(po => po.ExpectedDeliveryDate) : query.OrderBy(po => po.ExpectedDeliveryDate),
+                "suppliername" => desc ? query.OrderByDescending(po => po.Supplier.SupplierName) : query.OrderBy(po => po.Supplier.SupplierName),
+                "isorderfinalized" => desc ? query.OrderByDescending(po => po.IsOrderFinalized) : query.OrderBy(po => po.IsOrderFinalized),
+                _ => query.OrderByDescending(po => po.OrderDate) // default sort
+            };
         }
     }
 }

@@ -25,14 +25,16 @@ test.describe('Theme', () => {
   });
 
   test('accent color #aaff00 is used on active nav link', async ({ page }) => {
-    const color = await page.locator('.nav-links li a.active').first().evaluate(
-      el => getComputedStyle(el).color
-    );
-    expect(color).toBe('rgb(170, 255, 0)');
+    const activeLink = page.locator('.nav-links li a.active').first();
+    await expect(activeLink).toHaveCSS('color', 'rgb(170, 255, 0)');
   });
 
   test('surface color #2a2a2a is used on cards', async ({ page }) => {
-    const bg = await page.locator('.card').first().evaluate(
+    // Use table element which always renders and uses $bg-surface
+    await page.goto('/orders');
+    const table = page.locator('table').first();
+    await expect(table).toBeVisible({ timeout: 15000 });
+    const bg = await table.evaluate(
       el => getComputedStyle(el).backgroundColor
     );
     expect(bg).toBe('rgb(42, 42, 42)');

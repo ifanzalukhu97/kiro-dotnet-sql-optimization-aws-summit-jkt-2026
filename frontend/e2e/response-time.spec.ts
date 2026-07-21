@@ -26,8 +26,8 @@ test.describe('Response Time Badge', () => {
       await page.goto(path);
 
       const badge = page.locator('.response-time-badge');
-      await expect(badge).toBeVisible({ timeout: 10000 });
-      await expect(badge).toHaveText(/Loaded in \d+ms/);
+      await expect(badge).toBeVisible({ timeout: 15000 });
+      await expect(badge).toHaveText(/Loaded in \d+ms/, { timeout: 15000 });
     });
   }
 

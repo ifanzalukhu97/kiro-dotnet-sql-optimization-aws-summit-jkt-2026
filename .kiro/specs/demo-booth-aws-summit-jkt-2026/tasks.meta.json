@@ -1249,6 +1249,420 @@
         "chatSessionId": "sess_145ccc8a-f869-4d43-8a27-e8c9f4834d80",
         "timestamp": 1784464230742
       }
+    ],
+    "19.1 Add `sortBy` and `sortDirection` query parameters to all 11 list controllers (Orders, Customers, Suppliers, PurchaseOrders, StockItems, Invoices, Deliveries, Warehouse, Payments, ProductSearch, SalesReport)": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008684
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632040407
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632668508
+      }
+    ],
+    "20.1 Add `string? search = null` parameter to all 11 list controllers": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008739
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632679759
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632973822
+      }
+    ],
+    "21.1 Update filter parameters in all controllers that have dropdown filters to accept comma-separated IDs": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008806
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632984890
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633266606
+      }
+    ],
+    "22.1 Add `DateTime? startDate` and `DateTime? endDate` parameters to `OrdersController.GetOrders`": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008842
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633277175
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633353103
+      }
+    ],
+    "23.1 Add `'id'` format type to `ColumnDef` interface and `DataTable.formatValue()`": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008885
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633364716
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633549686
+      }
+    ],
+    "24.1 Update DataTable component to render a \"No.\" column as the first column": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008926
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633562017
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633632232
+      }
+    ],
+    "25.1 Update DataTable template to show total records and page info": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008964
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633637865
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633693563
+      }
+    ],
+    "26.1 Update all list page components to pass `sortBy` and `sortDirection` to the API": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632008997
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633705213
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634156410
+      }
+    ],
+    "27.1 Create `shared/components/search-input/` component": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009034
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634166515
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634269783
+      }
+    ],
+    "27.2 Add search input to all 11 list pages": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009068
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634281072
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634608425
+      }
+    ],
+    "28.1 Enhance `DropdownFilterComponent` with multi-select mode": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009105
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634619075
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634736433
+      }
+    ],
+    "28.2 Update all list pages to use multi-select mode on their dropdown filters": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009156
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634753077
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634902623
+      }
+    ],
+    "29.1 Create detail page components for each list module": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009208
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634914731
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784635838641
+      }
+    ],
+    "29.2 Add child routes for detail pages in each page module": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009248
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784635849020
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784635903050
+      }
+    ],
+    "29.3 Refactor list pages: replace inline detail panel with router navigation": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009297
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784635908454
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636268344
+      }
+    ],
+    "30.1 Create `shared/components/export-csv-button/` component": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009337
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636279956
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636376211
+      }
+    ],
+    "30.2 Add export button to all 11 list pages": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009393
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636383641
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636889224
+      }
+    ],
+    "31.1 Add start date and end date inputs to Orders filter bar": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009474
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636895444
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636989811
+      }
+    ],
+    "32. Checkpoint — List page enhancements complete": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632009512
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636996221
+      },
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784637606233
+      }
+    ],
+    "19. Backend: Add sorting support to all list endpoints": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632668565
+      }
+    ],
+    "20. Backend: Add search support to all list endpoints": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784632973870
+      }
+    ],
+    "21. Backend: Add multi-value filter support": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633266713
+      }
+    ],
+    "22. Backend: Add date range filter to Orders endpoint": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633353169
+      }
+    ],
+    "23. Frontend: Fix ID column formatting": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633549773
+      }
+    ],
+    "24. Frontend: Add row number column to DataTable": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633632298
+      }
+    ],
+    "25. Frontend: Add pagination info display to DataTable": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784633693620
+      }
+    ],
+    "26. Frontend: Connect sorting to backend": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634156505
+      }
+    ],
+    "27. Frontend: Add search input component and integrate with all list pages": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634608548
+      }
+    ],
+    "28. Frontend: Upgrade dropdown filter to support multi-select": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784634902674
+      }
+    ],
+    "29. Frontend: Implement separate detail pages with routing": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636268474
+      }
+    ],
+    "30. Frontend: Implement CSV export": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636889336
+      }
+    ],
+    "31. Frontend: Add date range filter inputs to Orders page": [
+      {
+        "executionId": "5fe2cc07-ea99-4fc0-9e3f-97f7e36bf91e",
+        "chatSessionId": "sess_1b67d667-2527-413d-b9cd-3acd29f7f6ff",
+        "timestamp": 1784636990116
+      }
     ]
   }
 }

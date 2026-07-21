@@ -27,7 +27,7 @@ test.describe('Navigation', () => {
 
   for (const { label, path } of navPages) {
     test(`navigates to ${label} page via nav menu`, async ({ page }) => {
-      const navLink = page.locator('.nav-links a', { hasText: label });
+      const navLink = page.getByRole('link', { name: label, exact: true });
       await navLink.click();
 
       await expect(page).toHaveURL(new RegExp(`${path}$`));

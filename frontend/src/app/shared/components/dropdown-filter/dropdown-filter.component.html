@@ -1,6 +1,9 @@
 <div class="dropdown-filter">
   <label *ngIf="label" class="dropdown-filter__label">{{ label }}</label>
+
+  <!-- Single-select mode (existing behavior) -->
   <select
+    *ngIf="!multiple"
     class="dropdown-filter__select"
     [value]="selectedValue"
     (change)="onSelectionChange($event)"
@@ -10,4 +13,37 @@
       {{ option.name }}
     </option>
   </select>
+
+  <!-- Multi-select mode -->
+  <div *ngIf="multiple" class="dropdown-filter__multi">
+    <button
+      type="button"
+      class="dropdown-filter__trigger"
+      (click)="togglePanel()"
+      [attr.aria-label]="label || placeholder"
+      [attr.aria-expanded]="panelOpen">
+      <span class="dropdown-filter__trigger-text">{{ triggerLabel }}</span>
+      <span class="dropdown-filter__trigger-arrow"></span>
+    </button>
+
+    <div *ngIf="panelOpen" class="dropdown-filter__panel">
+      <button
+        *ngIf="selectedValues.size > 0"
+        type="button"
+        class="dropdown-filter__clear"
+        (click)="clearSelection()">
+        Clear
+      </button>
+      <label
+        *ngFor="let option of options"
+        class="dropdown-filter__option"
+        (click)="$event.stopPropagation()">
+        <input
+          type="checkbox"
+          [checked]="isSelected(option.id)"
+          (change)="toggleOption(option.id)" />
+        <span class="dropdown-filter__option-text">{{ option.name }}</span>
+      </label>
+    </div>
+  </div>
 </div>

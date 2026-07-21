@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem, PaginatedResponse } from '../../core/models';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 export interface SalesReportItem {
   invoiceLineId: number;
@@ -35,14 +37,26 @@ export class SalesReportComponent implements OnInit, OnDestroy {
   page = 1;
   pageSize = 20;
   totalCount = 0;
+  sortBy = '';
+  sortDirection = '';
 
   customers: LookupItem[] = [];
   products: LookupItem[] = [];
 
-  selectedCustomerId: number | null = null;
-  selectedProductId: number | null = null;
+  selectedCustomerIds: number[] = [];
+  selectedProductIds: number[] = [];
+  search = '';
   startDate: string = '';
   endDate: string = '';
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedCustomerIds.length) params['customerId'] = this.selectedCustomerIds.join(',');
+    if (this.selectedProductIds.length) params['stockItemId'] = this.selectedProductIds.join(',');
+    if (this.startDate) params['startDate'] = this.startDate;
+    if (this.endDate) params['endDate'] = this.endDate;
+    return this.apiService.getList<SalesReportItem>('salesreport', params).pipe(map(r => r.data));
+  };
 
   responseTime: number | null = null;
   requestFailed = false;
@@ -92,17 +106,24 @@ export class SalesReportComponent implements OnInit, OnDestroy {
       pageSize: this.pageSize
     };
 
-    if (this.selectedCustomerId) {
-      params['customerId'] = this.selectedCustomerId;
+    if (this.search) {
+      params['search'] = this.search;
     }
-    if (this.selectedProductId) {
-      params['stockItemId'] = this.selectedProductId;
+    if (this.selectedCustomerIds.length) {
+      params['customerId'] = this.selectedCustomerIds.join(',');
+    }
+    if (this.selectedProductIds.length) {
+      params['stockItemId'] = this.selectedProductIds.join(',');
     }
     if (this.startDate) {
       params['startDate'] = this.startDate;
     }
     if (this.endDate) {
       params['endDate'] = this.endDate;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<SalesReportItem>('salesreport', params).subscribe({
@@ -118,14 +139,20 @@ export class SalesReportComponent implements OnInit, OnDestroy {
     });
   }
 
-  onCustomerChange(customerId: number | null): void {
-    this.selectedCustomerId = customerId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
     this.loadData();
   }
 
-  onProductChange(productId: number | null): void {
-    this.selectedProductId = productId;
+  onCustomerChange(customerIds: number[]): void {
+    this.selectedCustomerIds = customerIds;
+    this.page = 1;
+    this.loadData();
+  }
+
+  onProductChange(productIds: number[]): void {
+    this.selectedProductIds = productIds;
     this.page = 1;
     this.loadData();
   }
@@ -144,6 +171,13 @@ export class SalesReportComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     this.page = page;
+    this.loadData();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadData();
   }
 }

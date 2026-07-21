@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -24,9 +25,12 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<DeliveryListDto>>> GetDeliveries(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? driverId = null,
+            [FromQuery] string driverId = null,
             [FromQuery] DateTime? startDate = null,
-            [FromQuery] DateTime? endDate = null)
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize > 100) pageSize = 100;
             if (pageSize < 1) pageSize = 1;
@@ -38,9 +42,17 @@ namespace WideWorldImporters.Api.Controllers
                 .Include(i => i.InvoiceLines)
                 .AsQueryable();
 
-            if (driverId.HasValue)
+            if (!string.IsNullOrWhiteSpace(driverId))
             {
-                query = query.Where(i => i.SalespersonPersonID == driverId.Value);
+                var ids = driverId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(i => ids.Contains(i.SalespersonPersonID));
+                }
             }
 
             if (startDate.HasValue)
@@ -53,10 +65,14 @@ namespace WideWorldImporters.Api.Controllers
                 query = query.Where(i => i.InvoiceDate <= endDate.Value);
             }
 
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(i => i.Customer.CustomerName.Contains(search) || i.SalespersonPerson.FullName.Contains(search));
+            }
+
             var totalCount = await query.CountAsync();
 
-            var invoices = await query
-                .OrderByDescending(i => i.InvoiceDate)
+            var invoices = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -136,6 +152,20 @@ namespace WideWorldImporters.Api.Controllers
                 .ToListAsync();
 
             return Ok(drivers);
+        }
+
+        private static IQueryable<Invoice> ApplySort(IQueryable<Invoice> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "invoiceid" => desc ? query.OrderByDescending(i => i.InvoiceID) : query.OrderBy(i => i.InvoiceID),
+                "invoicedate" => desc ? query.OrderByDescending(i => i.InvoiceDate) : query.OrderBy(i => i.InvoiceDate),
+                "customername" => desc ? query.OrderByDescending(i => i.Customer.CustomerName) : query.OrderBy(i => i.Customer.CustomerName),
+                "drivername" => desc ? query.OrderByDescending(i => i.SalespersonPerson.FullName) : query.OrderBy(i => i.SalespersonPerson.FullName),
+                _ => query.OrderByDescending(i => i.InvoiceDate) // default sort
+            };
         }
     }
 }

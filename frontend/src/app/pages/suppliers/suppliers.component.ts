@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem } from '../../core/models/lookup-item';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 export interface SupplierListItem {
   supplierId: number;
@@ -10,28 +13,6 @@ export interface SupplierListItem {
   categoryName: string;
   purchaseOrderCount: number;
   stockItemCount: number;
-}
-
-export interface SupplierDetail {
-  supplierId: number;
-  supplierName: string;
-  categoryName: string;
-  recentPurchaseOrders: RecentPurchaseOrder[];
-  stockItems: StockItemLookup[];
-}
-
-export interface RecentPurchaseOrder {
-  purchaseOrderId: number;
-  supplierName: string;
-  orderDate: string;
-  expectedDeliveryDate: string;
-  isOrderFinalized: boolean;
-  lineCount: number;
-}
-
-export interface StockItemLookup {
-  id: number;
-  name: string;
 }
 
 @Component({
@@ -42,7 +23,6 @@ export interface StockItemLookup {
 export class SuppliersComponent implements OnInit {
   suppliers: SupplierListItem[] = [];
   categories: LookupItem[] = [];
-  selectedSupplier: SupplierDetail | null = null;
 
   columns: ColumnDef[] = [
     { key: 'supplierName', header: 'Supplier Name', sortable: true },
@@ -55,17 +35,28 @@ export class SuppliersComponent implements OnInit {
   pageSize = 20;
   totalCount = 0;
   loading = false;
+  sortBy = '';
+  sortDirection = '';
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
-  detailLoading = false;
 
-  private categoryId: number | null = null;
+  search = '';
+
+  private selectedCategoryIds: number[] = [];
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedCategoryIds.length) params['categoryId'] = this.selectedCategoryIds.join(',');
+    return this.apiService.getList<SupplierListItem>('suppliers', params).pipe(map(r => r.data));
+  };
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -89,8 +80,15 @@ export class SuppliersComponent implements OnInit {
       pageSize: this.pageSize
     };
 
-    if (this.categoryId) {
-      params['categoryId'] = this.categoryId;
+    if (this.selectedCategoryIds.length) {
+      params['categoryId'] = this.selectedCategoryIds.join(',');
+    }
+    if (this.search) {
+      params['search'] = this.search;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<SupplierListItem>('suppliers', params).subscribe({
@@ -111,46 +109,35 @@ export class SuppliersComponent implements OnInit {
       next: (items) => {
         this.categories = items;
       },
-      error: () => {
-        // Silently handle lookup failure
-      }
+      error: () => {}
     });
   }
 
-  onCategoryChange(categoryId: number | null): void {
-    this.categoryId = categoryId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
-    this.closeDetail();
+    this.loadSuppliers();
+  }
+
+  onCategoryChange(categoryIds: number[]): void {
+    this.selectedCategoryIds = categoryIds;
+    this.page = 1;
     this.loadSuppliers();
   }
 
   onPageChange(page: number): void {
     this.page = page;
-    this.closeDetail();
+    this.loadSuppliers();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadSuppliers();
   }
 
   onRowClick(row: SupplierListItem): void {
-    this.loadSupplierDetail(row.supplierId);
-  }
-
-  loadSupplierDetail(supplierId: number): void {
-    this.detailLoading = true;
-    this.selectedSupplier = null;
-
-    this.apiService.getDetail<SupplierDetail>('suppliers', supplierId).subscribe({
-      next: (detail) => {
-        this.selectedSupplier = detail;
-        this.detailLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.error || 'Failed to load supplier detail.';
-        this.detailLoading = false;
-      }
-    });
-  }
-
-  closeDetail(): void {
-    this.selectedSupplier = null;
+    this.router.navigate([row.supplierId], { relativeTo: this.route, queryParamsHandling: 'preserve' });
   }
 }

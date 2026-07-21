@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -23,7 +25,10 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<StockItemListDto>>> GetStockItems(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? supplierId = null)
+            [FromQuery] string supplierId = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize > 100) pageSize = 100;
             if (pageSize < 1) pageSize = 20;
@@ -31,16 +36,28 @@ namespace WideWorldImporters.Api.Controllers
 
             var query = _context.StockItems.AsQueryable();
 
-            if (supplierId.HasValue)
+            if (!string.IsNullOrWhiteSpace(supplierId))
             {
-                query = query.Where(s => s.SupplierID == supplierId.Value);
+                var ids = supplierId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(s => ids.Contains(s.SupplierID));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(s => s.StockItemName.Contains(search) || s.Supplier.SupplierName.Contains(search));
             }
 
             var totalCount = await query.CountAsync();
 
             // SELECT * pattern: load entire entities with all columns
-            var stockItems = await query
-                .OrderBy(s => s.StockItemName)
+            var stockItems = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -137,6 +154,20 @@ namespace WideWorldImporters.Api.Controllers
             }).ToList();
 
             return Ok(lookup);
+        }
+
+        private static IQueryable<StockItem> ApplySort(IQueryable<StockItem> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", System.StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "stockitemid" => desc ? query.OrderByDescending(s => s.StockItemID) : query.OrderBy(s => s.StockItemID),
+                "stockitemname" => desc ? query.OrderByDescending(s => s.StockItemName) : query.OrderBy(s => s.StockItemName),
+                "unitprice" => desc ? query.OrderByDescending(s => s.UnitPrice) : query.OrderBy(s => s.UnitPrice),
+                "recommendedretailprice" => desc ? query.OrderByDescending(s => s.RecommendedRetailPrice) : query.OrderBy(s => s.RecommendedRetailPrice),
+                _ => query.OrderBy(s => s.StockItemName) // default sort
+            };
         }
     }
 }

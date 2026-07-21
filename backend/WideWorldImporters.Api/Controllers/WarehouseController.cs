@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -24,7 +25,10 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<WarehouseTransactionListDto>>> GetTransactions(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? stockItemId = null)
+            [FromQuery] string stockItemId = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
@@ -35,15 +39,27 @@ namespace WideWorldImporters.Api.Controllers
                     .ThenInclude(si => si.StockItemHolding)
                 .AsQueryable();
 
-            if (stockItemId.HasValue)
+            if (!string.IsNullOrWhiteSpace(stockItemId))
             {
-                query = query.Where(t => t.StockItemID == stockItemId.Value);
+                var ids = stockItemId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(t => ids.Contains(t.StockItemID));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t => t.StockItem.StockItemName.Contains(search));
             }
 
             var totalCount = await query.CountAsync();
 
-            var data = await query
-                .OrderByDescending(t => t.TransactionOccurredWhen)
+            var data = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(t => new WarehouseTransactionListDto
@@ -96,6 +112,20 @@ namespace WideWorldImporters.Api.Controllers
             };
 
             return Ok(detail);
+        }
+
+        private static IQueryable<StockItemTransaction> ApplySort(IQueryable<StockItemTransaction> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "stockitemtransactionid" => desc ? query.OrderByDescending(t => t.StockItemTransactionID) : query.OrderBy(t => t.StockItemTransactionID),
+                "stockitemname" => desc ? query.OrderByDescending(t => t.StockItem.StockItemName) : query.OrderBy(t => t.StockItem.StockItemName),
+                "transactionoccurredwhen" => desc ? query.OrderByDescending(t => t.TransactionOccurredWhen) : query.OrderBy(t => t.TransactionOccurredWhen),
+                "quantity" => desc ? query.OrderByDescending(t => t.Quantity) : query.OrderBy(t => t.Quantity),
+                _ => query.OrderByDescending(t => t.TransactionOccurredWhen) // default sort
+            };
         }
     }
 }

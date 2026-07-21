@@ -4,6 +4,8 @@ import { DataTableModule } from './components/data-table/data-table.module';
 import { ResponseTimeBadgeModule } from './components/response-time-badge/response-time-badge.module';
 import { DropdownFilterModule } from './components/dropdown-filter/dropdown-filter.module';
 import { ErrorMessageModule } from './components/error-message/error-message.module';
+import { SearchInputModule } from './components/search-input/search-input.module';
+import { ExportCsvButtonModule } from './components/export-csv-button/export-csv-button.module';
 
 @NgModule({
   imports: [
@@ -11,13 +13,17 @@ import { ErrorMessageModule } from './components/error-message/error-message.mod
     DataTableModule,
     ResponseTimeBadgeModule,
     DropdownFilterModule,
-    ErrorMessageModule
+    ErrorMessageModule,
+    SearchInputModule,
+    ExportCsvButtonModule
   ],
   exports: [
     DataTableModule,
     ResponseTimeBadgeModule,
     DropdownFilterModule,
-    ErrorMessageModule
+    ErrorMessageModule,
+    SearchInputModule,
+    ExportCsvButtonModule
   ]
 })
 export class SharedModule { }

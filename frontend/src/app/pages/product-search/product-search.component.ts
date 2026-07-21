@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem, PaginatedResponse } from '../../core/models';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 interface ProductSearchItem {
   stockItemId: number;
@@ -34,14 +36,26 @@ export class ProductSearchComponent implements OnInit {
   page = 1;
   pageSize = 20;
   totalCount = 0;
+  sortBy = '';
+  sortDirection = '';
 
   suppliers: LookupItem[] = [];
   stockGroups: LookupItem[] = [];
 
-  selectedSupplierId: number | null = null;
-  selectedStockGroupId: number | null = null;
+  selectedSupplierIds: number[] = [];
+  selectedStockGroupIds: number[] = [];
+  search = '';
   minPrice: string = '';
   maxPrice: string = '';
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedSupplierIds.length) params['supplierId'] = this.selectedSupplierIds.join(',');
+    if (this.selectedStockGroupIds.length) params['stockGroupId'] = this.selectedStockGroupIds.join(',');
+    if (this.minPrice) params['minPrice'] = this.minPrice;
+    if (this.maxPrice) params['maxPrice'] = this.maxPrice;
+    return this.apiService.getList<ProductSearchItem>('productsearch', params).pipe(map(r => r.data));
+  };
 
   responseTime: number | null = null;
   requestFailed = false;
@@ -86,17 +100,24 @@ export class ProductSearchComponent implements OnInit {
       pageSize: this.pageSize
     };
 
-    if (this.selectedSupplierId) {
-      params['supplierId'] = this.selectedSupplierId;
+    if (this.search) {
+      params['search'] = this.search;
     }
-    if (this.selectedStockGroupId) {
-      params['stockGroupId'] = this.selectedStockGroupId;
+    if (this.selectedSupplierIds.length) {
+      params['supplierId'] = this.selectedSupplierIds.join(',');
+    }
+    if (this.selectedStockGroupIds.length) {
+      params['stockGroupId'] = this.selectedStockGroupIds.join(',');
     }
     if (this.minPrice) {
       params['minPrice'] = this.minPrice;
     }
     if (this.maxPrice) {
       params['maxPrice'] = this.maxPrice;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<ProductSearchItem>('productsearch', params).subscribe({
@@ -112,14 +133,20 @@ export class ProductSearchComponent implements OnInit {
     });
   }
 
-  onSupplierChange(supplierId: number | null): void {
-    this.selectedSupplierId = supplierId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
     this.loadData();
   }
 
-  onStockGroupChange(stockGroupId: number | null): void {
-    this.selectedStockGroupId = stockGroupId;
+  onSupplierChange(supplierIds: number[]): void {
+    this.selectedSupplierIds = supplierIds;
+    this.page = 1;
+    this.loadData();
+  }
+
+  onStockGroupChange(stockGroupIds: number[]): void {
+    this.selectedStockGroupIds = stockGroupIds;
     this.page = 1;
     this.loadData();
   }
@@ -138,6 +165,13 @@ export class ProductSearchComponent implements OnInit {
 
   onPageChange(page: number): void {
     this.page = page;
+    this.loadData();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadData();
   }
 }

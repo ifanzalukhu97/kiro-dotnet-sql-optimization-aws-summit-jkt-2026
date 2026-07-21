@@ -1,18 +1,27 @@
 <div class="page-container">
   <div class="page-header">
     <h1>Invoices</h1>
-    <app-response-time-badge
-      [timeMs]="responseTime"
-      [error]="requestFailed">
-    </app-response-time-badge>
+    <div class="header-actions">
+      <app-export-csv-button
+        [resourceName]="'invoices'"
+        [columns]="columns"
+        [fetchFn]="exportFn">
+      </app-export-csv-button>
+      <app-response-time-badge
+        [timeMs]="responseTime"
+        [error]="requestFailed">
+      </app-response-time-badge>
+    </div>
   </div>
 
   <div class="filter-bar">
+    <app-search-input (searchChange)="onSearchChange($event)"></app-search-input>
     <app-dropdown-filter
       [options]="customers"
       [label]="'Customer'"
       [placeholder]="'All Customers'"
-      (selectionChange)="onCustomerChange($event)">
+      [multiple]="true"
+      (multiSelectionChange)="onCustomerChange($event)">
     </app-dropdown-filter>
 
     <div class="date-filter">
@@ -47,52 +56,7 @@
     [pageSize]="pageSize"
     [totalCount]="totalCount"
     (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
     (rowClick)="onRowClick($event)">
   </app-data-table>
-
-  <div class="detail-panel" *ngIf="selectedInvoice">
-    <div class="detail-header">
-      <h2>Invoice #{{ selectedInvoice.invoiceId }}</h2>
-      <button class="close-btn" (click)="closeDetail()">&times;</button>
-    </div>
-    <div class="detail-info">
-      <div class="detail-field">
-        <span class="label">Customer:</span>
-        <span class="value">{{ selectedInvoice.customerName }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Invoice Date:</span>
-        <span class="value">{{ selectedInvoice.invoiceDate | date:'mediumDate' }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Dry Items:</span>
-        <span class="value">{{ selectedInvoice.totalDryItems }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Chiller Items:</span>
-        <span class="value">{{ selectedInvoice.totalChillerItems }}</span>
-      </div>
-    </div>
-    <div class="detail-lines">
-      <h3>Invoice Lines</h3>
-      <table class="lines-table">
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Qty</th>
-            <th>Unit Price</th>
-            <th>Extended Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let line of selectedInvoice.lines">
-            <td>{{ line.description }}</td>
-            <td>{{ line.quantity }}</td>
-            <td>{{ line.unitPrice | currency }}</td>
-            <td>{{ line.extendedPrice | currency }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
 </div>

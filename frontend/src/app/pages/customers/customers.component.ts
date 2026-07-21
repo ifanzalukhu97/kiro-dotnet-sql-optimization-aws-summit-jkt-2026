@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { PaginatedResponse } from '../../core/models';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 export interface CustomerListItem {
   customerId: number;
@@ -11,33 +14,6 @@ export interface CustomerListItem {
   lastOrderDate: string | null;
   outstandingBalance: number;
   creditLimit: number | null;
-}
-
-export interface CustomerDetail {
-  customerId: number;
-  customerName: string;
-  creditLimit: number | null;
-  orderCount: number;
-  invoiceCount: number;
-  outstandingBalance: number;
-  recentOrders: RecentOrder[];
-  recentTransactions: RecentTransaction[];
-}
-
-export interface RecentOrder {
-  orderId: number;
-  customerName: string;
-  orderDate: string;
-  expectedDeliveryDate: string;
-  lineCount: number;
-  totalAmount: number;
-}
-
-export interface RecentTransaction {
-  customerTransactionId: number;
-  transactionDate: string;
-  transactionAmount: number;
-  outstandingBalance: number;
 }
 
 @Component({
@@ -59,43 +35,25 @@ export class CustomersComponent implements OnInit {
   pageSize = 20;
   totalCount = 0;
   loading = false;
+  sortBy = '';
+  sortDirection = '';
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
 
-  selectedCustomer: CustomerDetail | null = null;
-  detailLoading = false;
+  search = '';
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
-
-  get visiblePages(): number[] {
-    const pages: number[] = [];
-    const total = this.totalPages;
-    const current = this.page;
-
-    let start = Math.max(1, current - 2);
-    let end = Math.min(total, current + 2);
-
-    if (end - start < 4) {
-      if (start === 1) {
-        end = Math.min(total, start + 4);
-      } else if (end === total) {
-        start = Math.max(1, end - 4);
-      }
-    }
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  }
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    return this.apiService.getList<CustomerListItem>('customers', params).pipe(map(r => r.data));
+  };
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -115,7 +73,9 @@ export class CustomersComponent implements OnInit {
 
     this.apiService.getList<CustomerListItem>('customers', {
       page: this.page,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+      ...(this.search ? { search: this.search } : {}),
+      ...(this.sortBy ? { sortBy: this.sortBy, sortDirection: this.sortDirection } : {})
     }).subscribe({
       next: (response: PaginatedResponse<CustomerListItem>) => {
         this.customers = response.data;
@@ -129,27 +89,25 @@ export class CustomersComponent implements OnInit {
     });
   }
 
+  onSearchChange(term: string): void {
+    this.search = term;
+    this.page = 1;
+    this.loadCustomers();
+  }
+
   onPageChange(page: number): void {
     this.page = page;
     this.loadCustomers();
   }
 
-  onRowClick(row: CustomerListItem): void {
-    this.detailLoading = true;
-    this.selectedCustomer = null;
-
-    this.apiService.getDetail<CustomerDetail>('customers', row.customerId).subscribe({
-      next: (detail) => {
-        this.selectedCustomer = detail;
-        this.detailLoading = false;
-      },
-      error: () => {
-        this.detailLoading = false;
-      }
-    });
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
+    this.loadCustomers();
   }
 
-  closeDetail(): void {
-    this.selectedCustomer = null;
+  onRowClick(row: CustomerListItem): void {
+    this.router.navigate([row.customerId], { relativeTo: this.route, queryParamsHandling: 'preserve' });
   }
 }

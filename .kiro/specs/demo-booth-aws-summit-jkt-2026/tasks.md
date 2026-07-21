@@ -460,3 +460,142 @@ This plan implements a monorepo application demonstrating SQL Server query optim
   ]
 }
 ```
+
+
+---
+
+## Phase 2: List Page Enhancements (Requirement 15)
+
+These tasks implement the 9 list page enhancements. All existing tasks (1–18) are complete. These new tasks build on top of the existing implementation.
+
+- [x] 19. Backend: Add sorting support to all list endpoints
+  - [x] 19.1 Add `sortBy` and `sortDirection` query parameters to all 11 list controllers (Orders, Customers, Suppliers, PurchaseOrders, StockItems, Invoices, Deliveries, Warehouse, Payments, ProductSearch, SalesReport)
+    - Add `string? sortBy = null` and `string? sortDirection = "asc"` parameters
+    - Implement per-controller `ApplySort` method with a whitelist of valid sort columns mapped to EF Core expressions
+    - Fall back to existing default sort when `sortBy` is null or not in the whitelist
+    - Only accept `"asc"` or `"desc"` for `sortDirection`
+    - _Requirements: 15.3 (AC 8, 9, 10)_
+
+- [x] 20. Backend: Add search support to all list endpoints
+  - [x] 20.1 Add `string? search = null` parameter to all 11 list controllers
+    - Apply case-insensitive Contains filter against the searchable text columns per controller (as defined in design doc)
+    - Apply search filter after other filters and before pagination so `totalCount` reflects the searched subset
+    - _Requirements: 15.1 (AC 2, 3, 4)_
+
+- [x] 21. Backend: Add multi-value filter support
+  - [x] 21.1 Update filter parameters in all controllers that have dropdown filters to accept comma-separated IDs
+    - Change filter parameter types from `int?` to `string?` where multi-select is needed
+    - Parse comma-separated values and apply `WHERE IN (...)` clause
+    - Affected controllers: Orders (customerId, stockItemId), Customers (none currently), Suppliers (categoryId), PurchaseOrders (supplierId), StockItems (supplierId), Invoices (customerId), Deliveries (driverId), Warehouse (stockItemId), Payments (customerId), ProductSearch (supplierId, stockGroupId), SalesReport (customerId)
+    - _Requirements: 15.7 (AC 20, 21)_
+
+- [x] 22. Backend: Add date range filter to Orders endpoint
+  - [x] 22.1 Add `DateTime? startDate` and `DateTime? endDate` parameters to `OrdersController.GetOrders`
+    - Filter `OrderDate >= startDate` and `OrderDate <= endDate` (inclusive)
+    - _Requirements: 15.5 (AC 14, 15)_
+
+- [x] 23. Frontend: Fix ID column formatting
+  - [x] 23.1 Add `'id'` format type to `ColumnDef` interface and `DataTable.formatValue()`
+    - In `formatValue`, `case 'id'` returns `String(Math.floor(Number(value)))` (plain integer, no locale formatting)
+    - Update all page column definitions: change `format: 'number'` to `format: 'id'` for ID columns (orderId, customerId, stockItemId, invoiceId, purchaseOrderId, stockItemTransactionId, customerTransactionId, etc.)
+    - _Requirements: 15.4 (AC 12, 13)_
+
+- [x] 24. Frontend: Add row number column to DataTable
+  - [x] 24.1 Update DataTable component to render a "No." column as the first column
+    - Render `(page - 1) * pageSize + rowIndex + 1` for each row
+    - Column is not sortable, fixed width ~60px
+    - Rendered internally by DataTable (not part of the `columns` input array)
+    - _Requirements: 15.9 (AC 27, 28, 29)_
+
+- [x] 25. Frontend: Add pagination info display to DataTable
+  - [x] 25.1 Update DataTable template to show total records and page info
+    - Add text: "Showing page {page} of {totalPages} ({totalCount} records)" in the pagination section
+    - Values update reactively when `totalCount`, `page`, or `pageSize` inputs change
+    - _Requirements: 15.2 (AC 6, 7)_
+
+- [x] 26. Frontend: Connect sorting to backend
+  - [x] 26.1 Update all list page components to pass `sortBy` and `sortDirection` to the API
+    - On `DataTable.sortChange` event, store sort state and include in `loadData()` API params
+    - Reset to page 1 when sort changes
+    - _Requirements: 15.3 (AC 8, 11)_
+
+- [x] 27. Frontend: Add search input component and integrate with all list pages
+  - [x] 27.1 Create `shared/components/search-input/` component
+    - Text input with debounce (400ms) before emitting `searchChange` event
+    - Clear button to reset search
+    - Dark-mode styled (surface background, accent border on focus)
+  - [x] 27.2 Add search input to all 11 list pages
+    - Include `<app-search-input>` in the filter bar
+    - On search change: store search term, reset to page 1, reload data with `search` param
+    - On clear: reload without search param
+    - _Requirements: 15.1 (AC 1, 2, 5)_
+
+- [x] 28. Frontend: Upgrade dropdown filter to support multi-select
+  - [x] 28.1 Enhance `DropdownFilterComponent` with multi-select mode
+    - Add `@Input() multiple = false` to enable multi-select behavior
+    - In multi-select mode: render a dropdown panel with checkboxes per option
+    - Track selected values in a `Set<number>`
+    - Display "N selected" in the trigger when multiple items are checked
+    - Add "Clear" action to deselect all
+    - Emit `multiSelectionChange` with `number[]` of selected IDs
+  - [x] 28.2 Update all list pages to use multi-select mode on their dropdown filters
+    - Set `[multiple]="true"` on all existing `<app-dropdown-filter>` instances
+    - Handle `multiSelectionChange` event: join IDs with commas and include in API params
+    - _Requirements: 15.7 (AC 19, 20, 22)_
+
+- [x] 29. Frontend: Implement separate detail pages with routing
+  - [x] 29.1 Create detail page components for each list module
+    - Create: `OrderDetailComponent`, `CustomerDetailComponent`, `SupplierDetailComponent`, `InvoiceDetailComponent`, `DeliveryDetailComponent`, `PurchaseOrderDetailComponent`, `WarehouseDetailComponent`, `PaymentDetailComponent`
+    - Each fetches entity detail by ID from route params and displays full detail with related data tables
+    - Include "← Back to list" button using `router.navigate(['..'], { relativeTo: route, queryParamsHandling: 'preserve' })`
+    - Include `ResponseTimeBadge`
+  - [x] 29.2 Add child routes for detail pages in each page module
+    - Add `{ path: ':id', component: XxxDetailComponent }` to each page routing module
+    - Pages affected: Orders, Customers, Suppliers, Invoices, Deliveries, PurchaseOrders, Warehouse, Payments
+  - [x] 29.3 Refactor list pages: replace inline detail panel with router navigation
+    - Remove inline detail panel HTML and `selectedXxx` logic from list components
+    - On row click: navigate to `[row.id]` relative route
+    - Store current list state (page, filters, search, sort) as URL query params so back navigation preserves state
+    - _Requirements: 15.6 (AC 16, 17, 18)_
+
+- [x] 30. Frontend: Implement CSV export
+  - [x] 30.1 Create `shared/components/export-csv-button/` component
+    - Input: `resourceName`, `columns: ColumnDef[]`, `fetchFn: () => Observable<any[]>`
+    - On click: call `fetchFn()`, convert JSON to CSV using column headers, trigger browser download
+    - Filename pattern: `{resourceName}-export-{YYYY-MM-DD}.csv`
+    - Create CSV utility function `generateCsv(data, columns)` with proper value escaping
+  - [x] 30.2 Add export button to all 11 list pages
+    - Provide a `fetchFn` that calls the list API with current filters (no search, large pageSize e.g., 10000)
+    - Place "Export CSV" button in the page header area or filter bar
+    - _Requirements: 15.8 (AC 23, 24, 25, 26)_
+
+- [x] 31. Frontend: Add date range filter inputs to Orders page
+  - [x] 31.1 Add start date and end date inputs to Orders filter bar
+    - Two `<input type="date">` fields for start and end date
+    - On change: store values, reset to page 1, include `startDate` and `endDate` in API params
+    - Dark-mode styled to match existing filter bar design
+    - _Requirements: 15.5 (AC 14, 15)_
+
+- [x] 32. Checkpoint — List page enhancements complete
+  - Verify all list pages have: search, multi-select filters, sorting connected to backend, pagination info, row numbers, CSV export, ID formatting fix, and separate detail pages
+  - Ensure existing functionality (response time badge, error handling, pagination) still works
+
+## Task Dependency Graph (Phase 2)
+
+```json
+{
+  "waves": [
+    { "id": 0, "tasks": ["19.1", "20.1", "21.1", "22.1", "23.1", "24.1", "25.1"] },
+    { "id": 1, "tasks": ["26.1", "27.1", "28.1", "29.1"] },
+    { "id": 2, "tasks": ["27.2", "28.2", "29.2", "30.1", "31.1"] },
+    { "id": 3, "tasks": ["29.3", "30.2"] },
+    { "id": 4, "tasks": ["32"] }
+  ]
+}
+```
+
+**Wave 0** — Independent backend and frontend atomic changes (no cross-dependencies)
+**Wave 1** — New frontend components that depend on Wave 0 foundations
+**Wave 2** — Integration of new components into pages + detail route setup
+**Wave 3** — Refactoring list pages to use new routing + wiring export button
+**Wave 4** — Final checkpoint verification

@@ -3,5 +3,5 @@ export interface ColumnDef {
   header: string;
   sortable?: boolean;
   width?: string;
-  format?: 'currency' | 'date' | 'number' | 'text';
+  format?: 'currency' | 'date' | 'number' | 'id' | 'text';
 }

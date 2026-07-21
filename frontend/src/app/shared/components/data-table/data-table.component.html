@@ -13,6 +13,7 @@
   <table>
     <thead>
       <tr>
+        <th style="width: 60px;">No.</th>
         <th
           *ngFor="let col of columns"
           [style.width]="col.width || 'auto'"
@@ -27,7 +28,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of data" (click)="onRowClick(row)" class="clickable-row">
+      <tr *ngFor="let row of data; let i = index" (click)="onRowClick(row)" class="clickable-row">
+        <td style="width: 60px;">{{ (page - 1) * pageSize + i + 1 }}</td>
         <td *ngFor="let col of columns" [style.width]="col.width || 'auto'">
           {{ formatValue(row[col.key], col.format) }}
         </td>
@@ -37,6 +39,7 @@
 
   <!-- Pagination -->
   <div class="pagination" *ngIf="totalPages > 1">
+    <span class="page-info">Showing page {{ page }} of {{ totalPages }} ({{ totalCount }} records)</span>
     <button
       (click)="previousPage()"
       [disabled]="page <= 1"

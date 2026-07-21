@@ -829,3 +829,338 @@ The following are better served by integration/E2E/manual tests:
 - Audit script output correctness (depends on SQL Server state — integration test)
 - N+1 query detection (requires SQL profiling — integration test with query counter)
 - Animation timing (CSS — visual inspection + Playwright animation assertions)
+
+
+## List Page Enhancements (Requirement 15)
+
+This section describes the technical design for the 9 list page enhancements added in Requirement 15.
+
+### 15.1 — Search
+
+#### Backend
+
+All list endpoints gain an optional `search` query parameter:
+
+```
+GET /api/orders?page=1&pageSize=20&search=contoso
+```
+
+Each controller applies a case-insensitive `Contains` filter against the entity's common text columns:
+
+| Controller | Searchable Columns |
+|---|---|
+| Orders | CustomerName |
+| Customers | CustomerName |
+| Suppliers | SupplierName, SupplierCategoryName |
+| PurchaseOrders | SupplierName |
+| StockItems | StockItemName |
+| Invoices | CustomerName |
+| Deliveries | CustomerName, DriverName |
+| Warehouse | StockItemName |
+| Payments | CustomerName |
+| ProductSearch | StockItemName, SupplierName, StockGroupName |
+| SalesReport | CustomerName, StockItemName |
+
+The search filter is applied **before** pagination and **after** other filters, so `totalCount` reflects the searched subset.
+
+#### Frontend
+
+A new shared `SearchInputComponent` is added to `shared/components/search-input/`:
+
+```typescript
+@Component({ selector: 'app-search-input' })
+export class SearchInputComponent {
+  @Output() searchChange = new EventEmitter<string>();
+  // Debounces input by 400ms before emitting
+}
+```
+
+Each list page includes `<app-search-input>` in the filter bar area. On emission, the page resets to `page = 1` and reloads data with the `search` param.
+
+### 15.2 — Pagination Total Display
+
+The `DataTable` component template's pagination section is updated to display:
+
+```
+Showing page {page} of {totalPages} ({totalCount} records)
+```
+
+This renders directly from the existing `page`, `totalPages`, and `totalCount` values already available in the component. When filters or search change, the backend returns the updated `totalCount`, so the display updates automatically.
+
+### 15.3 — Backend Sorting
+
+#### Backend
+
+All list endpoints gain optional `sortBy` and `sortDirection` query parameters:
+
+```
+GET /api/orders?page=1&pageSize=20&sortBy=orderDate&sortDirection=desc
+```
+
+Implementation pattern (applied per controller):
+
+```csharp
+[HttpGet]
+public async Task<ActionResult<PaginatedResponse<OrderListDto>>> GetOrders(
+    int page = 1, int pageSize = 20,
+    string? search = null,
+    string? sortBy = null, string? sortDirection = "asc",
+    /* existing filter params */)
+{
+    // ... build query with filters and search ...
+
+    // Apply sorting
+    query = ApplySort(query, sortBy, sortDirection);
+
+    // Pagination
+    var totalCount = await query.CountAsync();
+    var data = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+}
+```
+
+Each controller defines a whitelist of valid `sortBy` values (matching the DTO field names returned to the frontend). If `sortBy` is null or not in the whitelist, the controller falls back to its existing default sort. `sortDirection` defaults to `"asc"` and accepts only `"asc"` or `"desc"`.
+
+A private helper method per controller (or a shared extension method) maps the DTO field name to the EF Core expression:
+
+```csharp
+private IQueryable<Order> ApplySort(IQueryable<Order> query, string? sortBy, string? direction)
+{
+    var desc = string.Equals(direction, "desc", StringComparison.OrdinalIgnoreCase);
+    return sortBy?.ToLower() switch
+    {
+        "orderdate" => desc ? query.OrderByDescending(o => o.OrderDate) : query.OrderBy(o => o.OrderDate),
+        "customername" => desc ? query.OrderByDescending(o => o.Customer.CustomerName) : query.OrderBy(o => o.Customer.CustomerName),
+        // ... other columns
+        _ => query.OrderByDescending(o => o.OrderDate) // default
+    };
+}
+```
+
+#### Frontend
+
+The `DataTable.sortChange` event already emits `{ column, direction }`. Each page's handler now includes these in the API request:
+
+```typescript
+onSortChange(event: SortEvent): void {
+  this.sortBy = event.column;
+  this.sortDirection = event.direction;
+  this.page = 1;
+  this.loadData();
+}
+```
+
+The `loadData()` method passes `sortBy` and `sortDirection` as query params to the backend.
+
+### 15.4 — ID Column Format Fix
+
+The `ColumnDef` interface gains a new format option `'id'`:
+
+```typescript
+export interface ColumnDef {
+  key: string;
+  header: string;
+  sortable?: boolean;
+  width?: string;
+  format?: 'currency' | 'date' | 'number' | 'id' | 'text';
+}
+```
+
+In `DataTable.formatValue()`:
+
+```typescript
+case 'id':
+  return String(Math.floor(Number(value)));  // plain integer, no locale formatting
+```
+
+All column definitions that currently use `format: 'number'` for ID fields (orderId, customerId, stockItemId, invoiceId, etc.) are changed to `format: 'id'`.
+
+### 15.5 — Orders Date Range Filter
+
+#### Backend
+
+`OrdersController.GetOrders` gains two new optional parameters:
+
+```csharp
+public async Task<ActionResult<PaginatedResponse<OrderListDto>>> GetOrders(
+    ..., DateTime? startDate = null, DateTime? endDate = null)
+{
+    if (startDate.HasValue)
+        query = query.Where(o => o.OrderDate >= startDate.Value);
+    if (endDate.HasValue)
+        query = query.Where(o => o.OrderDate <= endDate.Value);
+}
+```
+
+#### Frontend
+
+The Orders page adds two date input fields (`<input type="date">`) in the filter bar for start date and end date. On change, the page resets to `page = 1` and reloads with `startDate` and `endDate` query params.
+
+### 15.6 — Separate Detail Page
+
+#### Routing Changes
+
+Each list page module adds a child route for the detail view:
+
+```typescript
+// orders-routing.module.ts
+const routes: Routes = [
+  { path: '', component: OrdersComponent },
+  { path: ':id', component: OrderDetailComponent }
+];
+```
+
+New detail components are created per domain: `OrderDetailComponent`, `CustomerDetailComponent`, `SupplierDetailComponent`, `InvoiceDetailComponent`, `DeliveryDetailComponent`, `PurchaseOrderDetailComponent`, `WarehouseDetailComponent`, `PaymentDetailComponent`.
+
+#### Navigation
+
+- Row click in the list navigates via `this.router.navigate([row.orderId], { relativeTo: this.route })` (or equivalent per page)
+- Detail page includes a "← Back to list" button that navigates back using `this.router.navigate(['..'], { relativeTo: this.route })`
+- List state preservation: query params (page, filters, search, sort) are stored in the URL as query params so the browser back button naturally restores them, or `queryParamsHandling: 'preserve'` is used on back navigation
+
+#### Detail Page Layout
+
+Each detail page follows a consistent structure:
+1. Back navigation link
+2. Entity title (e.g., "Order #73506")
+3. Summary fields in a card grid
+4. Related data tables (e.g., order lines, recent transactions)
+5. Response time badge
+
+The existing inline detail panel code (currently appending below the list) is refactored into the new standalone detail components.
+
+### 15.7 — Multi-Select Dropdown Filter
+
+The existing `DropdownFilterComponent` is enhanced (or replaced with a new `MultiSelectFilterComponent`):
+
+```typescript
+@Component({ selector: 'app-dropdown-filter' })
+export class DropdownFilterComponent {
+  @Input() options: LookupItem[] = [];
+  @Input() placeholder = 'Select...';
+  @Input() label = '';
+  @Input() multiple = false;  // NEW
+
+  @Output() selectionChange = new EventEmitter<number | null>();          // single mode
+  @Output() multiSelectionChange = new EventEmitter<number[]>();          // multi mode
+
+  selectedValues: Set<number> = new Set();
+}
+```
+
+**UI behavior in multi-select mode:**
+- Clicking the dropdown opens a panel with checkboxes for each option
+- Each checkbox toggles an item in/out of `selectedValues`
+- The trigger button shows "3 selected" (or "All" / placeholder when none selected)
+- A "Clear" button resets selection
+- On change, emits the array of selected IDs
+
+**Backend contract:**
+
+Filters accept comma-separated IDs:
+
+```
+GET /api/orders?customerId=1,5,12&page=1&pageSize=20
+```
+
+Backend parses:
+
+```csharp
+if (!string.IsNullOrEmpty(customerIdParam))
+{
+    var ids = customerIdParam.Split(',').Select(int.Parse).ToList();
+    query = query.Where(o => ids.Contains(o.CustomerID));
+}
+```
+
+### 15.8 — Export to CSV
+
+#### Frontend
+
+A new shared `ExportCsvButtonComponent`:
+
+```typescript
+@Component({ selector: 'app-export-csv-button' })
+export class ExportCsvButtonComponent {
+  @Input() resourceName = '';
+  @Input() columns: ColumnDef[] = [];
+  @Input() fetchFn!: () => Observable<any[]>;  // function that returns all filtered data
+  // On click: calls fetchFn, converts to CSV, triggers browser download
+}
+```
+
+**Export flow:**
+1. User clicks "Export CSV"
+2. Component calls the page's fetch function which requests data from the backend with current filters applied, `pageSize` set to a large number (e.g., 10000), and **no search parameter**
+3. The JSON response is converted to CSV client-side using the `columns` definitions for headers and field extraction
+4. File is downloaded as `{resourceName}-export-{YYYY-MM-DD}.csv`
+
+**CSV generation** is done in a utility function:
+
+```typescript
+export function generateCsv(data: any[], columns: ColumnDef[]): string {
+  const header = columns.map(c => c.header).join(',');
+  const rows = data.map(row =>
+    columns.map(c => escapeCsvValue(row[c.key])).join(',')
+  );
+  return [header, ...rows].join('\n');
+}
+```
+
+The backend does **not** need a separate CSV endpoint — the frontend reuses the existing JSON list endpoint with a large page size.
+
+### 15.9 — Row Number Column
+
+The `DataTable` component automatically prepends a "No." column:
+
+- Header: "No."
+- Value: `(page - 1) * pageSize + rowIndex + 1`
+- Not sortable
+- Fixed width (e.g., `60px`)
+- Not included in `columns` input — rendered internally by the DataTable
+
+This is handled purely in the DataTable template without requiring each page to define the column.
+
+### Updated API Endpoint Signature (Example)
+
+After all enhancements, a typical list endpoint looks like:
+
+```
+GET /api/orders?page=1&pageSize=20&search=contoso&sortBy=orderDate&sortDirection=desc&customerId=1,5,12&stockItemId=7&startDate=2024-01-01&endDate=2024-12-31
+```
+
+Response remains unchanged:
+
+```json
+{
+  "data": [...],
+  "page": 1,
+  "pageSize": 20,
+  "totalCount": 42
+}
+```
+
+### Correctness Properties (Additions)
+
+#### Property 13: Search reduces totalCount
+
+*For any* list endpoint, when a `search` parameter is provided that matches fewer records than the unfiltered set, the `totalCount` in the response SHALL be less than or equal to the totalCount without the search parameter (with same filters applied).
+
+**Validates: Requirements 15.1, 15.2**
+
+#### Property 14: Sort order consistency
+
+*For any* list endpoint and any valid `sortBy` + `sortDirection` combination, the returned `data` array SHALL be ordered according to the specified column and direction. Requesting the same sort twice SHALL return identical ordering.
+
+**Validates: Requirement 15.3**
+
+#### Property 15: Multi-select filter is superset of single-select
+
+*For any* list endpoint with a multi-value filter (e.g., `customerId=1,5`), the result set SHALL be the union of the individual single-value filter results (i.e., equivalent to `customerId=1` UNION `customerId=5`).
+
+**Validates: Requirement 15.7**
+
+#### Property 16: CSV export matches filtered list (sans search)
+
+*For any* list page, the CSV export SHALL contain exactly the records that match the current active filters with no search applied, regardless of the current pagination page.
+
+**Validates: Requirement 15.8**

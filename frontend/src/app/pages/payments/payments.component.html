@@ -1,18 +1,27 @@
 <div class="page-container">
   <div class="page-header">
     <h1>Payments</h1>
-    <app-response-time-badge
-      [timeMs]="responseTime"
-      [error]="requestFailed">
-    </app-response-time-badge>
+    <div class="header-actions">
+      <app-export-csv-button
+        [resourceName]="'payments'"
+        [columns]="columns"
+        [fetchFn]="exportFn">
+      </app-export-csv-button>
+      <app-response-time-badge
+        [timeMs]="responseTime"
+        [error]="requestFailed">
+      </app-response-time-badge>
+    </div>
   </div>
 
   <div class="filter-bar">
+    <app-search-input (searchChange)="onSearchChange($event)"></app-search-input>
     <app-dropdown-filter
       [options]="customers"
       [label]="'Customer'"
       [placeholder]="'All Customers'"
-      (selectionChange)="onCustomerChange($event)">
+      [multiple]="true"
+      (multiSelectionChange)="onCustomerChange($event)">
     </app-dropdown-filter>
   </div>
 
@@ -29,39 +38,7 @@
     [pageSize]="pageSize"
     [totalCount]="totalCount"
     (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
     (rowClick)="onRowClick($event)">
   </app-data-table>
-
-  <div class="detail-panel" *ngIf="selectedPayment">
-    <div class="detail-header">
-      <h2>Payment #{{ selectedPayment.customerTransactionId }}</h2>
-      <button class="close-btn" (click)="closeDetail()">&times;</button>
-    </div>
-    <div class="detail-info">
-      <div class="detail-field">
-        <span class="label">Customer:</span>
-        <span class="value">{{ selectedPayment.customerName }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Transaction Date:</span>
-        <span class="value">{{ selectedPayment.transactionDate | date:'mediumDate' }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Amount (excl. Tax):</span>
-        <span class="value">{{ selectedPayment.amountExcludingTax | currency }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Tax Amount:</span>
-        <span class="value">{{ selectedPayment.taxAmount | currency }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Total Amount:</span>
-        <span class="value">{{ selectedPayment.transactionAmount | currency }}</span>
-      </div>
-      <div class="detail-field">
-        <span class="label">Outstanding Balance:</span>
-        <span class="value">{{ selectedPayment.outstandingBalance | currency }}</span>
-      </div>
-    </div>
-  </div>
 </div>

@@ -39,4 +39,108 @@
       color: var(--color-text);
     }
   }
+
+  // Multi-select mode styles
+  &__multi {
+    position: relative;
+  }
+
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border: 1px solid var(--border-color, #444);
+    border-radius: var(--border-radius, 4px);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary, #aaff00);
+      box-shadow: 0 0 0 2px rgba(170, 255, 0, 0.2);
+    }
+
+    &:hover {
+      border-color: var(--color-primary, #aaff00);
+    }
+  }
+
+  &__trigger-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__trigger-arrow {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #b0b0b0;
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: #2a2a2a;
+    border: 1px solid var(--border-color, #444);
+    border-radius: var(--border-radius, 4px);
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  &__clear {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-color, #444);
+    color: var(--color-primary, #aaff00);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      background-color: rgba(170, 255, 0, 0.1);
+    }
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    color: #ffffff;
+    font-size: 0.85rem;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    input[type="checkbox"] {
+      margin-right: 0.5rem;
+      accent-color: var(--color-primary, #aaff00);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+  }
+
+  &__option-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

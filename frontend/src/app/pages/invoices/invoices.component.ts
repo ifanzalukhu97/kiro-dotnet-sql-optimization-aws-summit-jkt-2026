@@ -1,9 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem, PaginatedResponse } from '../../core/models';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 export interface InvoiceListItem {
   invoiceId: number;
@@ -15,24 +18,6 @@ export interface InvoiceListItem {
   totalChillerItems: number;
 }
 
-export interface InvoiceLineItem {
-  invoiceLineId: number;
-  stockItemId: number;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  extendedPrice: number;
-}
-
-export interface InvoiceDetail {
-  invoiceId: number;
-  customerName: string;
-  invoiceDate: string;
-  totalDryItems: number;
-  totalChillerItems: number;
-  lines: InvoiceLineItem[];
-}
-
 @Component({
   selector: 'app-invoices',
   templateUrl: './invoices.component.html',
@@ -40,7 +25,7 @@ export interface InvoiceDetail {
 })
 export class InvoicesComponent implements OnInit, OnDestroy {
   columns: ColumnDef[] = [
-    { key: 'invoiceId', header: 'Invoice ID', sortable: true, format: 'number' },
+    { key: 'invoiceId', header: 'Invoice ID', sortable: true, format: 'id' },
     { key: 'customerName', header: 'Customer', sortable: true },
     { key: 'invoiceDate', header: 'Invoice Date', sortable: true, format: 'date' },
     { key: 'lineCount', header: 'Lines', sortable: true, format: 'number' },
@@ -54,24 +39,35 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   page = 1;
   pageSize = 20;
   totalCount = 0;
+  sortBy = '';
+  sortDirection = '';
 
   customers: LookupItem[] = [];
 
-  selectedCustomerId: number | null = null;
+  selectedCustomerIds: number[] = [];
+  search = '';
   startDate: string = '';
   endDate: string = '';
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedCustomerIds.length) params['customerId'] = this.selectedCustomerIds.join(',');
+    if (this.startDate) params['startDate'] = this.startDate;
+    if (this.endDate) params['endDate'] = this.endDate;
+    return this.apiService.getList<InvoiceListItem>('invoices', params).pipe(map(r => r.data));
+  };
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
 
-  selectedInvoice: InvoiceDetail | null = null;
-
   private subscriptions = new Subscription();
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -106,14 +102,21 @@ export class InvoicesComponent implements OnInit, OnDestroy {
       pageSize: this.pageSize
     };
 
-    if (this.selectedCustomerId) {
-      params['customerId'] = this.selectedCustomerId;
+    if (this.selectedCustomerIds.length) {
+      params['customerId'] = this.selectedCustomerIds.join(',');
+    }
+    if (this.search) {
+      params['search'] = this.search;
     }
     if (this.startDate) {
       params['startDate'] = this.startDate;
     }
     if (this.endDate) {
       params['endDate'] = this.endDate;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<InvoiceListItem>('invoices', params).subscribe({
@@ -129,49 +132,43 @@ export class InvoicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  onCustomerChange(customerId: number | null): void {
-    this.selectedCustomerId = customerId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
-    this.closeDetail();
+    this.loadData();
+  }
+
+  onCustomerChange(customerIds: number[]): void {
+    this.selectedCustomerIds = customerIds;
+    this.page = 1;
     this.loadData();
   }
 
   onStartDateChange(event: Event): void {
     this.startDate = (event.target as HTMLInputElement).value;
     this.page = 1;
-    this.closeDetail();
     this.loadData();
   }
 
   onEndDateChange(event: Event): void {
     this.endDate = (event.target as HTMLInputElement).value;
     this.page = 1;
-    this.closeDetail();
     this.loadData();
   }
 
   onPageChange(page: number): void {
     this.page = page;
-    this.closeDetail();
+    this.loadData();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadData();
   }
 
   onRowClick(row: InvoiceListItem): void {
-    this.loadInvoiceDetail(row.invoiceId);
-  }
-
-  loadInvoiceDetail(invoiceId: number): void {
-    this.apiService.getDetail<InvoiceDetail>('invoices', invoiceId).subscribe({
-      next: (detail) => {
-        this.selectedInvoice = detail;
-      },
-      error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.error || 'Failed to load invoice detail.';
-      }
-    });
-  }
-
-  closeDetail(): void {
-    this.selectedInvoice = null;
+    this.router.navigate([row.invoiceId], { relativeTo: this.route, queryParamsHandling: 'preserve' });
   }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -23,7 +25,10 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<PaymentListDto>>> GetPayments(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? customerId = null)
+            [FromQuery] string customerId = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
@@ -33,15 +38,27 @@ namespace WideWorldImporters.Api.Controllers
                 .Include(ct => ct.Customer)
                 .AsQueryable();
 
-            if (customerId.HasValue)
+            if (!string.IsNullOrWhiteSpace(customerId))
             {
-                query = query.Where(ct => ct.CustomerID == customerId.Value);
+                var ids = customerId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(ct => ids.Contains(ct.CustomerID));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(ct => ct.Customer.CustomerName.Contains(search));
             }
 
             var totalCount = await query.CountAsync();
 
-            var data = await query
-                .OrderByDescending(ct => ct.TransactionDate)
+            var data = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(ct => new PaymentListDto
@@ -109,6 +126,21 @@ namespace WideWorldImporters.Api.Controllers
                 .ToListAsync();
 
             return Ok(customers);
+        }
+
+        private static IQueryable<CustomerTransaction> ApplySort(IQueryable<CustomerTransaction> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", System.StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "customertransactionid" => desc ? query.OrderByDescending(ct => ct.CustomerTransactionID) : query.OrderBy(ct => ct.CustomerTransactionID),
+                "transactiondate" => desc ? query.OrderByDescending(ct => ct.TransactionDate) : query.OrderBy(ct => ct.TransactionDate),
+                "customername" => desc ? query.OrderByDescending(ct => ct.Customer.CustomerName) : query.OrderBy(ct => ct.Customer.CustomerName),
+                "transactionamount" => desc ? query.OrderByDescending(ct => ct.TransactionAmount) : query.OrderBy(ct => ct.TransactionAmount),
+                "outstandingbalance" => desc ? query.OrderByDescending(ct => ct.OutstandingBalance) : query.OrderBy(ct => ct.OutstandingBalance),
+                _ => query.OrderByDescending(ct => ct.TransactionDate) // default sort
+            };
         }
     }
 }

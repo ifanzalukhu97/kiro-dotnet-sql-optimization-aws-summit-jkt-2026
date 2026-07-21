@@ -102,7 +102,7 @@ export class DataTableComponent implements OnChanges {
     this.rowClick.emit(row);
   }
 
-  formatValue(value: any, format?: 'currency' | 'date' | 'number' | 'text'): string {
+  formatValue(value: any, format?: 'currency' | 'date' | 'number' | 'id' | 'text'): string {
     if (value === null || value === undefined) {
       return '—';
     }
@@ -114,6 +114,8 @@ export class DataTableComponent implements OnChanges {
         return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
       case 'number':
         return Number(value).toLocaleString('en-US');
+      case 'id':
+        return String(Math.floor(Number(value)));
       case 'text':
       default:
         return String(value);

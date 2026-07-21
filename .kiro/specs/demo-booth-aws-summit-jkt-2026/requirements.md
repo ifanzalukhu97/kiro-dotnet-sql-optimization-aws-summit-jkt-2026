@@ -204,3 +204,65 @@ This document captures requirements for a demo booth application for AWS Summit 
 8. IF the Backend is unavailable during a Playwright test run, THEN THE Playwright_Test_Suite SHALL include at least one test that verifies the Frontend displays a user-visible error message indicating a connection or loading failure
 9. THE Playwright_Test_Suite SHALL include tests verifying the Dashboard page renders KPI summary cards with numeric values and at least one chart element is present in the DOM
 10. THE Playwright_Test_Suite SHALL complete a full test run within 5 minutes when executed against a local full-stack environment (Backend, Frontend, and database running)
+
+### Requirement 15: List Page Enhancements
+
+**User Story:** As a demo audience member, I want list pages with full-featured search, pagination info, sorting, proper ID display, multi-select filters, CSV export, and row numbers, so that the application feels like a production-quality enterprise tool.
+
+#### Acceptance Criteria
+
+**15.1 — Search across all list pages**
+
+1. WHEN a list page is displayed, THE Frontend SHALL render a search input field above the data table that allows the user to type a free-text search term
+2. WHEN the user types a search term, THE Frontend SHALL send the search term to the Backend as a `search` query parameter along with the existing pagination and filter parameters
+3. THE Backend SHALL filter results by matching the search term against common searchable text columns for the entity (e.g., customer name, product name, description) using a case-insensitive LIKE/Contains pattern
+4. WHEN search is applied, THE pagination totalCount SHALL reflect the filtered result count (not the unfiltered total)
+5. WHEN the user clears the search field, THE Frontend SHALL reload data without the search parameter, restoring the full (filter-only) result set
+
+**15.2 — Pagination total display**
+
+6. THE Frontend pagination section SHALL display the total number of records and total number of pages in a human-readable format (e.g., "Showing page 1 of 50 (1,000 records)")
+7. WHEN filters or search are applied, THE displayed total records and total pages SHALL update to reflect the filtered/searched count
+
+**15.3 — Backend sorting connected to frontend column ordering**
+
+8. WHEN a user clicks a sortable column header in the DataTable, THE Frontend SHALL send `sortBy` and `sortDirection` query parameters to the Backend
+9. THE Backend list endpoints SHALL accept optional `sortBy` (column name) and `sortDirection` (`asc` or `desc`) query parameters and apply ORDER BY accordingly in the database query
+10. IF `sortBy` is not provided or is invalid, THE Backend SHALL use its default sort order for the endpoint
+11. THE Frontend sort state (column indicator) SHALL accurately reflect the active sort applied by the Backend
+
+**15.4 — ID column formatting fix**
+
+12. THE Frontend SHALL display ID columns (e.g., orderId, customerId, invoiceId, etc.) as plain integers without thousand-separator formatting (e.g., `73506` not `73,506`)
+13. THE ColumnDef model SHALL support a format type of `'id'` that renders the value as a plain integer without locale-based number formatting
+
+**15.5 — Orders page date range filter**
+
+14. THE Orders page SHALL include a start date and end date filter that filters orders by their order date
+15. WHEN the user selects a date range, THE Frontend SHALL send `startDate` and `endDate` query parameters to the Backend, and THE Backend SHALL filter orders where `OrderDate` falls within the specified range (inclusive)
+
+**15.6 — Separate detail page (instead of inline append)**
+
+16. WHEN a user clicks a row in a list table, THE Frontend SHALL navigate to a separate detail page route (e.g., `/orders/:id`, `/customers/:id`) instead of appending detail content below the list
+17. THE detail page SHALL display the full entity detail with related data, and include a back button or breadcrumb to return to the list page
+18. THE detail page SHALL preserve the user's previous list state (page, filters, search) when navigating back
+
+**15.7 — Multi-select dropdown filters**
+
+19. THE dropdown filter component SHALL support multi-select mode where the user can select multiple values via checkboxes
+20. WHEN multiple values are selected, THE Frontend SHALL send all selected IDs as a comma-separated list (e.g., `customerId=1,5,12`) to the Backend
+21. THE Backend list endpoints SHALL accept comma-separated filter values and apply an IN clause to filter by multiple values
+22. THE multi-select dropdown SHALL display a summary of selected items (e.g., "3 selected") when multiple values are chosen
+
+**15.8 — Export to CSV**
+
+23. THE Frontend SHALL display an "Export CSV" button on each list page
+24. WHEN the user clicks "Export CSV", THE Frontend SHALL request all data from the Backend matching the current active filters (ignoring pagination and search), and generate a CSV file client-side from the JSON response
+25. THE exported CSV SHALL include column headers matching the visible table columns and respect the active filter selections but NOT apply the search term
+26. THE exported CSV file SHALL be downloaded automatically with a filename pattern of `{resource}-export-{YYYY-MM-DD}.csv`
+
+**15.9 — Row number column**
+
+27. THE Frontend SHALL display a sequential row number (No.) as the leftmost column in every list table
+28. THE row number SHALL be calculated as `(page - 1) * pageSize + rowIndex + 1` so that numbering is continuous across pages
+29. THE row number column SHALL NOT be sortable and SHALL have a fixed narrow width

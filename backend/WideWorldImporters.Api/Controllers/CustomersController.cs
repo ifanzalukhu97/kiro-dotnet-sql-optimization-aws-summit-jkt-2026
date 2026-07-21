@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -27,12 +28,21 @@ namespace WideWorldImporters.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<PaginatedResponse<CustomerListDto>>> GetCustomers(
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
-            var totalCount = await _context.Customers.CountAsync();
+            var query = _context.Customers.AsQueryable();
 
-            var customers = await _context.Customers
-                .OrderBy(c => c.CustomerName)
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(c => c.CustomerName.Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var customers = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -152,6 +162,19 @@ namespace WideWorldImporters.Api.Controllers
             };
 
             return Ok(detail);
+        }
+
+        private static IQueryable<Customer> ApplySort(IQueryable<Customer> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "customerid" => desc ? query.OrderByDescending(c => c.CustomerID) : query.OrderBy(c => c.CustomerID),
+                "customername" => desc ? query.OrderByDescending(c => c.CustomerName) : query.OrderBy(c => c.CustomerName),
+                "creditlimit" => desc ? query.OrderByDescending(c => c.CreditLimit) : query.OrderBy(c => c.CreditLimit),
+                _ => query.OrderBy(c => c.CustomerName) // default sort
+            };
         }
     }
 }

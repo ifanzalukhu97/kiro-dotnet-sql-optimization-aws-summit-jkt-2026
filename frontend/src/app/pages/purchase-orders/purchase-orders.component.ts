@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem } from '../../core/models/lookup-item';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 export interface PurchaseOrderListItem {
   purchaseOrderId: number;
@@ -13,24 +16,6 @@ export interface PurchaseOrderListItem {
   lineCount: number;
 }
 
-export interface PurchaseOrderLineItem {
-  purchaseOrderLineId: number;
-  stockItemId: number;
-  stockItemName: string;
-  orderedOuters: number;
-  receivedOuters: number;
-  expectedUnitPricePerOuter: number;
-}
-
-export interface PurchaseOrderDetail {
-  purchaseOrderId: number;
-  supplierName: string;
-  orderDate: string;
-  expectedDeliveryDate: string;
-  isOrderFinalized: boolean;
-  lines: PurchaseOrderLineItem[];
-}
-
 @Component({
   selector: 'app-purchase-orders',
   templateUrl: './purchase-orders.component.html',
@@ -39,10 +24,9 @@ export interface PurchaseOrderDetail {
 export class PurchaseOrdersComponent implements OnInit {
   purchaseOrders: PurchaseOrderListItem[] = [];
   suppliers: LookupItem[] = [];
-  selectedPurchaseOrder: PurchaseOrderDetail | null = null;
 
   columns: ColumnDef[] = [
-    { key: 'purchaseOrderId', header: 'PO ID', sortable: true, format: 'number' },
+    { key: 'purchaseOrderId', header: 'PO ID', sortable: true, format: 'id' },
     { key: 'supplierName', header: 'Supplier', sortable: true },
     { key: 'orderDate', header: 'Order Date', sortable: true, format: 'date' },
     { key: 'expectedDeliveryDate', header: 'Expected Delivery', sortable: true, format: 'date' },
@@ -54,17 +38,28 @@ export class PurchaseOrdersComponent implements OnInit {
   pageSize = 20;
   totalCount = 0;
   loading = false;
+  sortBy = '';
+  sortDirection = '';
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
-  detailLoading = false;
 
-  private supplierId: number | null = null;
+  search = '';
+
+  private selectedSupplierIds: number[] = [];
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedSupplierIds.length) params['supplierId'] = this.selectedSupplierIds.join(',');
+    return this.apiService.getList<PurchaseOrderListItem>('purchaseorders', params).pipe(map(r => r.data));
+  };
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -88,8 +83,15 @@ export class PurchaseOrdersComponent implements OnInit {
       pageSize: this.pageSize
     };
 
-    if (this.supplierId) {
-      params['supplierId'] = this.supplierId;
+    if (this.selectedSupplierIds.length) {
+      params['supplierId'] = this.selectedSupplierIds.join(',');
+    }
+    if (this.search) {
+      params['search'] = this.search;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<PurchaseOrderListItem>('purchaseorders', params).subscribe({
@@ -110,46 +112,35 @@ export class PurchaseOrdersComponent implements OnInit {
       next: (items) => {
         this.suppliers = items;
       },
-      error: () => {
-        // Silently handle lookup failure
-      }
+      error: () => {}
     });
   }
 
-  onSupplierChange(supplierId: number | null): void {
-    this.supplierId = supplierId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
-    this.closeDetail();
+    this.loadPurchaseOrders();
+  }
+
+  onSupplierChange(supplierIds: number[]): void {
+    this.selectedSupplierIds = supplierIds;
+    this.page = 1;
     this.loadPurchaseOrders();
   }
 
   onPageChange(page: number): void {
     this.page = page;
-    this.closeDetail();
+    this.loadPurchaseOrders();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadPurchaseOrders();
   }
 
   onRowClick(row: PurchaseOrderListItem): void {
-    this.loadPurchaseOrderDetail(row.purchaseOrderId);
-  }
-
-  loadPurchaseOrderDetail(purchaseOrderId: number): void {
-    this.detailLoading = true;
-    this.selectedPurchaseOrder = null;
-
-    this.apiService.getDetail<PurchaseOrderDetail>('purchaseorders', purchaseOrderId).subscribe({
-      next: (detail) => {
-        this.selectedPurchaseOrder = detail;
-        this.detailLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.error || 'Failed to load purchase order detail.';
-        this.detailLoading = false;
-      }
-    });
-  }
-
-  closeDetail(): void {
-    this.selectedPurchaseOrder = null;
+    this.router.navigate([row.purchaseOrderId], { relativeTo: this.route, queryParamsHandling: 'preserve' });
   }
 }

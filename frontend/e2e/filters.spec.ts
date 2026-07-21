@@ -33,29 +33,27 @@ test.describe('Filter Interactions', () => {
       const tableRow = page.locator('tbody tr').first();
       await expect(tableRow).toBeVisible({ timeout: 10000 });
 
-      // Find the dropdown select element(s)
-      const selects = page.locator('.dropdown-filter__select');
-      const targetSelect = selects.nth(selectIndex ?? 0);
-      await expect(targetSelect).toBeVisible({ timeout: 5000 });
+      // Click trigger to open multi-select panel
+      const filterContainer = page.locator('.dropdown-filter').nth(selectIndex ?? 0);
+      const trigger = filterContainer.locator('.dropdown-filter__trigger');
+      await expect(trigger).toBeVisible({ timeout: 5000 });
+      await trigger.click();
 
-      // Wait for options to be populated (at least placeholder + 1 real option)
-      await expect(targetSelect.locator('option')).not.toHaveCount(0, { timeout: 10000 });
-      const optionCount = await targetSelect.locator('option').count();
-      expect(optionCount).toBeGreaterThanOrEqual(2);
+      // Wait for panel (scoped to the same filter container)
+      const panel = filterContainer.locator('.dropdown-filter__panel');
+      await expect(panel).toBeVisible();
 
-      // Get a non-default option value
-      const firstRealOption = targetSelect.locator('option').nth(1);
-      const optionValue = await firstRealOption.getAttribute('value');
-      expect(optionValue).toBeTruthy();
+      // Check first checkbox option
+      const firstCheckbox = panel.locator('input[type="checkbox"]').first();
+      await expect(firstCheckbox).toBeVisible({ timeout: 10000 });
 
       // Listen for the API response triggered by filter change
       const responsePromise = page.waitForResponse(
         (resp) => resp.url().includes('/api/') && resp.url().includes('page') && resp.status() === 200,
-        { timeout: 10000 }
+        { timeout: 15000 }
       );
 
-      // Select the non-default option
-      await targetSelect.selectOption(optionValue!);
+      await firstCheckbox.check();
 
       // Verify a new API call was made
       const response = await responsePromise;

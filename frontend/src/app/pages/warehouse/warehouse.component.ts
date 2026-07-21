@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem } from '../../core/models/lookup-item';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 interface WarehouseTransactionListItem {
   stockItemTransactionId: number;
@@ -12,35 +15,33 @@ interface WarehouseTransactionListItem {
   quantityOnHand: number;
 }
 
-interface WarehouseTransactionDetail {
-  stockItemTransactionId: number;
-  stockItemId: number;
-  stockItemName: string;
-  transactionOccurredWhen: string;
-  quantity: number;
-  quantityOnHand: number;
-  reorderLevel: number;
-  targetStockLevel: number;
-}
-
 @Component({
   selector: 'app-warehouse',
   template: `
     <div class="page-container">
       <div class="page-header">
         <h1>Warehouse</h1>
-        <app-response-time-badge
-          [timeMs]="responseTime"
-          [error]="requestFailed">
-        </app-response-time-badge>
+        <div class="header-actions">
+          <app-export-csv-button
+            [resourceName]="'warehouse'"
+            [columns]="columns"
+            [fetchFn]="exportFn">
+          </app-export-csv-button>
+          <app-response-time-badge
+            [timeMs]="responseTime"
+            [error]="requestFailed">
+          </app-response-time-badge>
+        </div>
       </div>
 
       <div class="filter-bar">
+        <app-search-input (searchChange)="onSearchChange($event)"></app-search-input>
         <app-dropdown-filter
           [options]="stockItems"
           placeholder="All Stock Items"
           label="Stock Item"
-          (selectionChange)="onStockItemChange($event)">
+          [multiple]="true"
+          (multiSelectionChange)="onStockItemChange($event)">
         </app-dropdown-filter>
       </div>
 
@@ -57,41 +58,9 @@ interface WarehouseTransactionDetail {
         [pageSize]="pageSize"
         [totalCount]="totalCount"
         (pageChange)="onPageChange($event)"
+        (sortChange)="onSortChange($event)"
         (rowClick)="onRowClick($event)">
       </app-data-table>
-
-      <div class="detail-panel" *ngIf="selectedTransaction">
-        <div class="detail-header">
-          <h2>Transaction #{{ selectedTransaction.stockItemTransactionId }}</h2>
-          <button class="close-btn" (click)="closeDetail()">&times;</button>
-        </div>
-        <div class="detail-info">
-          <div class="detail-field">
-            <span class="label">Stock Item:</span>
-            <span class="value">{{ selectedTransaction.stockItemName }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Transaction Date:</span>
-            <span class="value">{{ selectedTransaction.transactionOccurredWhen | date:'mediumDate' }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Quantity:</span>
-            <span class="value">{{ selectedTransaction.quantity }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Quantity On Hand:</span>
-            <span class="value">{{ selectedTransaction.quantityOnHand }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Reorder Level:</span>
-            <span class="value">{{ selectedTransaction.reorderLevel }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Target Stock Level:</span>
-            <span class="value">{{ selectedTransaction.targetStockLevel }}</span>
-          </div>
-        </div>
-      </div>
     </div>
   `,
   styles: [`
@@ -111,6 +80,12 @@ interface WarehouseTransactionDetail {
         font-size: 28px;
         font-weight: 600;
       }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
     }
 
     .filter-bar {
@@ -119,67 +94,11 @@ interface WarehouseTransactionDetail {
       margin-bottom: 24px;
       flex-wrap: wrap;
     }
-
-    .detail-panel {
-      margin-top: 24px;
-      background: #2a2a2a;
-      border-radius: 8px;
-      padding: 24px;
-      border: 1px solid #3a3a3a;
-    }
-
-    .detail-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-
-      h2 {
-        margin: 0;
-        color: #aaff00;
-        font-size: 20px;
-      }
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: #b0b0b0;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-
-      &:hover {
-        color: #ffffff;
-        background: #3a3a3a;
-      }
-    }
-
-    .detail-info {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .detail-field {
-      .label {
-        color: #b0b0b0;
-        margin-right: 8px;
-        font-size: 14px;
-      }
-
-      .value {
-        color: #ffffff;
-        font-size: 14px;
-      }
-    }
   `]
 })
 export class WarehouseComponent implements OnInit {
   transactions: WarehouseTransactionListItem[] = [];
   stockItems: LookupItem[] = [];
-  selectedTransaction: WarehouseTransactionDetail | null = null;
 
   columns: ColumnDef[] = [
     { key: 'stockItemName', header: 'Stock Item', sortable: true },
@@ -192,16 +111,28 @@ export class WarehouseComponent implements OnInit {
   pageSize = 20;
   totalCount = 0;
   loading = false;
+  sortBy = '';
+  sortDirection = '';
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
 
-  private stockItemId: number | null = null;
+  search = '';
+
+  private selectedStockItemIds: number[] = [];
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedStockItemIds.length) params['stockItemId'] = this.selectedStockItemIds.join(',');
+    return this.apiService.getList<WarehouseTransactionListItem>('warehouse', params).pipe(map(r => r.data));
+  };
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -225,8 +156,15 @@ export class WarehouseComponent implements OnInit {
       pageSize: this.pageSize
     };
 
-    if (this.stockItemId) {
-      params['stockItemId'] = this.stockItemId;
+    if (this.selectedStockItemIds.length) {
+      params['stockItemId'] = this.selectedStockItemIds.join(',');
+    }
+    if (this.search) {
+      params['search'] = this.search;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<WarehouseTransactionListItem>('warehouse', params).subscribe({
@@ -247,41 +185,35 @@ export class WarehouseComponent implements OnInit {
       next: (items) => {
         this.stockItems = items;
       },
-      error: () => {
-        // Silently handle lookup failure
-      }
+      error: () => {}
     });
   }
 
-  onStockItemChange(stockItemId: number | null): void {
-    this.stockItemId = stockItemId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
-    this.closeDetail();
+    this.loadTransactions();
+  }
+
+  onStockItemChange(stockItemIds: number[]): void {
+    this.selectedStockItemIds = stockItemIds;
+    this.page = 1;
     this.loadTransactions();
   }
 
   onPageChange(page: number): void {
     this.page = page;
-    this.closeDetail();
+    this.loadTransactions();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadTransactions();
   }
 
   onRowClick(row: WarehouseTransactionListItem): void {
-    this.loadTransactionDetail(row.stockItemTransactionId);
-  }
-
-  loadTransactionDetail(transactionId: number): void {
-    this.apiService.getDetail<WarehouseTransactionDetail>('warehouse', transactionId).subscribe({
-      next: (detail) => {
-        this.selectedTransaction = detail;
-      },
-      error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.error || 'Failed to load transaction detail.';
-      }
-    });
-  }
-
-  closeDetail(): void {
-    this.selectedTransaction = null;
+    this.router.navigate([row.stockItemTransactionId], { relativeTo: this.route, queryParamsHandling: 'preserve' });
   }
 }

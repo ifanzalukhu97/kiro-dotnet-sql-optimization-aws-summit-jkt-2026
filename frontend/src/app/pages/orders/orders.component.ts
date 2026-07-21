@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 import { LookupItem } from '../../core/models/lookup-item';
 import { ColumnDef } from '../../shared/models/column-def';
+import { SortEvent } from '../../shared/components/data-table/data-table.component';
 
 interface OrderListItem {
   orderId: number;
@@ -13,48 +16,49 @@ interface OrderListItem {
   totalAmount: number;
 }
 
-interface OrderLineItem {
-  orderLineId: number;
-  stockItemName: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-}
-
-interface OrderDetail {
-  orderId: number;
-  customerName: string;
-  orderDate: string;
-  expectedDeliveryDate: string;
-  lines: OrderLineItem[];
-}
-
 @Component({
   selector: 'app-orders',
   template: `
     <div class="page-container">
       <div class="page-header">
         <h1>Orders</h1>
-        <app-response-time-badge
-          [timeMs]="responseTime"
-          [error]="requestFailed">
-        </app-response-time-badge>
+        <div class="header-actions">
+          <app-export-csv-button
+            [resourceName]="'orders'"
+            [columns]="columns"
+            [fetchFn]="exportFn">
+          </app-export-csv-button>
+          <app-response-time-badge
+            [timeMs]="responseTime"
+            [error]="requestFailed">
+          </app-response-time-badge>
+        </div>
       </div>
 
       <div class="filter-bar">
+        <app-search-input (searchChange)="onSearchChange($event)"></app-search-input>
         <app-dropdown-filter
           [options]="customers"
           placeholder="All Customers"
           label="Customer"
-          (selectionChange)="onCustomerChange($event)">
+          [multiple]="true"
+          (multiSelectionChange)="onCustomerChange($event)">
         </app-dropdown-filter>
         <app-dropdown-filter
           [options]="products"
           placeholder="All Products"
           label="Product"
-          (selectionChange)="onProductChange($event)">
+          [multiple]="true"
+          (multiSelectionChange)="onProductChange($event)">
         </app-dropdown-filter>
+        <div class="date-filter">
+          <label class="date-label">From</label>
+          <input type="date" class="date-input" [value]="startDate" (change)="onStartDateChange($event)">
+        </div>
+        <div class="date-filter">
+          <label class="date-label">To</label>
+          <input type="date" class="date-input" [value]="endDate" (change)="onEndDateChange($event)">
+        </div>
       </div>
 
       <app-error-message
@@ -70,52 +74,9 @@ interface OrderDetail {
         [pageSize]="pageSize"
         [totalCount]="totalCount"
         (pageChange)="onPageChange($event)"
+        (sortChange)="onSortChange($event)"
         (rowClick)="onRowClick($event)">
       </app-data-table>
-
-      <div class="detail-panel" *ngIf="selectedOrder">
-        <div class="detail-header">
-          <h2>Order #{{ selectedOrder.orderId }}</h2>
-          <button class="close-btn" (click)="closeDetail()">&times;</button>
-        </div>
-        <div class="detail-info">
-          <div class="detail-field">
-            <span class="label">Customer:</span>
-            <span class="value">{{ selectedOrder.customerName }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Order Date:</span>
-            <span class="value">{{ selectedOrder.orderDate | date:'mediumDate' }}</span>
-          </div>
-          <div class="detail-field">
-            <span class="label">Expected Delivery:</span>
-            <span class="value">{{ selectedOrder.expectedDeliveryDate | date:'mediumDate' }}</span>
-          </div>
-        </div>
-        <div class="detail-lines">
-          <h3>Order Lines</h3>
-          <table class="lines-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Description</th>
-                <th>Qty</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let line of selectedOrder.lines">
-                <td>{{ line.stockItemName }}</td>
-                <td>{{ line.description }}</td>
-                <td>{{ line.quantity }}</td>
-                <td>{{ line.unitPrice | currency }}</td>
-                <td>{{ line.totalPrice | currency }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   `,
   styles: [`
@@ -135,6 +96,12 @@ interface OrderDetail {
         font-size: 28px;
         font-weight: 600;
       }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
     }
 
     .filter-bar {
@@ -142,97 +109,32 @@ interface OrderDetail {
       gap: 16px;
       margin-bottom: 24px;
       flex-wrap: wrap;
+      align-items: flex-end;
     }
 
-    .detail-panel {
-      margin-top: 24px;
+    .date-filter {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .date-label {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .date-input {
       background: #2a2a2a;
-      border-radius: 8px;
-      padding: 24px;
-      border: 1px solid #3a3a3a;
-    }
-
-    .detail-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-
-      h2 {
-        margin: 0;
-        color: #aaff00;
-        font-size: 20px;
-      }
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: #b0b0b0;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 4px 8px;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 8px 12px;
       border-radius: 4px;
+      font-size: 14px;
+      color-scheme: dark;
 
-      &:hover {
-        color: #ffffff;
-        background: #3a3a3a;
-      }
-    }
-
-    .detail-info {
-      display: flex;
-      gap: 24px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .detail-field {
-      .label {
-        color: #b0b0b0;
-        margin-right: 8px;
-        font-size: 14px;
-      }
-
-      .value {
-        color: #ffffff;
-        font-size: 14px;
-      }
-    }
-
-    .detail-lines {
-      h3 {
-        color: #ffffff;
-        margin-bottom: 12px;
-        font-size: 16px;
-      }
-    }
-
-    .lines-table {
-      width: 100%;
-      border-collapse: collapse;
-
-      th, td {
-        padding: 10px 12px;
-        text-align: left;
-        border-bottom: 1px solid #3a3a3a;
-      }
-
-      th {
-        color: #b0b0b0;
-        font-weight: 500;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      td {
-        color: #ffffff;
-        font-size: 14px;
-      }
-
-      tbody tr:hover {
-        background: #333333;
+      &:focus {
+        outline: none;
+        border-color: #aaff00;
       }
     }
   `]
@@ -241,10 +143,9 @@ export class OrdersComponent implements OnInit {
   orders: OrderListItem[] = [];
   customers: LookupItem[] = [];
   products: LookupItem[] = [];
-  selectedOrder: OrderDetail | null = null;
 
   columns: ColumnDef[] = [
-    { key: 'orderId', header: 'Order ID', sortable: true, format: 'number' },
+    { key: 'orderId', header: 'Order ID', sortable: true, format: 'id' },
     { key: 'customerName', header: 'Customer', sortable: true },
     { key: 'orderDate', header: 'Order Date', sortable: true, format: 'date' },
     { key: 'expectedDeliveryDate', header: 'Expected Delivery', sortable: true, format: 'date' },
@@ -256,17 +157,33 @@ export class OrdersComponent implements OnInit {
   pageSize = 20;
   totalCount = 0;
   loading = false;
+  sortBy = '';
+  sortDirection = '';
 
   responseTime: number | null = null;
   requestFailed = false;
   errorMessage: string | null = null;
 
-  private customerId: number | null = null;
-  private stockItemId: number | null = null;
+  search = '';
+  startDate = '';
+  endDate = '';
+  private selectedCustomerIds: number[] = [];
+  private selectedStockItemIds: number[] = [];
+
+  exportFn = () => {
+    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    if (this.selectedCustomerIds.length) params['customerId'] = this.selectedCustomerIds.join(',');
+    if (this.selectedStockItemIds.length) params['stockItemId'] = this.selectedStockItemIds.join(',');
+    if (this.startDate) params['startDate'] = this.startDate;
+    if (this.endDate) params['endDate'] = this.endDate;
+    return this.apiService.getList<OrderListItem>('orders', params).pipe(map(r => r.data));
+  };
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -291,11 +208,24 @@ export class OrdersComponent implements OnInit {
       pageSize: this.pageSize
     };
 
-    if (this.customerId) {
-      params['customerId'] = this.customerId;
+    if (this.selectedCustomerIds.length) {
+      params['customerId'] = this.selectedCustomerIds.join(',');
     }
-    if (this.stockItemId) {
-      params['stockItemId'] = this.stockItemId;
+    if (this.selectedStockItemIds.length) {
+      params['stockItemId'] = this.selectedStockItemIds.join(',');
+    }
+    if (this.search) {
+      params['search'] = this.search;
+    }
+    if (this.startDate) {
+      params['startDate'] = this.startDate;
+    }
+    if (this.endDate) {
+      params['endDate'] = this.endDate;
+    }
+    if (this.sortBy) {
+      params['sortBy'] = this.sortBy;
+      params['sortDirection'] = this.sortDirection;
     }
 
     this.apiService.getList<OrderListItem>('orders', params).subscribe({
@@ -316,9 +246,7 @@ export class OrdersComponent implements OnInit {
       next: (items) => {
         this.customers = items;
       },
-      error: () => {
-        // Silently handle lookup failure
-      }
+      error: () => {}
     });
   }
 
@@ -327,48 +255,53 @@ export class OrdersComponent implements OnInit {
       next: (items) => {
         this.products = items;
       },
-      error: () => {
-        // Silently handle lookup failure
-      }
+      error: () => {}
     });
   }
 
-  onCustomerChange(customerId: number | null): void {
-    this.customerId = customerId;
+  onSearchChange(term: string): void {
+    this.search = term;
     this.page = 1;
-    this.closeDetail();
     this.loadOrders();
   }
 
-  onProductChange(stockItemId: number | null): void {
-    this.stockItemId = stockItemId;
+  onCustomerChange(customerIds: number[]): void {
+    this.selectedCustomerIds = customerIds;
     this.page = 1;
-    this.closeDetail();
+    this.loadOrders();
+  }
+
+  onProductChange(stockItemIds: number[]): void {
+    this.selectedStockItemIds = stockItemIds;
+    this.page = 1;
+    this.loadOrders();
+  }
+
+  onStartDateChange(event: Event): void {
+    this.startDate = (event.target as HTMLInputElement).value;
+    this.page = 1;
+    this.loadOrders();
+  }
+
+  onEndDateChange(event: Event): void {
+    this.endDate = (event.target as HTMLInputElement).value;
+    this.page = 1;
     this.loadOrders();
   }
 
   onPageChange(page: number): void {
     this.page = page;
-    this.closeDetail();
+    this.loadOrders();
+  }
+
+  onSortChange(event: SortEvent): void {
+    this.sortBy = event.column;
+    this.sortDirection = event.direction;
+    this.page = 1;
     this.loadOrders();
   }
 
   onRowClick(row: OrderListItem): void {
-    this.loadOrderDetail(row.orderId);
-  }
-
-  loadOrderDetail(orderId: number): void {
-    this.apiService.getDetail<OrderDetail>('orders', orderId).subscribe({
-      next: (detail) => {
-        this.selectedOrder = detail;
-      },
-      error: (err) => {
-        this.errorMessage = err?.error?.message || err?.error?.error || 'Failed to load order detail.';
-      }
-    });
-  }
-
-  closeDetail(): void {
-    this.selectedOrder = null;
+    this.router.navigate([row.orderId], { relativeTo: this.route, queryParamsHandling: 'preserve' });
   }
 }

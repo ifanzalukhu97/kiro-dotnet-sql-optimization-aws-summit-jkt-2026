@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,10 +24,13 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<ProductSearchItemDto>>> GetProducts(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? supplierId = null,
-            [FromQuery] int? stockGroupId = null,
+            [FromQuery] string supplierId = null,
+            [FromQuery] string stockGroupId = null,
             [FromQuery] decimal? minPrice = null,
-            [FromQuery] decimal? maxPrice = null)
+            [FromQuery] decimal? maxPrice = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
@@ -58,14 +62,30 @@ namespace WideWorldImporters.Api.Controllers
                     s => s.SupplierID,
                     (x, s) => new { x.StockItem, x.StockItemStockGroup, x.StockGroup, Supplier = s });
 
-            if (supplierId.HasValue)
+            if (!string.IsNullOrWhiteSpace(supplierId))
             {
-                query = query.Where(x => x.StockItem.SupplierID == supplierId.Value);
+                var ids = supplierId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(x => ids.Contains(x.StockItem.SupplierID));
+                }
             }
 
-            if (stockGroupId.HasValue)
+            if (!string.IsNullOrWhiteSpace(stockGroupId))
             {
-                query = query.Where(x => x.StockGroup.StockGroupID == stockGroupId.Value);
+                var ids = stockGroupId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(x => ids.Contains(x.StockGroup.StockGroupID));
+                }
             }
 
             if (minPrice.HasValue)
@@ -78,10 +98,26 @@ namespace WideWorldImporters.Api.Controllers
                 query = query.Where(x => x.StockItem.UnitPrice <= maxPrice.Value);
             }
 
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(x => x.StockItem.StockItemName.Contains(search) || x.Supplier.SupplierName.Contains(search) || x.StockGroup.StockGroupName.Contains(search));
+            }
+
             var totalCount = await query.CountAsync();
 
-            var items = await query
-                .OrderBy(x => x.StockItem.StockItemName)
+            var desc = string.Equals(sortDirection, "desc", System.StringComparison.OrdinalIgnoreCase);
+            var orderedQuery = sortBy?.ToLowerInvariant() switch
+            {
+                "stockitemid" => desc ? query.OrderByDescending(x => x.StockItem.StockItemID) : query.OrderBy(x => x.StockItem.StockItemID),
+                "stockitemname" => desc ? query.OrderByDescending(x => x.StockItem.StockItemName) : query.OrderBy(x => x.StockItem.StockItemName),
+                "suppliername" => desc ? query.OrderByDescending(x => x.Supplier.SupplierName) : query.OrderBy(x => x.Supplier.SupplierName),
+                "stockgroupname" => desc ? query.OrderByDescending(x => x.StockGroup.StockGroupName) : query.OrderBy(x => x.StockGroup.StockGroupName),
+                "unitprice" => desc ? query.OrderByDescending(x => x.StockItem.UnitPrice) : query.OrderBy(x => x.StockItem.UnitPrice),
+                "recommendedretailprice" => desc ? query.OrderByDescending(x => x.StockItem.RecommendedRetailPrice) : query.OrderBy(x => x.StockItem.RecommendedRetailPrice),
+                _ => query.OrderBy(x => x.StockItem.StockItemName)
+            };
+
+            var items = await orderedQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(x => new ProductSearchItemDto

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WideWorldImporters.Api.Data;
 using WideWorldImporters.Api.Models.Dtos;
+using WideWorldImporters.Api.Models.Entities;
 
 namespace WideWorldImporters.Api.Controllers
 {
@@ -23,7 +25,10 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<PaginatedResponse<SupplierListDto>>> GetSuppliers(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] int? categoryId = null)
+            [FromQuery] string categoryId = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] string sortDirection = "asc",
+            [FromQuery] string search = null)
         {
             if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
@@ -33,15 +38,27 @@ namespace WideWorldImporters.Api.Controllers
                 .Include(s => s.SupplierCategory)
                 .AsQueryable();
 
-            if (categoryId.HasValue)
+            if (!string.IsNullOrWhiteSpace(categoryId))
             {
-                query = query.Where(s => s.SupplierCategoryID == categoryId.Value);
+                var ids = categoryId.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+                if (ids.Any())
+                {
+                    query = query.Where(s => ids.Contains(s.SupplierCategoryID));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(s => s.SupplierName.Contains(search) || s.SupplierCategory.SupplierCategoryName.Contains(search));
             }
 
             var totalCount = await query.CountAsync();
 
-            var data = await query
-                .OrderBy(s => s.SupplierName)
+            var data = await ApplySort(query, sortBy, sortDirection)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(s => new SupplierListDto
@@ -130,6 +147,19 @@ namespace WideWorldImporters.Api.Controllers
                 .ToListAsync();
 
             return Ok(categories);
+        }
+
+        private static IQueryable<Supplier> ApplySort(IQueryable<Supplier> query, string sortBy, string sortDirection)
+        {
+            var desc = string.Equals(sortDirection, "desc", System.StringComparison.OrdinalIgnoreCase);
+
+            return sortBy?.ToLowerInvariant() switch
+            {
+                "supplierid" => desc ? query.OrderByDescending(s => s.SupplierID) : query.OrderBy(s => s.SupplierID),
+                "suppliername" => desc ? query.OrderByDescending(s => s.SupplierName) : query.OrderBy(s => s.SupplierName),
+                "categoryname" => desc ? query.OrderByDescending(s => s.SupplierCategory.SupplierCategoryName) : query.OrderBy(s => s.SupplierCategory.SupplierCategoryName),
+                _ => query.OrderBy(s => s.SupplierName) // default sort
+            };
         }
     }
 }

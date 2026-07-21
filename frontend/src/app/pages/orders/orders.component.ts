@@ -26,7 +26,8 @@ interface OrderListItem {
           <app-export-csv-button
             [resourceName]="'orders'"
             [columns]="columns"
-            [fetchFn]="exportFn">
+            [fetchFn]="exportFn"
+            [totalCount]="totalCount">
           </app-export-csv-button>
           <app-response-time-badge
             [timeMs]="responseTime"

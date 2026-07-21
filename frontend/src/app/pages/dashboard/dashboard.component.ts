@@ -48,8 +48,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.chartReady = true;
     if (this.pendingChartData) {
-      this.buildChart(this.pendingChartData);
-      this.pendingChartData = null;
+      setTimeout(() => {
+        this.buildChart(this.pendingChartData!);
+        this.pendingChartData = null;
+      }, 0);
     }
   }
 
@@ -75,7 +77,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.timingService.setLastResponseTime(elapsed);
 
         if (this.chartReady) {
-          this.buildChart(data);
+          setTimeout(() => this.buildChart(data), 0);
         } else {
           this.pendingChartData = data;
         }
@@ -91,6 +93,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private buildChart(data: DashboardKpi): void {
+    if (!this.chartCanvas) return;  // canvas not yet in DOM (*ngIf hasn't resolved)
     if (this.chart) {
       this.chart.destroy();
     }

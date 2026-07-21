@@ -143,4 +143,28 @@ test.describe('Phase 2 Bugfixes', () => {
     expect(text?.trim().length).toBeGreaterThan(0);
   });
 
+  test('export failure shows error message in UI (not silent)', async ({ page }) => {
+    // Intercept any export=true request and return 500
+    await page.route('**/api/**?*export=true*', route =>
+      route.fulfill({ status: 500, body: '{"error":"server error"}' })
+    );
+
+    await page.goto('/orders');
+    await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10000 });
+
+    // Click the export button
+    const exportBtn = page.locator('.export-btn');
+    await exportBtn.click();
+
+    // Error message should appear
+    const errorSpan = page.locator('.export-error');
+    await expect(errorSpan).toBeVisible({ timeout: 5000 });
+    const errorText = await errorSpan.textContent();
+    expect(errorText?.trim().length).toBeGreaterThan(0);
+
+    // Button should be back to idle state (not "Exporting...")
+    await expect(exportBtn).toHaveText('Export CSV');
+    await expect(exportBtn).toBeEnabled();
+  });
+
 });

@@ -372,3 +372,163 @@ END FOR
 - Products row click navigates to `/products/:id` detail page
 - Sales Report nav link and route no longer exist
 - Order/Invoice/Delivery detail pages show product names in line items
+
+---
+
+## Phase 2 — Additional Bugs (Bugs 12–14)
+
+### Bug 12: Dashboard `nativeElement` crash
+
+**File**: `frontend/src/app/pages/dashboard/dashboard.component.ts`
+
+**Root Cause**: `@ViewChild('kpiChart')` references a `<canvas #kpiChart>` that sits inside `*ngIf="kpiData"`. Because `kpiData` is `null` on init, the canvas is not in the DOM — so `this.chartCanvas` is `undefined` at `ngAfterViewInit`. The existing `chartReady` / `pendingChartData` guard sets `chartReady = true` in `ngAfterViewInit` and defers `buildChart` until data arrives, which looks correct. However when data arrives, the code does:
+
+```typescript
+this.kpiData = data;         // triggers *ngIf to become truthy
+// ...
+this.buildChart(data);       // called immediately — Angular CD hasn't run yet
+```
+
+Angular's `*ngIf` does not instantly insert the `<canvas>` into the DOM; it waits for the next change-detection cycle. So `this.chartCanvas` is still `undefined` when `buildChart` accesses `.nativeElement`, causing `TypeError: Cannot read properties of undefined (reading 'nativeElement')`.
+
+**Fix**: Guard `buildChart` with a null-check on `this.chartCanvas`, then defer via `setTimeout(() => this.buildChart(data), 0)` after setting `kpiData`. This allows Angular's change-detection cycle to run and insert the canvas before `buildChart` executes. Alternatively, inject `ChangeDetectorRef` and call `this.cdr.detectChanges()` immediately after setting `kpiData` before calling `buildChart`.
+
+The `setTimeout` approach is the minimal diff: no new import, one-line change.
+
+---
+
+### Bug 13: Export silently fails for large datasets (73k+ records)
+
+**Files**:
+- `frontend/src/app/shared/components/export-csv-button/export-csv-button.component.ts`
+- `backend/WideWorldImporters.Api/Controllers/OrdersController.cs` (and all other list controllers)
+
+**Root Cause (multiple contributing factors)**:
+
+1. **Backend SQL timeout**: EF Core `.ToListAsync()` on 73k+ rows with joins can exceed the default SQL command timeout (30s), causing the query to throw an exception mid-flight. The `ExceptionHandlingMiddleware` returns a 500/408, or the connection is dropped.
+2. **Frontend silent failure**: `ExportCsvButtonComponent.export()` error handler does only `this.loading = false` — no error message shown to the user. The button goes back to "Export CSV" with no feedback.
+3. **Frontend memory**: `generateCsv()` builds the entire CSV string synchronously in one call. For 73k rows × multiple columns this is a large synchronous string allocation, but with modern V8 it's usually tolerable below ~500k rows. The `Blob` creation at the end is fine.
+4. **No user warning**: No indication before the export that a very large download is starting.
+
+**Fix**:
+
+Backend — add a row-count cap for export endpoints:
+- When `export=true`, add a hard cap of 50,000 rows
+- If `totalCount > 50000`, return HTTP 413 (Payload Too Large) with a JSON body explaining the limit
+- Increase EF Core `CommandTimeout` for export queries to 120s to handle the 50k-row case
+
+Frontend — surface errors to the user:
+- In `ExportCsvButtonComponent.export()`, the `error` callback must set an `errorMessage` property and display it in the template
+- Add a user confirmation dialog (browser `confirm()` or a visible warning banner) when `totalCount > 10000` before starting export
+- `@Input() totalCount?: number` added to `ExportCsvButtonComponent` so the parent can pass the current filtered count
+
+---
+
+### Bug 14: Export silent failure affects all list pages
+
+**Root Cause**: Bug 13's frontend fix is in `ExportCsvButtonComponent`, a shared component used by all list pages. The fix automatically covers: Orders, Invoices, Deliveries, Customers, Suppliers, StockItems/Inventory, ProductSearch, PurchaseOrders, Warehouse, Payments.
+
+The backend fix (row cap + timeout) must be applied per-controller. Controllers that already have `export=true` support (added in Wave 0): Orders, Invoices, Customers, Suppliers, StockItems, ProductSearch, Deliveries, PurchaseOrders. Remaining controllers (Warehouse, Payments) need the same treatment if they have list+export endpoints.
+
+---
+
+## Additional Correctness Properties
+
+### Property 7: Export error is always surfaced to the user
+
+_For any_ failed export attempt (network error, timeout, 4xx/5xx response), the `ExportCsvButtonComponent` SHALL display a visible error message to the user and reset to an actionable state — it SHALL NOT silently return to the idle state without feedback.
+
+**Validates: Bug 13 (frontend error handler)**
+
+### Property 8: Export row cap is enforced consistently
+
+_For any_ list endpoint that supports `export=true`, when the total matching record count exceeds 50,000 the backend SHALL return HTTP 413 with an explanatory error message rather than attempting to stream the full dataset.
+
+**Validates: Bug 13 and Bug 14 (backend cap)**
+
+---
+
+## Additional Fix Implementation
+
+### Bug 12: Dashboard chart timing fix
+
+**File**: `frontend/src/app/pages/dashboard/dashboard.component.ts`
+
+**Change**: In `loadDashboardData` `next` callback, after setting `this.kpiData = data`, replace the direct `this.buildChart(data)` call with a deferred call:
+
+```typescript
+this.kpiData = data;
+// ...
+if (this.chartReady) {
+  setTimeout(() => this.buildChart(data), 0);  // defer until CD inserts <canvas>
+} else {
+  this.pendingChartData = data;
+}
+```
+
+Also add a null-guard in `buildChart` itself as a safety net:
+
+```typescript
+private buildChart(data: DashboardKpi): void {
+  if (!this.chartCanvas) return;  // canvas not yet in DOM
+  // ... rest of method unchanged
+}
+```
+
+And in `ngAfterViewInit`:
+
+```typescript
+ngAfterViewInit(): void {
+  this.chartReady = true;
+  if (this.pendingChartData) {
+    setTimeout(() => {
+      this.buildChart(this.pendingChartData!);
+      this.pendingChartData = null;
+    }, 0);
+  }
+}
+```
+
+---
+
+### Bug 13 & 14: Export error surfacing + backend row cap
+
+**Frontend** (`export-csv-button.component.ts`):
+
+Add `@Input() totalCount?: number` and `errorMessage: string | null = null`. Update template to show error. Update `export()` to warn on large counts and surface errors:
+
+```typescript
+export(): void {
+  if (!this.fetchFn || this.loading) return;
+  if (this.totalCount && this.totalCount > 10000) {
+    const ok = confirm(`This will export ${this.totalCount.toLocaleString()} records. Continue?`);
+    if (!ok) return;
+  }
+  this.loading = true;
+  this.errorMessage = null;
+  this.fetchFn().subscribe({
+    next: (data) => { /* existing logic */ this.loading = false; },
+    error: () => {
+      this.loading = false;
+      this.errorMessage = 'Export failed. The dataset may be too large or the server timed out.';
+    }
+  });
+}
+```
+
+**Backend** (each list controller with `export=true`):
+
+Add row cap check before executing the export query:
+
+```csharp
+if (export) {
+  const int ExportRowLimit = 50_000;
+  var count = await query.CountAsync();
+  if (count > ExportRowLimit)
+    return StatusCode(413, new { error = $"Export exceeds {ExportRowLimit:N0} row limit. Apply filters to reduce the result set." });
+  // Increase command timeout for large queries
+  _context.Database.SetCommandTimeout(120);
+  var data = await query.ToListAsync();
+  return Ok(data);
+}
+```

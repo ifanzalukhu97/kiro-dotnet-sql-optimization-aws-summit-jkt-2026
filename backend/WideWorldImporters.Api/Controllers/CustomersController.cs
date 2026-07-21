@@ -43,12 +43,22 @@ namespace WideWorldImporters.Api.Controllers
 
             var totalCount = await query.CountAsync();
 
-            var customers = export
-                ? await ApplySort(query, sortBy, sortDirection).ToListAsync()
-                : await ApplySort(query, sortBy, sortDirection)
+            List<Customer> customers;
+            if (export)
+            {
+                const int ExportRowLimit = 50_000;
+                if (totalCount > ExportRowLimit)
+                    return StatusCode(413, new { error = $"Export exceeds {ExportRowLimit:N0} row limit. Apply filters to reduce the result set." });
+                _context.Database.SetCommandTimeout(120);
+                customers = await ApplySort(query, sortBy, sortDirection).ToListAsync();
+            }
+            else
+            {
+                customers = await ApplySort(query, sortBy, sortDirection)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
+            }
 
             var customerDtos = new List<CustomerListDto>();
 

@@ -5,7 +5,8 @@
       <app-export-csv-button
         [resourceName]="'deliveries'"
         [columns]="columns"
-        [fetchFn]="exportFn">
+        [fetchFn]="exportFn"
+        [totalCount]="totalCount">
       </app-export-csv-button>
       <app-response-time-badge
         [timeMs]="responseTime"

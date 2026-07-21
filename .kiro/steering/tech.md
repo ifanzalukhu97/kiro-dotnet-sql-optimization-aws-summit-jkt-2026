@@ -127,3 +127,6 @@ If the output is NOT `5.0.4xx`:
 **Platform-specific SDK notes:**
 - Apple Silicon Macs: .NET 5 has no arm64 build. Install the x86_64 SDK and use `direnv` (see `.envrc.example`) to override `DOTNET_ROOT`. The `.envrc` file in this repo already configures this — just run `direnv allow .`.
 - Windows/Linux/Intel Mac: Install .NET 5 SDK normally from https://dotnet.microsoft.com/en-us/download/dotnet/5.0
+
+## Git & Shell Commands
+Untuk perintah git (commit, push, status, diff) atau perintah shell lainnya langsung delegate ke spec-task-execution subagent yang punya akses terminal.

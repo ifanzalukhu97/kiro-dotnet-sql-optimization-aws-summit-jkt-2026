@@ -25,7 +25,8 @@ interface WarehouseTransactionListItem {
           <app-export-csv-button
             [resourceName]="'warehouse'"
             [columns]="columns"
-            [fetchFn]="exportFn">
+            [fetchFn]="exportFn"
+            [totalCount]="totalCount">
           </app-export-csv-button>
           <app-response-time-badge
             [timeMs]="responseTime"

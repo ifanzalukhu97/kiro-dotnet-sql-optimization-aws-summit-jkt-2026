@@ -64,6 +64,13 @@ namespace WideWorldImporters.Api.Controllers
             var totalCount = await query.CountAsync();
 
             var sorted = ApplySort(query, sortBy, sortDirection);
+            if (export)
+            {
+                const int ExportRowLimit = 50_000;
+                if (totalCount > ExportRowLimit)
+                    return StatusCode(413, new { error = $"Export exceeds {ExportRowLimit:N0} row limit. Apply filters to reduce the result set." });
+                _context.Database.SetCommandTimeout(120);
+            }
             var paged = export ? sorted : sorted.Skip((page - 1) * pageSize).Take(pageSize);
             var purchaseOrders = await paged
                 .Select(po => new PurchaseOrderListDto

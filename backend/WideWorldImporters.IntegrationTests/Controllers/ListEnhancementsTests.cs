@@ -209,12 +209,27 @@ namespace WideWorldImporters.IntegrationTests.Controllers
         // --- EXPORT TESTS ---
         // Validates: Requirements 2.1
 
+        // Uses /api/customers only: orders exceeds the 50k export cap and correctly returns 413
+        // (covered by AllExportEndpoints_EnforceRowLimit which handles both cases adaptively)
         [Theory]
-        [InlineData("/api/orders")]
         [InlineData("/api/customers")]
         public async Task GetList_WithExportTrue_ReturnsAllRecords(string endpoint)
         {
+            // Check count first so the test is correct regardless of DB size
+            var countResponse = await _client.GetAsync($"{endpoint}?page=1&pageSize=1");
+            countResponse.EnsureSuccessStatusCode();
+            var countContent = await countResponse.Content.ReadAsStringAsync();
+            using var countDoc = JsonDocument.Parse(countContent);
+            var totalCount = countDoc.RootElement.GetProperty("totalCount").GetInt32();
+
             var response = await _client.GetAsync($"{endpoint}?export=true");
+
+            if (totalCount > 50_000)
+            {
+                Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+                return;
+            }
+
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
@@ -222,10 +237,80 @@ namespace WideWorldImporters.IntegrationTests.Controllers
             var root = doc.RootElement;
 
             var data = root.GetProperty("data");
-            var totalCount = root.GetProperty("totalCount").GetInt32();
+            var returnedCount = root.GetProperty("totalCount").GetInt32();
 
-            Assert.Equal(totalCount, data.GetArrayLength());
-            Assert.True(totalCount > 0, "Export should return at least some records");
+            Assert.Equal(returnedCount, data.GetArrayLength());
+            Assert.True(returnedCount > 0, "Export should return at least some records");
+        }
+
+        // --- EXPORT ROW LIMIT TESTS ---
+        // Validates: Bug 13, Property 8 (Task 20.5)
+
+        [Fact]
+        public async Task GetOrders_WithExportTrue_EnforcesRowLimit()
+        {
+            // First get the total count via a normal paginated request
+            var countResponse = await _client.GetAsync("/api/orders?page=1&pageSize=1");
+            countResponse.EnsureSuccessStatusCode();
+            var countContent = await countResponse.Content.ReadAsStringAsync();
+            using var countDoc = JsonDocument.Parse(countContent);
+            var totalCount = countDoc.RootElement.GetProperty("totalCount").GetInt32();
+
+            var exportResponse = await _client.GetAsync("/api/orders?export=true");
+
+            if (totalCount <= 50_000)
+            {
+                // DB has ≤50k orders: export must succeed and return all rows
+                Assert.Equal(HttpStatusCode.OK, exportResponse.StatusCode);
+                var content = await exportResponse.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(content);
+                var data = doc.RootElement.GetProperty("data");
+                Assert.Equal(totalCount, data.GetArrayLength());
+            }
+            else
+            {
+                // DB has >50k orders: export must be rejected with 413
+                Assert.Equal(HttpStatusCode.RequestEntityTooLarge, exportResponse.StatusCode);
+            }
+        }
+
+        // Validates: Bug 14, Property 8 (Task 21.2)
+        // Parameterized across ALL export-supporting controllers
+
+        [Theory]
+        [InlineData("/api/orders")]
+        [InlineData("/api/invoices")]
+        [InlineData("/api/customers")]
+        [InlineData("/api/suppliers")]
+        [InlineData("/api/stockitems")]
+        [InlineData("/api/productsearch")]
+        [InlineData("/api/delivery")]
+        [InlineData("/api/purchaseorders")]
+        public async Task AllExportEndpoints_EnforceRowLimit(string endpoint)
+        {
+            // Get total count via paginated request (pageSize=1 is cheap)
+            var countResponse = await _client.GetAsync($"{endpoint}?page=1&pageSize=1");
+            countResponse.EnsureSuccessStatusCode();
+            var countContent = await countResponse.Content.ReadAsStringAsync();
+            using var countDoc = JsonDocument.Parse(countContent);
+            var totalCount = countDoc.RootElement.GetProperty("totalCount").GetInt32();
+
+            var exportResponse = await _client.GetAsync($"{endpoint}?export=true");
+
+            if (totalCount <= 50_000)
+            {
+                // ≤50k rows: must return 200 with all matching records
+                Assert.Equal(HttpStatusCode.OK, exportResponse.StatusCode);
+                var content = await exportResponse.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(content);
+                var data = doc.RootElement.GetProperty("data");
+                Assert.Equal(totalCount, data.GetArrayLength());
+            }
+            else
+            {
+                // >50k rows: must return 413 and not attempt to stream the full dataset
+                Assert.Equal(HttpStatusCode.RequestEntityTooLarge, exportResponse.StatusCode);
+            }
         }
     }
 }

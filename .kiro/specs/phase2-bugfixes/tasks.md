@@ -234,3 +234,84 @@ Wave 4 (checkpoint):
 | 2 | 13, 14 | Yes (both independent) |
 | 3 | 15, 16, 17 | Yes (all independent test suites) |
 | 4 | 18 | No (final gate) |
+
+
+### Wave 5: New Bug Fixes (Bugs 12–14)
+
+- [x] 19. Frontend: Fix Dashboard chart nativeElement crash (Bug 12)
+  - [x] 19.1 Guard `buildChart` with null-check on `this.chartCanvas` + defer calls with `setTimeout(..., 0)` in both `loadDashboardData` and `ngAfterViewInit`
+    - In `buildChart`: add early return `if (!this.chartCanvas) return;`
+    - In `loadDashboardData` next callback: replace `this.buildChart(data)` with `setTimeout(() => this.buildChart(data), 0)`
+    - In `ngAfterViewInit`: wrap `this.buildChart(this.pendingChartData!)` in `setTimeout`
+    - _Bug_Condition: kpiData arrives after ngAfterViewInit, canvas is inside *ngIf="kpiData" so ViewChild is undefined until next CD cycle_
+    - _Expected_Behavior: Chart renders without TypeError after data loads_
+    - _Preservation: Chart still displays correctly once data and canvas are both available_
+    - _Requirements: Bug 12_
+  - [x] 19.2 Test: Unit test that `buildChart` is not called when `chartCanvas` is undefined
+    - Mock scenario where `chartCanvas` is undefined, verify no exception thrown
+    - _Requirements: Bug 12_
+  - [x] 19.3 Test: E2E test — Dashboard chart renders without console errors (Playwright)
+    - Navigate to dashboard, wait for KPI data, assert canvas element exists and no console errors
+    - _Requirements: Bug 12_
+
+- [x] 20. Frontend + Backend: Fix silent export failure for large datasets (Bug 13)
+  - [x] 20.1 Frontend: Show user-visible error message in `ExportCsvButtonComponent` on failure
+    - Add `errorMessage` property, update template to display it, set it in `error` callback
+    - _Bug_Condition: fetchFn fails (timeout, 4xx, 5xx) and user sees no feedback_
+    - _Expected_Behavior: Error message is displayed to user on export failure_
+    - _Preservation: Successful exports still work as before_
+    - _Requirements: Bug 13, Property 7_
+  - [x] 20.2 Frontend: Add `@Input() totalCount` and confirmation warning when `totalCount > 10000` before export
+    - Use `confirm()` dialog; if user cancels, abort export
+    - Update all parent components that use `<app-export-csv-button>` to pass `[totalCount]="totalCount"`
+    - _Requirements: Bug 13_
+  - [x] 20.3 Backend: Add export row limit cap (50,000) with 413 response in all list controllers that support `export=true`
+    - Before executing export query: count rows, if > 50000 return `StatusCode(413, ...)` with explanatory JSON
+    - Applies to: Orders, Invoices, Customers, Suppliers, StockItems, ProductSearch, Deliveries, PurchaseOrders
+    - _Bug_Condition: totalRecords > 50000 AND export=true → query times out or OOMs_
+    - _Expected_Behavior: 413 returned with clear error message_
+    - _Preservation: Exports ≤ 50k rows still return full data_
+    - _Requirements: Bug 13, Bug 14, Property 8_
+  - [x] 20.4 Backend: Increase EF Core `CommandTimeout` to 120s for export queries in all list controllers
+    - Add `_context.Database.SetCommandTimeout(120)` before export `.ToListAsync()`
+    - _Requirements: Bug 13_
+  - [x] 20.5 Test: Backend integration test — export endpoint with >50k matching rows returns 413
+    - _Requirements: Bug 13, Property 8_
+  - [x] 20.6 Test: E2E test — export failure shows error message in UI (not silent)
+    - Mock or trigger a failed export, assert error message element is visible
+    - _Requirements: Bug 13, Property 7_
+
+- [x] 21. Verify export fix applies to all list pages (Bug 14)
+  - [x] 21.1 Verify `ExportCsvButtonComponent` fix (error message + totalCount warning) is inherited by all pages: Orders, Invoices, Deliveries, Customers, Suppliers, Inventory, ProductSearch, PurchaseOrders, Warehouse, Payments
+    - Ensure all parent components pass `[totalCount]` to the shared component
+    - _Bug_Condition: Any list page export could fail silently_
+    - _Expected_Behavior: All pages show error on failure and warn on large exports_
+    - _Requirements: Bug 14_
+  - [x] 21.2 Test: Backend integration test — all list export endpoints respect the 50k row limit cap
+    - Parameterized test across all controllers with export support
+    - _Requirements: Bug 14, Property 8_
+
+- [x] 22. Checkpoint — Ensure all new bug fix tests pass
+  - Run `dotnet test` for backend integration tests (including new 413 tests)
+  - Run `ng test --watch=false` for frontend unit tests (including dashboard chart test)
+  - Run `npx playwright test` for E2E tests (including dashboard + export error tests)
+  - Ensure no regressions in Waves 0–4
+  - Ask the user if questions arise
+  - _Requirements: Bug 12, Bug 13, Bug 14_
+
+## Wave 5 Dependency Graph
+
+```
+Wave 5 (new bugs):
+  Task 19 (dashboard chart) ─── independent, no deps on other Wave 5 tasks
+  Task 20.1 + 20.2 (frontend export error) ─── independent
+  Task 20.3 + 20.4 (backend export cap) ─── independent
+  Task 21 ─── depends on Tasks 20.1 + 20.2 + 20.3
+  Task 22 ─── depends on ALL Wave 5 tasks
+```
+
+| Wave | Tasks | Can Run In Parallel |
+|------|-------|-------------------|
+| 5a | 19.1, 20.1, 20.2, 20.3, 20.4 | Yes (all independent) |
+| 5b | 19.2, 19.3, 20.5, 20.6, 21.1, 21.2 | Yes (tests + verification, after 5a) |
+| 5c | 22 | No (final checkpoint) |

@@ -986,6 +986,231 @@
         "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
         "timestamp": 1784647856459
       }
+    ],
+    "19.1 Guard `buildChart` with null-check on `this.chartCanvas` + defer calls with `setTimeout(..., 0)` in both `loadDashboardData` and `ngAfterViewInit`": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898635
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650912251
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651059669
+      }
+    ],
+    "19.2 Test: Unit test that `buildChart` is not called when `chartCanvas` is undefined": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898792
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651072592
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651182989
+      }
+    ],
+    "19.3 Test: E2E test — Dashboard chart renders without console errors (Playwright)": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898820
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651191280
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651248717
+      }
+    ],
+    "20.1 Frontend: Show user-visible error message in `ExportCsvButtonComponent` on failure": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898867
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651259826
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651455601
+      }
+    ],
+    "20.2 Frontend: Add `@Input() totalCount` and confirmation warning when `totalCount > 10000` before export": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898915
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651460371
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651464813
+      }
+    ],
+    "20.3 Backend: Add export row limit cap (50,000) with 413 response in all list controllers that support `export=true`": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898952
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651475043
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651638134
+      }
+    ],
+    "20.4 Backend: Increase EF Core `CommandTimeout` to 120s for export queries in all list controllers": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650898999
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651673488
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651679733
+      }
+    ],
+    "20.5 Test: Backend integration test — export endpoint with >50k matching rows returns 413": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650899049
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651691959
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651837034
+      }
+    ],
+    "20.6 Test: E2E test — export failure shows error message in UI (not silent)": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650899101
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651850014
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651949653
+      }
+    ],
+    "21.1 Verify `ExportCsvButtonComponent` fix (error message + totalCount warning) is inherited by all pages: Orders, Invoices, Deliveries, Customers, Suppliers, Inventory, ProductSearch, PurchaseOrders, Warehouse, Payments": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650899307
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651957547
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784652039284
+      }
+    ],
+    "21.2 Test: Backend integration test — all list export endpoints respect the 50k row limit cap": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650899388
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784652045108
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784652051186
+      }
+    ],
+    "22. Checkpoint — Ensure all new bug fix tests pass": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784650899417
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784652056937
+      },
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784652272688
+      }
+    ],
+    "19. Frontend: Fix Dashboard chart nativeElement crash (Bug 12)": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651248774
+      }
+    ],
+    "20. Frontend + Backend: Fix silent export failure for large datasets (Bug 13)": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784651949820
+      }
+    ],
+    "21. Verify export fix applies to all list pages (Bug 14)": [
+      {
+        "executionId": "2c45e738-1da7-4563-af94-1b2643951efa",
+        "chatSessionId": "sess_a123bcee-70e7-4cab-8533-7448a9f982ab",
+        "timestamp": 1784652051240
+      }
     ]
   }
 }

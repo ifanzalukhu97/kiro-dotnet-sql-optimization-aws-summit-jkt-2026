@@ -77,9 +77,19 @@ namespace WideWorldImporters.Api.Controllers
             var totalCount = await query.CountAsync();
 
             var sorted = ApplySort(query, sortBy, sortDirection);
-            var invoices = export
-                ? await sorted.ToListAsync()
-                : await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<Invoice> invoices;
+            if (export)
+            {
+                const int ExportRowLimit = 50_000;
+                if (totalCount > ExportRowLimit)
+                    return StatusCode(413, new { error = $"Export exceeds {ExportRowLimit:N0} row limit. Apply filters to reduce the result set." });
+                _context.Database.SetCommandTimeout(120);
+                invoices = await sorted.ToListAsync();
+            }
+            else
+            {
+                invoices = await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            }
 
             var deliveryDtos = invoices.Select(invoice => new DeliveryListDto
             {

@@ -121,6 +121,13 @@ namespace WideWorldImporters.Api.Controllers
                 _ => query.OrderBy(x => x.StockItem.StockItemName)
             };
 
+            if (export)
+            {
+                const int ExportRowLimit = 50_000;
+                if (totalCount > ExportRowLimit)
+                    return StatusCode(413, new { error = $"Export exceeds {ExportRowLimit:N0} row limit. Apply filters to reduce the result set." });
+                _context.Database.SetCommandTimeout(120);
+            }
             var pagedQuery = export ? orderedQuery : orderedQuery.Skip((page - 1) * pageSize).Take(pageSize);
             var items = await pagedQuery
                 .Select(x => new ProductSearchItemDto

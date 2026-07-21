@@ -44,6 +44,33 @@ test.describe('Dashboard', () => {
     await expect(canvas).toBeVisible({ timeout: 10000 });
   });
 
+  /**
+   * Validates: Bug 12
+   * Dashboard chart renders without TypeError console errors after KPI data loads.
+   * Regression guard for: "Cannot read properties of undefined (reading 'nativeElement')"
+   */
+  test('chart renders without TypeError console errors (Bug 12)', async ({ page }) => {
+    const typeErrors: string[] = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error' && msg.text().includes('TypeError')) {
+        typeErrors.push(msg.text());
+      }
+    });
+
+    // beforeEach already navigated and waited for KPI cards — canvas should be present
+    const canvas = page.locator('canvas');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Give any deferred async work (setTimeout 0) a chance to complete
+    await page.waitForTimeout(500);
+
+    // No TypeError should have been logged
+    const nativeElementErrors = typeErrors.filter(e =>
+      e.includes("Cannot read properties of undefined (reading 'nativeElement')")
+    );
+    expect(nativeElementErrors).toHaveLength(0);
+  });
+
   test('response time badge is present', async ({ page }) => {
     const badge = page.locator('app-response-time-badge');
     await expect(badge).toBeVisible();

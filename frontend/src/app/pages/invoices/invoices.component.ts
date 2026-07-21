@@ -50,7 +50,7 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   endDate: string = '';
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     if (this.selectedCustomerIds.length) params['customerId'] = this.selectedCustomerIds.join(',');
     if (this.startDate) params['startDate'] = this.startDate;
     if (this.endDate) params['endDate'] = this.endDate;

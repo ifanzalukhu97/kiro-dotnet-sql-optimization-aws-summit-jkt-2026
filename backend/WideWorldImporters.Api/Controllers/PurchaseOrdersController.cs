@@ -28,10 +28,14 @@ namespace WideWorldImporters.Api.Controllers
             [FromQuery] string supplierId = null,
             [FromQuery] string sortBy = null,
             [FromQuery] string sortDirection = "asc",
-            [FromQuery] string search = null)
+            [FromQuery] string search = null,
+            [FromQuery] bool export = false)
         {
-            if (pageSize < 1) pageSize = 1;
-            if (pageSize > 100) pageSize = 100;
+            if (!export)
+            {
+                if (pageSize < 1) pageSize = 1;
+                if (pageSize > 100) pageSize = 100;
+            }
             if (page < 1) page = 1;
 
             var query = _context.PurchaseOrders
@@ -59,9 +63,9 @@ namespace WideWorldImporters.Api.Controllers
 
             var totalCount = await query.CountAsync();
 
-            var purchaseOrders = await ApplySort(query, sortBy, sortDirection)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            var sorted = ApplySort(query, sortBy, sortDirection);
+            var paged = export ? sorted : sorted.Skip((page - 1) * pageSize).Take(pageSize);
+            var purchaseOrders = await paged
                 .Select(po => new PurchaseOrderListDto
                 {
                     PurchaseOrderId = po.PurchaseOrderID,

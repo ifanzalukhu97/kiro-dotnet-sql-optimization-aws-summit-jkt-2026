@@ -86,6 +86,46 @@ namespace WideWorldImporters.IntegrationTests.Controllers
         }
 
         [Fact]
+        public async Task GetOrder_ReturnsStockItemNameAndTotalPrice_OnEachLine()
+        {
+            // Validates: Requirements 2.4
+            var response = await _client.GetAsync("/api/orders/1");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var lines = doc.RootElement.GetProperty("lines");
+
+            Assert.True(lines.GetArrayLength() > 0, "Order should have at least one line");
+            foreach (var line in lines.EnumerateArray())
+            {
+                var stockItemName = line.GetProperty("stockItemName").GetString();
+                Assert.False(string.IsNullOrEmpty(stockItemName), "stockItemName should not be null or empty");
+
+                var quantity = line.GetProperty("quantity").GetInt32();
+                var unitPrice = line.GetProperty("unitPrice").GetDecimal();
+                var totalPrice = line.GetProperty("totalPrice").GetDecimal();
+                Assert.Equal(quantity * unitPrice, totalPrice);
+            }
+        }
+
+        [Fact]
+        public async Task GetOrder_NonLineFields_RemainCorrect()
+        {
+            // Validates: Requirements 3.4 (Preservation)
+            var response = await _client.GetAsync("/api/orders/1");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            Assert.False(string.IsNullOrEmpty(root.GetProperty("customerName").GetString()));
+            Assert.True(root.TryGetProperty("orderDate", out _));
+            Assert.True(root.TryGetProperty("expectedDeliveryDate", out _));
+        }
+
+        [Fact]
         public async Task GetOrdersLookup_ReturnsJsonArrayWithIdAndName()
         {
             var response = await _client.GetAsync("/api/orders/lookup");

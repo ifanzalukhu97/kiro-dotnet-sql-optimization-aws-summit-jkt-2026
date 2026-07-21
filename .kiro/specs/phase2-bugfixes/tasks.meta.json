@@ -1,0 +1,991 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add `[FromQuery] bool export = false` parameter to each list controller (Orders, Invoices, Customers, Suppliers, StockItems, ProductSearch, Deliveries, PurchaseOrders)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643896827
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643920637
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644157956
+      }
+    ],
+    "2.1 Add `StockItemName` (string) and `TotalPrice` (decimal) properties to `OrderLineDto` in `OrderDtos.cs`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643896886
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644169815
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644210987
+      }
+    ],
+    "2.2 Update `GetOrder` in `OrdersController.cs` to join StockItems and compute TotalPrice": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643896927
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644217065
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644284832
+      }
+    ],
+    "3.1 Add `StockItemName` (string) property to `InvoiceLineDto` in `InvoiceDtos.cs`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643896976
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644290549
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644319581
+      }
+    ],
+    "3.2 Update `GetInvoice` in `InvoicesController.cs` to join StockItems and map StockItemName": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897007
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644324942
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644404576
+      }
+    ],
+    "3.3 Update `GetDelivery` in `DeliveryController.cs` to join StockItems and map StockItemName": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897036
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644409977
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644494516
+      }
+    ],
+    "4.1 Delete `backend/WideWorldImporters.Api/Controllers/SalesReportController.cs`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897069
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644500295
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644535912
+      }
+    ],
+    "4.2 Delete `backend/WideWorldImporters.Api/Models/Dtos/SalesReportDtos.cs`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897105
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644542623
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644605998
+      }
+    ],
+    "5.1 Update `exportFn` in every list component that has one (product-search, inventory, orders, invoices, customers, suppliers, deliveries, purchase-orders)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897135
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644618997
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644718309
+      }
+    ],
+    "6.1 Add `searchTerm` property and `filteredOptions` getter to `dropdown-filter.component.ts`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897166
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644723613
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644776994
+      }
+    ],
+    "6.2 Add `<input>` above options list in template, bind to `searchTerm`, iterate `filteredOptions`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897236
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644782499
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644863970
+      }
+    ],
+    "6.3 Style the search input in SCSS to match dark theme": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897278
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644870508
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644934921
+      }
+    ],
+    "7.1 Add `[title]=\"option.name\"` to the option-text span in `dropdown-filter.component.html`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897319
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644940450
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644972680
+      }
+    ],
+    "8.1 Update `CustomerDetail` interface and template bindings from `transactions` to `recentTransactions`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897353
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644978232
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645038845
+      }
+    ],
+    "9.1 Update `SupplierDetail` interface and template bindings from `purchaseOrders` to `recentPurchaseOrders`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897384
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645045313
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645104505
+      }
+    ],
+    "10.1 Change page title in `product-search.component.html` from \"Product Search\" to \"Products\"": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897415
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645110302
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645150832
+      }
+    ],
+    "10.2 Update nav/sidebar label from \"Product Search\" to \"Products\"": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897454
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645161111
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645211044
+      }
+    ],
+    "10.3 Create `ProductDetailComponent` (inline template, same pattern as other details)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897490
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645217774
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645285605
+      }
+    ],
+    "10.4 Add `:id` child route in product-search module routing and `onRowClick` navigation": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897525
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645290977
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645428678
+      }
+    ],
+    "11.1 Create `InventoryDetailComponent` (inline template, back button, detail fields, response time badge)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897557
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645434106
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645514334
+      }
+    ],
+    "11.2 Add `:id` child route in inventory module routing": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897594
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645519584
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645569529
+      }
+    ],
+    "11.3 Update `onRowClick` to navigate via Router instead of inline panel": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897626
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645574907
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645738831
+      }
+    ],
+    "11.4 Remove inline detail panel HTML from `inventory.component.html`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897656
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645745746
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645760369
+      }
+    ],
+    "12.1 Delete `frontend/src/app/pages/sales-report/` directory (entire module)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897693
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645766089
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645809273
+      }
+    ],
+    "12.2 Remove `sales-report` lazy-loaded route from app routing module": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897723
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645814859
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645876069
+      }
+    ],
+    "12.3 Remove \"Sales Report\" entry from sidebar/nav component": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897794
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645884812
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645935765
+      }
+    ],
+    "13.1 Manually test (or write a quick script) that `exportFn` with `export=true` returns all filtered records from backend": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897826
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645947152
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646089801
+      }
+    ],
+    "14.1 Confirm Order Detail renders `stockItemName` and `totalPrice` columns from backend response": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897866
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646095617
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646158626
+      }
+    ],
+    "14.2 Confirm Invoice Detail renders `stockItemName` column": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897898
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646165573
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646221663
+      }
+    ],
+    "14.3 Confirm Delivery Detail renders `stockItemName` column": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897953
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646227584
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646294175
+      }
+    ],
+    "15.1 Test: `GET /api/orders/{id}` returns non-null `stockItemName` and correct `totalPrice` on each line": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643897988
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646307417
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646409838
+      }
+    ],
+    "15.2 Test: `GET /api/invoices/{id}` returns non-null `stockItemName` on each line": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898026
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646419189
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646503947
+      }
+    ],
+    "15.3 Test: `GET /api/delivery/{id}` returns non-null `stockItemName` on each line": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898068
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646510291
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646587563
+      }
+    ],
+    "15.4 Test: List endpoints with `export=true` return all records (totalCount matches data.length)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898098
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646593269
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646785071
+      }
+    ],
+    "15.5 Test: `GET /api/customers/{id}` response contains `recentTransactions` array field": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898127
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646791256
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646893533
+      }
+    ],
+    "15.6 Test: `GET /api/suppliers/{id}` response contains `recentPurchaseOrders` array field": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898162
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646899930
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646974745
+      }
+    ],
+    "16.1 Test: Paginated list requests (export=false) still return correct page/pageSize/totalCount": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898195
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646982243
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647089615
+      }
+    ],
+    "16.2 Test: Order Detail non-line fields (orderDate, customerName, expectedDelivery) remain correct": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898225
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647095887
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647181755
+      }
+    ],
+    "16.3 Test: Invoice/Delivery Detail non-product fields (description, quantity, unitPrice, extendedPrice) remain correct": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898254
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647188700
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647313888
+      }
+    ],
+    "16.4 Test: Customer Detail recentOrders section still returns data": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898325
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647325771
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647404856
+      }
+    ],
+    "16.5 Test: Supplier Detail stockItems section still returns data": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898357
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647411920
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647488290
+      }
+    ],
+    "17.1 Test: CSV export downloads file with row count matching total filtered records": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898404
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647495150
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647594713
+      }
+    ],
+    "17.2 Test: Dropdown filter search input filters options in real time": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898437
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647602653
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647652393
+      }
+    ],
+    "17.3 Test: Long option names show tooltip on hover (title attribute present)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898468
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647660788
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647712390
+      }
+    ],
+    "17.4 Test: Customer Detail shows transactions when data exists": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898503
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647718479
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647789199
+      }
+    ],
+    "17.5 Test: Supplier Detail shows purchase orders when data exists": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898533
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647795591
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647801752
+      }
+    ],
+    "17.6 Test: Inventory row click navigates to `/inventory/:id` detail page": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898565
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647808435
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647814940
+      }
+    ],
+    "17.7 Test: Products row click navigates to `/products/:id` detail page": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898598
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647822086
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647828480
+      }
+    ],
+    "17.8 Test: Sales Report nav link and route no longer exist": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898639
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647836195
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647843090
+      }
+    ],
+    "17.9 Test: Order/Invoice/Delivery detail pages show product names in line items": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898674
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647850045
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647856338
+      }
+    ],
+    "18. Checkpoint — Ensure all tests pass": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784643898704
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647863833
+      },
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784649095252
+      }
+    ],
+    "1. Backend: Add `export` query param to list controllers for CSV export": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644158023
+      }
+    ],
+    "2. Backend: Add StockItemName and TotalPrice to OrderLineDto": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644284908
+      }
+    ],
+    "3. Backend: Add StockItemName to InvoiceLineDto (covers Bugs 10 + 11)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644494610
+      }
+    ],
+    "4. Backend: Delete SalesReportController and SalesReportDtos": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644606038
+      }
+    ],
+    "5. Frontend: Fix CSV export — pass `export=true` instead of `pageSize: 10000`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644718381
+      }
+    ],
+    "6. Frontend: Add search input to dropdown-filter panel": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644934954
+      }
+    ],
+    "7. Frontend: Add tooltip to dropdown option text": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784644972720
+      }
+    ],
+    "8. Frontend: Fix Customer Detail transactions field mapping": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645038885
+      }
+    ],
+    "9. Frontend: Fix Supplier Detail purchaseOrders field mapping": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645104547
+      }
+    ],
+    "10. Frontend: Rename \"Product Search\" to \"Products\" + add detail page": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645428713
+      }
+    ],
+    "11. Frontend: Inventory detail page — separate route": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645760401
+      }
+    ],
+    "12. Frontend: Remove Sales Report module, route, and nav link": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784645935831
+      }
+    ],
+    "13. Integration: Verify frontend export works end-to-end with backend `export=true`": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646089853
+      }
+    ],
+    "14. Integration: Verify Order/Invoice/Delivery detail pages show product names": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646294218
+      }
+    ],
+    "15. Write bug condition exploration tests (backend)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784646974858
+      }
+    ],
+    "16. Write preservation tests (backend)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647488379
+      }
+    ],
+    "17. Write frontend E2E tests (Playwright)": [
+      {
+        "executionId": "9c214e3e-cc8c-4551-bb67-b1cebd67a837",
+        "chatSessionId": "sess_81d83b4c-7805-4405-908f-4cc84a4497b6",
+        "timestamp": 1784647856459
+      }
+    ]
+  }
+}

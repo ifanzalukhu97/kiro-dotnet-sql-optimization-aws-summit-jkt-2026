@@ -52,6 +52,19 @@ namespace WideWorldImporters.IntegrationTests.Controllers
         }
 
         [Fact]
+        public async Task GetSupplier_ReturnsRecentPurchaseOrdersArray()
+        {
+            var response = await _client.GetAsync("/api/suppliers/1");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+
+            Assert.True(doc.RootElement.TryGetProperty("recentPurchaseOrders", out var purchaseOrders));
+            Assert.Equal(JsonValueKind.Array, purchaseOrders.ValueKind);
+        }
+
+        [Fact]
         public async Task GetSupplier_WithNonExistentId_Returns404WithError()
         {
             var response = await _client.GetAsync("/api/suppliers/999999");
@@ -79,6 +92,19 @@ namespace WideWorldImporters.IntegrationTests.Controllers
 
             Assert.True(root.TryGetProperty("error", out var errorElement));
             Assert.False(string.IsNullOrEmpty(errorElement.GetString()));
+        }
+
+        [Fact]
+        public async Task GetSupplier_StockItems_StillReturnsData()
+        {
+            var response = await _client.GetAsync("/api/suppliers/1");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+
+            Assert.True(doc.RootElement.TryGetProperty("stockItems", out var stockItems));
+            Assert.Equal(JsonValueKind.Array, stockItems.ValueKind);
         }
 
         [Fact]

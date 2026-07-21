@@ -30,5 +30,7 @@ namespace WideWorldImporters.Api.Models.Dtos
         public string Description { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public string StockItemName { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

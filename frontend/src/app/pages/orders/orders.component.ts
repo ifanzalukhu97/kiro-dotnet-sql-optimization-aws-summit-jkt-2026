@@ -171,7 +171,7 @@ export class OrdersComponent implements OnInit {
   private selectedStockItemIds: number[] = [];
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     if (this.selectedCustomerIds.length) params['customerId'] = this.selectedCustomerIds.join(',');
     if (this.selectedStockItemIds.length) params['stockItemId'] = this.selectedStockItemIds.join(',');
     if (this.startDate) params['startDate'] = this.startDate;

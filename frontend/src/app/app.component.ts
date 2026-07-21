@@ -11,8 +11,7 @@ import { Component } from '@angular/core';
         <ul class="nav-links">
           <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
           <li><a routerLink="/orders" routerLinkActive="active">Orders</a></li>
-          <li><a routerLink="/sales-report" routerLinkActive="active">Sales Report</a></li>
-          <li><a routerLink="/product-search" routerLinkActive="active">Product Search</a></li>
+          <li><a routerLink="/product-search" routerLinkActive="active">Products</a></li>
           <li><a routerLink="/customers" routerLinkActive="active">Customers</a></li>
           <li><a routerLink="/suppliers" routerLinkActive="active">Suppliers</a></li>
           <li><a routerLink="/purchase-orders" routerLinkActive="active">Purchase Orders</a></li>

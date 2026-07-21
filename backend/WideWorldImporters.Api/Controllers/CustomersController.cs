@@ -31,7 +31,8 @@ namespace WideWorldImporters.Api.Controllers
             [FromQuery] int pageSize = 20,
             [FromQuery] string sortBy = null,
             [FromQuery] string sortDirection = "asc",
-            [FromQuery] string search = null)
+            [FromQuery] string search = null,
+            [FromQuery] bool export = false)
         {
             var query = _context.Customers.AsQueryable();
 
@@ -42,10 +43,12 @@ namespace WideWorldImporters.Api.Controllers
 
             var totalCount = await query.CountAsync();
 
-            var customers = await ApplySort(query, sortBy, sortDirection)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var customers = export
+                ? await ApplySort(query, sortBy, sortDirection).ToListAsync()
+                : await ApplySort(query, sortBy, sortDirection)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
 
             var customerDtos = new List<CustomerListDto>();
 

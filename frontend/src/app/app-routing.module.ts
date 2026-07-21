@@ -12,10 +12,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/orders/orders.module').then(m => m.OrdersModule)
   },
   {
-    path: 'sales-report',
-    loadChildren: () => import('./pages/sales-report/sales-report.module').then(m => m.SalesReportModule)
-  },
-  {
     path: 'product-search',
     loadChildren: () => import('./pages/product-search/product-search.module').then(m => m.ProductSearchModule)
   },

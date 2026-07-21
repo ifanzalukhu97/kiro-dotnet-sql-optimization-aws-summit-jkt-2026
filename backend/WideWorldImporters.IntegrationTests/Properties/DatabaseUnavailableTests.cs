@@ -52,7 +52,6 @@ namespace WideWorldImporters.IntegrationTests.Properties
             "/api/customers",
             "/api/stockitems",
             "/api/invoices",
-            "/api/salesreport",
             "/api/productsearch",
             "/api/suppliers",
             "/api/purchaseorders",

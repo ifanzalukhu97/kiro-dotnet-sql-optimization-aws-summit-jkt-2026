@@ -25,7 +25,6 @@ namespace WideWorldImporters.IntegrationTests.Properties
             "customers",
             "stockitems",
             "invoices",
-            "salesreport",
             "productsearch",
             "suppliers",
             "purchaseorders",

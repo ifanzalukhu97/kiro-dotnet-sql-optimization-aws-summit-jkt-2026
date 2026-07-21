@@ -45,7 +45,7 @@ export class CustomersComponent implements OnInit {
   search = '';
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     return this.apiService.getList<CustomerListItem>('customers', params).pipe(map(r => r.data));
   };
 

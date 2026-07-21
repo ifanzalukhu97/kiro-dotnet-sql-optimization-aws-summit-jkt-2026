@@ -28,10 +28,14 @@ namespace WideWorldImporters.Api.Controllers
             [FromQuery] string supplierId = null,
             [FromQuery] string sortBy = null,
             [FromQuery] string sortDirection = "asc",
-            [FromQuery] string search = null)
+            [FromQuery] string search = null,
+            [FromQuery] bool export = false)
         {
-            if (pageSize > 100) pageSize = 100;
-            if (pageSize < 1) pageSize = 20;
+            if (!export)
+            {
+                if (pageSize > 100) pageSize = 100;
+                if (pageSize < 1) pageSize = 20;
+            }
             if (page < 1) page = 1;
 
             var query = _context.StockItems.AsQueryable();
@@ -57,10 +61,10 @@ namespace WideWorldImporters.Api.Controllers
             var totalCount = await query.CountAsync();
 
             // SELECT * pattern: load entire entities with all columns
-            var stockItems = await ApplySort(query, sortBy, sortDirection)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var sorted = ApplySort(query, sortBy, sortDirection);
+            var stockItems = export
+                ? await sorted.ToListAsync()
+                : await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             // Map to DTO which uses fewer than 50% of the loaded columns
             var data = stockItems.Select(s => new StockItemListDto

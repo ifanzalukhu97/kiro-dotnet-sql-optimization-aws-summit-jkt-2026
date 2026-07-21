@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
@@ -17,7 +19,7 @@ const mockLookupResponse: any[] = [];
 
 function setupTestBed(component: any, declarations: any[] = []) {
   return TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule],
+    imports: [HttpClientTestingModule, RouterTestingModule],
     declarations: [component, ...declarations],
     providers: [
       {
@@ -55,16 +57,15 @@ describe('Page component endpoint URLs', () => {
       expect(endpoint).not.toMatch(/^api\//);
     });
 
-    it('should call getDetail with "customers" (not "api/customers")', async () => {
+    it('should navigate to detail route on row click', async () => {
       const { CustomersComponent } = await import('./customers/customers.component');
       setupTestBed(CustomersComponent).compileComponents();
-      const api = getMockApiService();
       const fixture = TestBed.createComponent(CustomersComponent);
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
       fixture.componentInstance.onRowClick({ customerId: 1 } as any);
 
-      expect(api.getDetail).toHaveBeenCalledWith('customers', 1);
-      const endpoint = api.getDetail.calls.mostRecent().args[0];
-      expect(endpoint).not.toMatch(/^api\//);
+      expect(router.navigate).toHaveBeenCalledWith([1], jasmine.any(Object));
     });
   });
 
@@ -227,20 +228,6 @@ describe('Page component endpoint URLs', () => {
       fixture.componentInstance.ngOnInit();
 
       expect(api.getList).toHaveBeenCalledWith('stockitems', jasmine.any(Object));
-      const endpoint = api.getList.calls.mostRecent().args[0];
-      expect(endpoint).not.toMatch(/^api\//);
-    });
-  });
-
-  describe('SalesReportComponent', () => {
-    it('should call getList with "salesreport"', async () => {
-      const { SalesReportComponent } = await import('./sales-report/sales-report.component');
-      setupTestBed(SalesReportComponent).compileComponents();
-      const api = getMockApiService();
-      const fixture = TestBed.createComponent(SalesReportComponent);
-      fixture.componentInstance.ngOnInit();
-
-      expect(api.getList).toHaveBeenCalledWith('salesreport', jasmine.any(Object));
       const endpoint = api.getList.calls.mostRecent().args[0];
       expect(endpoint).not.toMatch(/^api\//);
     });

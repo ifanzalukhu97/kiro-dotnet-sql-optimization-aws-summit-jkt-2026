@@ -176,12 +176,56 @@ namespace WideWorldImporters.IntegrationTests.Controllers
             Assert.True(doc.RootElement.TryGetProperty("totalCount", out _));
         }
 
-        [Fact]
-        public async Task GetSalesReport_WithAllParameters_ReturnsOk()
+
+
+        // --- PRESERVATION TESTS ---
+        // Validates: Requirements 3.1
+
+        [Theory]
+        [InlineData("/api/orders", 2, 5)]
+        [InlineData("/api/customers", 1, 10)]
+        [InlineData("/api/invoices", 1, 5)]
+        [InlineData("/api/suppliers", 1, 5)]
+        [InlineData("/api/stockitems", 1, 10)]
+        [InlineData("/api/productsearch", 1, 5)]
+        [InlineData("/api/delivery", 1, 5)]
+        [InlineData("/api/purchaseorders", 1, 5)]
+        public async Task GetList_WithoutExport_ReturnsPaginatedResponse(string endpoint, int page, int pageSize)
         {
-            var response = await _client.GetAsync(
-                "/api/salesreport?page=1&pageSize=10&customerId=1&search=widget&sortBy=invoicedate&sortDirection=desc&startDate=2016-01-01&endDate=2016-12-31");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var response = await _client.GetAsync($"{endpoint}?page={page}&pageSize={pageSize}");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            Assert.Equal(page, root.GetProperty("page").GetInt32());
+            Assert.True(root.GetProperty("pageSize").GetInt32() <= 100, "pageSize should be capped at 100");
+            Assert.Equal(pageSize, root.GetProperty("pageSize").GetInt32());
+            Assert.True(root.GetProperty("totalCount").GetInt32() > 0, "totalCount should be positive");
+            Assert.True(root.GetProperty("data").GetArrayLength() <= pageSize, "data length should not exceed pageSize");
+        }
+
+        // --- EXPORT TESTS ---
+        // Validates: Requirements 2.1
+
+        [Theory]
+        [InlineData("/api/orders")]
+        [InlineData("/api/customers")]
+        public async Task GetList_WithExportTrue_ReturnsAllRecords(string endpoint)
+        {
+            var response = await _client.GetAsync($"{endpoint}?export=true");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            var data = root.GetProperty("data");
+            var totalCount = root.GetProperty("totalCount").GetInt32();
+
+            Assert.Equal(totalCount, data.GetArrayLength());
+            Assert.True(totalCount > 0, "Export should return at least some records");
         }
     }
 }

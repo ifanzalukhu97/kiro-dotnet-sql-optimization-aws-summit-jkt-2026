@@ -31,10 +31,14 @@ namespace WideWorldImporters.Api.Controllers
             [FromQuery] DateTime? endDate = null,
             [FromQuery] string sortBy = null,
             [FromQuery] string sortDirection = "asc",
-            [FromQuery] string search = null)
+            [FromQuery] string search = null,
+            [FromQuery] bool export = false)
         {
-            if (pageSize < 1) pageSize = 1;
-            if (pageSize > 100) pageSize = 100;
+            if (!export)
+            {
+                if (pageSize < 1) pageSize = 1;
+                if (pageSize > 100) pageSize = 100;
+            }
             if (page < 1) page = 1;
 
             var query = _context.Orders
@@ -84,10 +88,10 @@ namespace WideWorldImporters.Api.Controllers
 
             var totalCount = await query.CountAsync();
 
-            var orders = await ApplySort(query, sortBy, sortDirection)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var sorted = ApplySort(query, sortBy, sortDirection);
+            var orders = export
+                ? await sorted.ToListAsync()
+                : await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             var orderDtos = new List<OrderListDto>();
 
@@ -135,6 +139,11 @@ namespace WideWorldImporters.Api.Controllers
                 return NotFound(new { error = $"Resource 'Order' with identifier '{orderId}' was not found" });
             }
 
+            var stockItemIds = order.OrderLines.Select(ol => ol.StockItemID).Distinct().ToList();
+            var stockItems = await _context.StockItems
+                .Where(si => stockItemIds.Contains(si.StockItemID))
+                .ToDictionaryAsync(si => si.StockItemID, si => si.StockItemName);
+
             var dto = new OrderDetailDto
             {
                 OrderId = order.OrderID,
@@ -148,7 +157,9 @@ namespace WideWorldImporters.Api.Controllers
                     StockItemId = ol.StockItemID,
                     Description = ol.Description,
                     Quantity = ol.Quantity,
-                    UnitPrice = ol.UnitPrice
+                    UnitPrice = ol.UnitPrice,
+                    StockItemName = stockItems.GetValueOrDefault(ol.StockItemID, ""),
+                    TotalPrice = ol.Quantity * ol.UnitPrice
                 }).ToList()
             };
 

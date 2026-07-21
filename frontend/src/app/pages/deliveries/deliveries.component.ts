@@ -48,7 +48,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
   endDate: string = '';
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     if (this.selectedDriverIds.length) params['driverId'] = this.selectedDriverIds.join(',');
     if (this.startDate) params['startDate'] = this.startDate;
     if (this.endDate) params['endDate'] = this.endDate;

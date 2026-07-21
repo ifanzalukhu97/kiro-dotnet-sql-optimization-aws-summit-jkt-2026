@@ -50,7 +50,7 @@ export class PurchaseOrdersComponent implements OnInit {
   private selectedSupplierIds: number[] = [];
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     if (this.selectedSupplierIds.length) params['supplierId'] = this.selectedSupplierIds.join(',');
     return this.apiService.getList<PurchaseOrderListItem>('purchaseorders', params).pipe(map(r => r.data));
   };

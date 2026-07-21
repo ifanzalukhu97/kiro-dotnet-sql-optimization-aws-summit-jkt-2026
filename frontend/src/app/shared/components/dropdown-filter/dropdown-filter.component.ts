@@ -18,6 +18,13 @@ export class DropdownFilterComponent {
   selectedValue: string = '';
   selectedValues = new Set<number>();
   panelOpen = false;
+  searchTerm: string = '';
+
+  get filteredOptions(): LookupItem[] {
+    if (!this.searchTerm) return this.options;
+    const term = this.searchTerm.toLowerCase();
+    return this.options.filter(o => o.name.toLowerCase().includes(term));
+  }
 
   constructor(private elementRef: ElementRef) {}
 

@@ -3,15 +3,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
 
-interface SupplierDetail {
-  supplierId: number;
+interface InventoryDetail {
+  stockItemId: number;
+  stockItemName: string;
   supplierName: string;
-  categoryName: string;
-  recentPurchaseOrders: any[];
+  unitPrice: number;
+  recommendedRetailPrice: number;
+  taxRate: number;
+  typicalWeightPerUnit: number;
+  quantityOnHand: number;
+  reorderLevel: number;
+  targetStockLevel: number;
+  stockGroups: string[];
 }
 
 @Component({
-  selector: 'app-supplier-detail',
+  selector: 'app-inventory-detail',
   template: `
     <div class="page-container">
       <div class="page-header">
@@ -20,23 +27,23 @@ interface SupplierDetail {
       </div>
       <div *ngIf="loading" class="loading">Loading...</div>
       <div *ngIf="detail" class="detail-content">
-        <h1>Supplier #{{ detail.supplierId }}</h1>
+        <h1>Inventory Item #{{ detail.stockItemId }}</h1>
         <div class="detail-info">
-          <div class="detail-field"><span class="label">Name:</span><span class="value">{{ detail.supplierName }}</span></div>
-          <div class="detail-field"><span class="label">Category:</span><span class="value">{{ detail.categoryName }}</span></div>
+          <div class="detail-field"><span class="label">Name:</span><span class="value">{{ detail.stockItemName }}</span></div>
+          <div class="detail-field"><span class="label">Supplier:</span><span class="value">{{ detail.supplierName }}</span></div>
+          <div class="detail-field"><span class="label">Unit Price:</span><span class="value">{{ detail.unitPrice | currency }}</span></div>
+          <div class="detail-field"><span class="label">Recommended Retail Price:</span><span class="value">{{ detail.recommendedRetailPrice | currency }}</span></div>
+          <div class="detail-field"><span class="label">Tax Rate:</span><span class="value">{{ detail.taxRate }}%</span></div>
+          <div class="detail-field"><span class="label">Typical Weight:</span><span class="value">{{ detail.typicalWeightPerUnit }} kg</span></div>
+          <div class="detail-field"><span class="label">Quantity On Hand:</span><span class="value">{{ detail.quantityOnHand }}</span></div>
+          <div class="detail-field"><span class="label">Reorder Level:</span><span class="value">{{ detail.reorderLevel }}</span></div>
+          <div class="detail-field"><span class="label">Target Stock Level:</span><span class="value">{{ detail.targetStockLevel }}</span></div>
         </div>
-        <h3>Purchase Orders</h3>
-        <table class="lines-table" *ngIf="detail.recentPurchaseOrders?.length">
-          <thead><tr><th>PO ID</th><th>Order Date</th><th>Expected Delivery</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let po of detail.recentPurchaseOrders">
-              <td>{{ po.purchaseOrderId }}</td>
-              <td>{{ po.orderDate | date:'mediumDate' }}</td>
-              <td>{{ po.expectedDeliveryDate | date:'mediumDate' }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p *ngIf="!detail.recentPurchaseOrders?.length" class="empty">No purchase orders.</p>
+        <h3>Stock Groups</h3>
+        <ul class="stock-groups" *ngIf="detail.stockGroups?.length">
+          <li *ngFor="let group of detail.stockGroups">{{ group }}</li>
+        </ul>
+        <p *ngIf="!detail.stockGroups?.length" class="empty">No stock groups.</p>
       </div>
     </div>
   `,
@@ -52,15 +59,13 @@ interface SupplierDetail {
     .detail-info { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
     .detail-field .label { color: #b0b0b0; margin-right: 8px; font-size: 14px; }
     .detail-field .value { color: #ffffff; font-size: 14px; }
-    .lines-table { width: 100%; border-collapse: collapse; }
-    .lines-table th, .lines-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #3a3a3a; }
-    .lines-table th { color: #b0b0b0; font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .lines-table td { color: #ffffff; font-size: 14px; }
-    .lines-table tbody tr:hover { background: #333333; }
+    .stock-groups { list-style: none; padding: 0; margin: 0; }
+    .stock-groups li { color: #ffffff; font-size: 14px; padding: 6px 12px; border-bottom: 1px solid #3a3a3a; }
+    .stock-groups li:hover { background: #333333; }
   `]
 })
-export class SupplierDetailComponent implements OnInit {
-  detail: SupplierDetail | null = null;
+export class InventoryDetailComponent implements OnInit {
+  detail: InventoryDetail | null = null;
   loading = true;
   responseTime: number | null = null;
   requestFailed = false;
@@ -82,7 +87,7 @@ export class SupplierDetailComponent implements OnInit {
 
   loadDetail(id: number): void {
     this.loading = true;
-    this.apiService.getDetail<SupplierDetail>('suppliers', id).subscribe({
+    this.apiService.getDetail<InventoryDetail>('stockitems', id).subscribe({
       next: (data) => { this.detail = data; this.loading = false; },
       error: () => { this.loading = false; }
     });

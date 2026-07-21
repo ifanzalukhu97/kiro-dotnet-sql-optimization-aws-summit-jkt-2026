@@ -30,10 +30,14 @@ namespace WideWorldImporters.Api.Controllers
             [FromQuery] decimal? maxPrice = null,
             [FromQuery] string sortBy = null,
             [FromQuery] string sortDirection = "asc",
-            [FromQuery] string search = null)
+            [FromQuery] string search = null,
+            [FromQuery] bool export = false)
         {
-            if (pageSize < 1) pageSize = 1;
-            if (pageSize > 100) pageSize = 100;
+            if (!export)
+            {
+                if (pageSize < 1) pageSize = 1;
+                if (pageSize > 100) pageSize = 100;
+            }
             if (page < 1) page = 1;
 
             if (minPrice.HasValue && maxPrice.HasValue && minPrice.Value > maxPrice.Value)
@@ -117,9 +121,8 @@ namespace WideWorldImporters.Api.Controllers
                 _ => query.OrderBy(x => x.StockItem.StockItemName)
             };
 
-            var items = await orderedQuery
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            var pagedQuery = export ? orderedQuery : orderedQuery.Skip((page - 1) * pageSize).Take(pageSize);
+            var items = await pagedQuery
                 .Select(x => new ProductSearchItemDto
                 {
                     StockItemId = x.StockItem.StockItemID,

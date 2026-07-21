@@ -1,6 +1,6 @@
 <div class="page-container">
   <div class="page-header">
-    <h1>Product Search</h1>
+    <h1>Products</h1>
     <div class="header-actions">
       <app-export-csv-button
         [resourceName]="'product-search'"
@@ -66,6 +66,7 @@
     [pageSize]="pageSize"
     [totalCount]="totalCount"
     (pageChange)="onPageChange($event)"
-    (sortChange)="onSortChange($event)">
+    (sortChange)="onSortChange($event)"
+    (rowClick)="onRowClick($event)">
   </app-data-table>
 </div>

@@ -8,7 +8,7 @@ interface CustomerDetail {
   customerName: string;
   creditLimit: number;
   recentOrders: any[];
-  transactions: any[];
+  recentTransactions: any[];
 }
 
 @Component({
@@ -40,17 +40,17 @@ interface CustomerDetail {
         <p *ngIf="!detail.recentOrders?.length" class="empty">No recent orders.</p>
 
         <h3>Transactions</h3>
-        <table class="lines-table" *ngIf="detail.transactions?.length">
+        <table class="lines-table" *ngIf="detail.recentTransactions?.length">
           <thead><tr><th>Date</th><th>Amount</th><th>Outstanding</th></tr></thead>
           <tbody>
-            <tr *ngFor="let tx of detail.transactions">
+            <tr *ngFor="let tx of detail.recentTransactions">
               <td>{{ tx.transactionDate | date:'mediumDate' }}</td>
               <td>{{ tx.transactionAmount | currency }}</td>
               <td>{{ tx.outstandingBalance | currency }}</td>
             </tr>
           </tbody>
         </table>
-        <p *ngIf="!detail.transactions?.length" class="empty">No transactions.</p>
+        <p *ngIf="!detail.recentTransactions?.length" class="empty">No transactions.</p>
       </div>
     </div>
   `,

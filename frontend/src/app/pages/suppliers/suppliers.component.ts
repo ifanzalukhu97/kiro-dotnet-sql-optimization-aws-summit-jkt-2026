@@ -47,7 +47,7 @@ export class SuppliersComponent implements OnInit {
   private selectedCategoryIds: number[] = [];
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     if (this.selectedCategoryIds.length) params['categoryId'] = this.selectedCategoryIds.join(',');
     return this.apiService.getList<SupplierListItem>('suppliers', params).pipe(map(r => r.data));
   };

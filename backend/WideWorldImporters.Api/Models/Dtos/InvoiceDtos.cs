@@ -28,6 +28,7 @@ namespace WideWorldImporters.Api.Models.Dtos
     {
         public int InvoiceLineId { get; set; }
         public int StockItemId { get; set; }
+        public string StockItemName { get; set; }
         public string Description { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

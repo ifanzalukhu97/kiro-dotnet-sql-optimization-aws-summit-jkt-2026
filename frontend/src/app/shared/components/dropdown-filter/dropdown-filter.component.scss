@@ -117,6 +117,28 @@
     }
   }
 
+  &__search-input {
+    width: calc(100% - 1.5rem);
+    margin: 0.5rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: 1px solid var(--border-color, #333);
+    border-radius: var(--border-radius, 4px);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &::placeholder {
+      color: #888;
+    }
+
+    &:focus {
+      border-color: var(--color-primary, #aaff00);
+      box-shadow: 0 0 0 2px rgba(170, 255, 0, 0.2);
+    }
+  }
+
   &__option {
     display: flex;
     align-items: center;

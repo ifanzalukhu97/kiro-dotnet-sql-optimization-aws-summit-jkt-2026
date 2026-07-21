@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { TimingService } from '../../core/services/timing.service';
@@ -49,7 +50,7 @@ export class ProductSearchComponent implements OnInit {
   maxPrice: string = '';
 
   exportFn = () => {
-    const params: Record<string, any> = { page: 1, pageSize: 10000 };
+    const params: Record<string, any> = { page: 1, export: 'true' };
     if (this.selectedSupplierIds.length) params['supplierId'] = this.selectedSupplierIds.join(',');
     if (this.selectedStockGroupIds.length) params['stockGroupId'] = this.selectedStockGroupIds.join(',');
     if (this.minPrice) params['minPrice'] = this.minPrice;
@@ -63,7 +64,9 @@ export class ProductSearchComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private timingService: TimingService
+    private timingService: TimingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -173,5 +176,9 @@ export class ProductSearchComponent implements OnInit {
     this.sortDirection = event.direction;
     this.page = 1;
     this.loadData();
+  }
+
+  onRowClick(row: any): void {
+    this.router.navigate([row.stockItemId], { relativeTo: this.route });
   }
 }

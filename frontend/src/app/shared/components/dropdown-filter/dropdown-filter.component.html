@@ -27,6 +27,12 @@
     </button>
 
     <div *ngIf="panelOpen" class="dropdown-filter__panel">
+      <input
+        type="text"
+        class="dropdown-filter__search-input"
+        placeholder="Search..."
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value" />
       <button
         *ngIf="selectedValues.size > 0"
         type="button"
@@ -35,14 +41,14 @@
         Clear
       </button>
       <label
-        *ngFor="let option of options"
+        *ngFor="let option of filteredOptions"
         class="dropdown-filter__option"
         (click)="$event.stopPropagation()">
         <input
           type="checkbox"
           [checked]="isSelected(option.id)"
           (change)="toggleOption(option.id)" />
-        <span class="dropdown-filter__option-text">{{ option.name }}</span>
+        <span class="dropdown-filter__option-text" [title]="option.name">{{ option.name }}</span>
       </label>
     </div>
   </div>

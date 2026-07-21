@@ -30,10 +30,14 @@ namespace WideWorldImporters.Api.Controllers
             [FromQuery] DateTime? endDate = null,
             [FromQuery] string sortBy = null,
             [FromQuery] string sortDirection = "asc",
-            [FromQuery] string search = null)
+            [FromQuery] string search = null,
+            [FromQuery] bool export = false)
         {
-            if (pageSize > 100) pageSize = 100;
-            if (pageSize < 1) pageSize = 1;
+            if (!export)
+            {
+                if (pageSize > 100) pageSize = 100;
+                if (pageSize < 1) pageSize = 1;
+            }
             if (page < 1) page = 1;
 
             var query = _context.Invoices.AsQueryable();
@@ -68,10 +72,10 @@ namespace WideWorldImporters.Api.Controllers
 
             var totalCount = await query.CountAsync();
 
-            var invoices = await ApplySort(query, sortBy, sortDirection)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var sorted = ApplySort(query, sortBy, sortDirection);
+            var invoices = export
+                ? await sorted.ToListAsync()
+                : await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             var invoiceDtos = new List<InvoiceListDto>();
             foreach (var invoice in invoices)
@@ -123,6 +127,11 @@ namespace WideWorldImporters.Api.Controllers
                 return NotFound(new { error = $"Resource 'Invoice' with identifier '{invoiceId}' was not found" });
             }
 
+            var stockItemIds = invoice.InvoiceLines.Select(il => il.StockItemID).Distinct().ToList();
+            var stockItems = await _context.StockItems
+                .Where(si => stockItemIds.Contains(si.StockItemID))
+                .ToDictionaryAsync(si => si.StockItemID, si => si.StockItemName);
+
             var detail = new InvoiceDetailDto
             {
                 InvoiceId = invoice.InvoiceID,
@@ -134,6 +143,7 @@ namespace WideWorldImporters.Api.Controllers
                 {
                     InvoiceLineId = il.InvoiceLineID,
                     StockItemId = il.StockItemID,
+                    StockItemName = stockItems.GetValueOrDefault(il.StockItemID, ""),
                     Description = il.Description,
                     Quantity = il.Quantity,
                     UnitPrice = il.UnitPrice,

@@ -52,6 +52,37 @@ namespace WideWorldImporters.IntegrationTests.Controllers
         }
 
         [Fact]
+        public async Task GetCustomer_ReturnsRecentTransactionsArray()
+        {
+            var response = await _client.GetAsync("/api/customers/1");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+
+            Assert.True(doc.RootElement.TryGetProperty("recentTransactions", out var transactions));
+            Assert.Equal(JsonValueKind.Array, transactions.ValueKind);
+        }
+
+        /// <summary>
+        /// Preservation: Customer Detail recentOrders section still returns data.
+        /// Validates: Requirements 3.7
+        /// </summary>
+        [Fact]
+        public async Task GetCustomer_RecentOrders_StillReturnsData()
+        {
+            var response = await _client.GetAsync("/api/customers/1");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+
+            Assert.True(doc.RootElement.TryGetProperty("recentOrders", out var orders));
+            Assert.Equal(JsonValueKind.Array, orders.ValueKind);
+            Assert.True(orders.GetArrayLength() > 0, "Customer 1 should have at least one recent order");
+        }
+
+        [Fact]
         public async Task GetCustomer_WithNonExistentId_Returns404WithError()
         {
             var response = await _client.GetAsync("/api/customers/999999");

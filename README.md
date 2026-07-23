@@ -260,3 +260,10 @@ The `.kiro/` directory contains AI-assisted development configuration:
 - **Frontend**: Angular 18 with dark-mode UI (`#121212` background, `#aaff00` accent), response time badges, dropdown filters
 - **Database**: SQL Server 2022 with WideWorldImporters (Full backup, 200K+ rows in key tables)
 - **Testing**: xUnit + FsCheck (backend), Jasmine + Karma (frontend unit), Playwright (E2E)
+
+## Contact
+
+- [linkedin.com/in/ifanzalukhu97](https://linkedin.com/in/ifanzalukhu97)
+- [github.com/ifanzalukhu97](https://github.com/ifanzalukhu97)
+- [medium.com/@ifanzalukhu97](https://medium.com/@ifanzalukhu97)
+- [dev.to/ifanzalukhu97](https://dev.to/ifanzalukhu97)

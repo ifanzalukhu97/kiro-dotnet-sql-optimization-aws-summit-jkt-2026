@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiro for .NET: MS SQL Server Optimization in Hours, Not Days — AWS Summit Jakarta 2026</title>
+<style>
+:root {
+  --bg:      #0d0d0d;
+  --bg2:     #141414;
+  --lime:    #aaff00;
+  --lime-bg: rgba(170,255,0,0.08);
+  --lime-border: rgba(170,255,0,0.25);
+  --text:    #ffffff;
+  --text2:   #cccccc;
+  --gray:    #888888;
+  --gray2:   #444444;
+  --border:  rgba(255,255,255,0.08);
+  --card-bg: #141414;
+  --code-bg: #0a0a0a;
+  --red:     #ff5555;
+  --green:   #4ade80;
+  --radius:  14px;
+  --shadow:  none;
+}
+body.light {
+  --bg:      #f7f7f5;
+  --bg2:     #eeeeeb;
+  --lime:    #3a8200;
+  --lime-bg: rgba(58,130,0,0.08);
+  --lime-border: rgba(58,130,0,0.3);
+  --text:    #111111;
+  --text2:   #333333;
+  --gray:    #666666;
+  --gray2:   #aaaaaa;
+  --border:  rgba(0,0,0,0.1);
+  --card-bg: #eeeeeb;
+  --code-bg: #e0e0db;
+  --red:     #cc2222;
+  --green:   #16803c;
+  --shadow:  0 2px 12px rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Segoe UI','Inter',system-ui,sans-serif;color:var(--text);transition:background 0.3s,color 0.3s;}
+
+#deck{position:fixed;inset:0;z-index:1;}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:64px 6%;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.4s ease,transform 0.4s ease;
+  transform:translateY(20px);overflow:hidden;
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateY(0);}
+.slide.out{opacity:0;transform:translateY(-20px);}
+
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--lime);z-index:100;transition:width 0.4s ease;}
+#slide-info{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--gray);z-index:100;letter-spacing:2px;}
+
+#nav{position:fixed;bottom:16px;right:24px;display:flex;gap:8px;z-index:100;}
+.nav-btn{
+  background:var(--bg2);border:1px solid var(--border);color:var(--text);
+  width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.nav-btn:hover{border-color:var(--lime);color:var(--lime);}
+
+.slide-title{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;color:var(--text);line-height:1.15;margin-bottom:12px;}
+.slide-title .accent{color:var(--lime);}
+.slide-subtitle{font-size:clamp(0.9rem,1.8vw,1.15rem);color:var(--gray);margin-bottom:28px;line-height:1.6;}
+.tag{display:inline-block;background:var(--lime-bg);border:1px solid var(--lime-border);color:var(--lime);font-size:11px;padding:4px 12px;border-radius:20px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);}
+.card.lime-border{border-color:var(--lime-border);}
+.card.highlight{background:var(--lime-bg);border-color:var(--lime-border);}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;max-width:920px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:1000px;}
+
+.dot-list{list-style:none;width:100%;}
+.dot-list li{padding:9px 0 9px 24px;position:relative;font-size:clamp(0.82rem,1.6vw,1rem);color:var(--text2);line-height:1.5;border-bottom:1px solid var(--border);}
+.dot-list li::before{content:'—';position:absolute;left:0;color:var(--lime);font-weight:700;}
+.dot-list li.bad::before{content:'✕';color:var(--red);}
+.dot-list li.good::before{content:'✓';color:var(--lime);}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;max-width:920px;}
+.compare-col{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.compare-col.active-col{border-color:var(--lime-border);background:var(--lime-bg);}
+.compare-header{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.compare-badge{display:inline-block;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:20px;}
+
+.timeline{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;max-width:980px;}
+.phase{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;flex:1;min-width:150px;text-align:center;}
+.phase-num{font-size:1.6rem;font-weight:900;color:var(--lime);line-height:1;}
+.phase-title{font-size:0.85rem;font-weight:700;color:var(--text);margin-top:8px;}
+.phase-desc{font-size:0.72rem;color:var(--gray);margin-top:6px;line-height:1.5;}
+
+.hl{color:var(--lime);font-weight:700;}
+.hl-red{color:var(--red);}
+
+.link-chip{display:inline-flex;align-items:center;gap:6px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.82rem;color:var(--lime);text-decoration:none;cursor:pointer;transition:border-color 0.2s;}
+.link-chip:hover{border-color:var(--lime-border);}
+
+.mono-table{width:100%;max-width:820px;border-collapse:collapse;font-size:0.82rem;}
+.mono-table th{text-align:left;color:var(--lime);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;border-bottom:1px solid var(--lime-border);}
+.mono-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);font-family:'Consolas','Courier New',monospace;}
+.mono-table td.desc{font-family:inherit;color:var(--gray);}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.a1{animation:fade-up 0.45s 0.05s both;}
+.a2{animation:fade-up 0.45s 0.15s both;}
+.a3{animation:fade-up 0.45s 0.28s both;}
+.a4{animation:fade-up 0.45s 0.42s both;}
+.a5{animation:fade-up 0.45s 0.56s both;}
+
+@media(max-width:720px){
+  .slide{padding:50px 4%;}
+  .g2,.compare{grid-template-columns:1fr;}
+  .g3{grid-template-columns:1fr;}
+  .slide-title{font-size:1.4rem;}
+  .timeline{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+
+<!-- S1 : TITLE -->
+<div class="slide active" id="s1">
+  <div style="text-align:center;max-width:860px;">
+    <div class="tag a1">AWS Summit Jakarta 2026 · Demo Booth</div>
+    <h1 class="slide-title a2" style="font-size:clamp(1.8rem,4.6vw,3.1rem);margin-top:20px;">
+      Kiro for .NET: MS SQL Server <span class="accent">Optimization</span><br/>in Hours, Not Days
+    </h1>
+    <p class="a3" style="font-size:clamp(0.95rem,2vw,1.15rem);color:var(--gray);margin-bottom:32px;">
+      An AI-assisted workflow for diagnosing and fixing slow SQL Server queries on .NET Core — from raw query to root cause to a working fix
+    </p>
+    <div class="a4" style="display:inline-flex;align-items:flex-start;gap:14px;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:16px 28px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--lime-bg);border:1px solid var(--lime-border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;margin-top:2px;">👨‍💻</div>
+      <div style="text-align:left;">
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px;">Ifan Jaya Suswanto Zalukhu</div>
+        <div style="font-size:0.78rem;color:var(--gray);line-height:1.7;">
+          AWS Community Builder<br/>
+          Co-organizer, AWS User Group Medan<br/>
+          Head of Engineering, SimpliDOTS
+        </div>
+      </div>
+    </div>
+    <p class="a5" style="margin-top:24px;font-size:0.72rem;color:var(--gray2);">← → navigate &nbsp;·&nbsp; L light mode &nbsp;·&nbsp; F fullscreen</p>
+  </div>
+</div>
+
+<!-- S2 : PAIN POINT - THE ORM BLIND SPOT -->
+<div class="slide" id="s2">
+  <div style="max-width:880px;width:100%;">
+    <div class="tag a1">1 · Pain Point</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">Slow Query? That's <span class="hl-red">Raw SQL</span>.<br/>Your Code? That's <span class="accent">ORM</span>.</h2>
+    <p class="a3" style="color:var(--gray);margin-bottom:8px;font-size:0.9rem;">If you've worked on a .NET Core app using an ORM (Object-Relational Mapping — an "auto-translator" between your code and the database), this is familiar:</p>
+    <div class="a3" style="margin-top:8px;">
+      <div class="card">
+        <ul class="dot-list">
+          <li class="bad">The database suddenly spikes, and you get handed the raw SQL query that's causing it</li>
+          <li class="bad">But your codebase is written in ORM / LINQ syntax — a form that looks nothing like that raw query</li>
+          <li class="bad">Tracing the raw query back to the exact line of code that generated it means manually searching and guessing across the codebase</li>
+          <li class="bad">Whoever's searching gets exhausted — and whoever fixes it afterward gets exhausted too</li>
+        </ul>
+      </div>
+    </div>
+    <div class="a4" style="margin-top:16px;padding:14px 20px;background:var(--lime-bg);border:1px solid var(--lime-border);border-radius:10px;font-size:0.88rem;">
+      <span class="hl">The result:</span> <span style="color:var(--text2);">finding the one query that's spiking the database used to take days — before anyone even starts fixing it.</span>
+    </div>
+  </div>
+</div>
+
+<!-- S3 : PAIN POINT - ENTER KIRO -->
+<div class="slide" id="s3">
+  <div style="max-width:920px;width:100%;">
+    <div class="tag a1">1 · Pain Point → Enter Kiro</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">From Raw Query to Root Cause, <span class="accent">Fast</span></h2>
+    <div class="compare a3">
+      <div class="compare-col">
+        <div class="compare-header" style="color:var(--red);">❌ Before</div>
+        <ul class="dot-list">
+          <li class="bad">Manually grep the codebase, guessing which LINQ expression maps to that raw SQL</li>
+          <li class="bad">Cross-check table and column names by hand</li>
+          <li class="bad">Ask around the team, still not fully sure</li>
+        </ul>
+        <span class="compare-badge" style="background:rgba(255,85,85,0.1);color:var(--red);margin-top:8px;">Days, just to investigate</span>
+      </div>
+      <div class="compare-col active-col">
+        <div class="compare-header" style="color:var(--lime);">✓ With Kiro</div>
+        <ul class="dot-list">
+          <li class="good">Kiro has no live connection to the database — you run the raw query yourself and hand the result to Kiro, along with access to the codebase</li>
+          <li class="good">Kiro traces which ORM/LINQ code actually generates that exact query</li>
+          <li class="good">Because Kiro can see the codebase, it also suggests how to optimize the query</li>
+          <li class="good">You learn something new about your own codebase along the way</li>
+        </ul>
+        <span class="compare-badge" style="background:var(--lime-bg);color:var(--lime);margin-top:8px;">Hours — root cause + a suggested fix</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S4 : ARCHITECTURE - STACK -->
+<div class="slide" id="s4">
+  <div style="max-width:1000px;width:100%;">
+    <div class="tag a1">2 · Architecture</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">The <span class="accent">Demo Stack</span></h2>
+    <div class="g3 a3">
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🖥️</div>
+        <div style="font-weight:700;margin-bottom:4px;">Frontend</div>
+        <div style="font-size:0.8rem;color:var(--gray);">Angular 18 SPA — a dummy web supply chain / distribution management system (DMS)</div>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px;">⚙️</div>
+        <div style="font-weight:700;margin-bottom:4px;">Backend</div>
+        <div style="font-size:0.8rem;color:var(--gray);">ASP.NET Core 5 Web API + EF Core — a dummy backend built close to a real-world case</div>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🗄️</div>
+        <div style="font-weight:700;margin-bottom:4px;">Database</div>
+        <div style="font-size:0.8rem;color:var(--gray);">SQL Server 2022 in Docker, using a <span class="hl">dummy / sample database</span> (WideWorldImporters)</div>
+      </div>
+    </div>
+    <div class="a4" style="margin-top:18px;padding:14px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;font-size:0.85rem;color:var(--text2);text-align:center;">
+      Angular&nbsp;18 → ASP.NET Core 5 API → EF Core → SQL Server 2022 (WideWorldImporters)
+    </div>
+  </div>
+</div>
+
+<!-- S5 : ARCHITECTURE - KIRO WRITES IT DOWN -->
+<div class="slide" id="s5">
+  <div style="max-width:1000px;width:100%;">
+    <div class="tag a1">2 · Architecture</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">Kiro Also <span class="accent">Writes It Down</span></h2>
+    <p class="a3" style="color:var(--gray);margin-bottom:8px;font-size:0.9rem;">Because Kiro has full access to the codebase, every optimization round becomes three things:</p>
+    <div class="g3 a4">
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🔍</div>
+        <div style="font-weight:700;margin-bottom:4px;">Finds It</div>
+        <div style="font-size:0.8rem;color:var(--gray);">Traces the raw query back to the exact ORM/LINQ code generating it</div>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🛠️</div>
+        <div style="font-weight:700;margin-bottom:4px;">Fixes It</div>
+        <div style="font-size:0.8rem;color:var(--gray);">Proposes concrete index or query changes to optimize it</div>
+      </div>
+      <div class="card highlight">
+        <div style="font-size:1.4rem;margin-bottom:8px;">📝</div>
+        <div style="font-weight:700;margin-bottom:4px;">Documents It</div>
+        <div style="font-size:0.8rem;color:var(--text2);">Every round is written down as a markdown file — more on this next →</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S6 : ARCHITECTURE - QUERY OPTIMIZATION HISTORY -->
+<div class="slide" id="s6">
+  <div style="max-width:980px;width:100%;">
+    <div class="tag a1">2 · Architecture</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">Living Documentation: <span class="accent">Query Optimization History</span></h2>
+    <p class="a3" style="color:var(--gray);margin-bottom:10px;font-size:0.88rem;">Every analysis is committed as its own markdown file, capturing: <span class="hl">problem</span> · <span class="hl">analysis result</span> · <span class="hl">recommendation / next action</span> · <span class="hl">before &amp; after performance</span>.</p>
+    <div class="timeline a4">
+      <div class="phase"><div class="phase-num">Day 1</div><div class="phase-title">Analyze & Record</div><div class="phase-desc">Found a slow query that needs a new index — recorded in a new .md file</div></div>
+      <div class="phase"><div class="phase-num">Day N</div><div class="phase-title">Re-check & Compare</div><div class="phase-desc">Send the latest query insight + performance, ask Kiro to compare it against the previous .md</div></div>
+      <div class="phase" style="border-color:var(--lime-border);background:var(--lime-bg);"><div class="phase-num">New .md</div><div class="phase-title">Updated History</div><div class="phase-desc">Kiro writes a new file noting whether the earlier fix actually helped</div></div>
+    </div>
+    <div class="a5" style="margin-top:16px;padding:14px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;font-size:0.85rem;color:var(--text2);text-align:center;">
+      Not just a changelog — a written <span class="hl">why</span>, so nothing gets re-broken by accident.
+    </div>
+  </div>
+</div>
+
+<!-- S7 : ARCHITECTURE - TWO SAFETY NETS -->
+<div class="slide" id="s7">
+  <div style="max-width:920px;width:100%;">
+    <div class="tag a1">2 · Architecture</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">One History, <span class="accent">Two Safety Nets</span></h2>
+    <div class="g2 a3">
+      <div class="card">
+        <div style="font-size:0.72rem;color:var(--lime);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🧠 Smarter Analysis</div>
+        <div style="font-size:0.85rem;color:var(--text2);line-height:1.6;">Kiro reads prior rounds before suggesting anything new — so it won't casually recommend dropping an index that turns out to matter, because the history already explains why it's there.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:0.72rem;color:var(--lime);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🔎 Smarter Code Review</div>
+        <div style="font-size:0.85rem;color:var(--text2);line-height:1.6;">The same history folder feeds into steering/hooks during code review — flagging new code that isn't index-optimal or risks reintroducing a previously-solved problem.</div>
+      </div>
+    </div>
+    <div class="a4" style="margin-top:16px;padding:14px 20px;background:var(--lime-bg);border:1px solid var(--lime-border);border-radius:10px;font-size:0.88rem;text-align:center;">
+      <span class="hl">The result:</span> <span style="color:var(--text2);">less guesswork today, and a safety net for every change tomorrow.</span>
+    </div>
+  </div>
+</div>
+
+<!-- S8 : HOW TO USE - DEMO FLOW -->
+<div class="slide" id="s8">
+  <div style="max-width:980px;width:100%;">
+    <div class="tag a1">3 · How to Use</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">The Demo Flow, <span class="accent">Step by Step</span></h2>
+    <div class="timeline a3">
+      <div class="phase"><div class="phase-num">1</div><div class="phase-title">Run Locally</div><div class="phase-desc">Start frontend, backend, and database locally per the README</div></div>
+      <div class="phase"><div class="phase-num">2</div><div class="phase-title">Spot the Slow Query</div><div class="phase-desc">Check for slow/long-running queries — in production this could come from a CPU/IO performance alert</div></div>
+      <div class="phase"><div class="phase-num">3</div><div class="phase-title">Audit</div><div class="phase-desc">Run the audit scripts and paste the results into the project folder</div></div>
+      <div class="phase" style="border-color:var(--lime-border);background:var(--lime-bg);"><div class="phase-num">4</div><div class="phase-title">Ask Kiro</div><div class="phase-desc">Kiro explains the problem, locates it in the current codebase, and suggests a fix</div></div>
+      <div class="phase"><div class="phase-num">5</div><div class="phase-title">Review & Verify</div><div class="phase-desc">Review the recommendation, apply the change, confirm the performance improved</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S9 : HOW TO USE - AUDIT SCRIPTS -->
+<div class="slide" id="s9">
+  <div style="max-width:820px;width:100%;">
+    <div class="tag a1">3 · How to Use</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">6 DMV Scripts Power the <span class="accent">Diagnosis</span></h2>
+    <table class="mono-table a3">
+      <tr><th>Script</th><th>Purpose</th></tr>
+      <tr><td>01-wait-stats.sql</td><td class="desc">Wait statistics from sys.dm_os_wait_stats</td></tr>
+      <tr><td>02-top-io-queries.sql</td><td class="desc">Top I/O queries from sys.dm_exec_query_stats</td></tr>
+      <tr><td>03-current-indexes.sql</td><td class="desc">Existing indexes from sys.indexes</td></tr>
+      <tr><td>04-index-usage-stats.sql</td><td class="desc">Index usage from sys.dm_db_index_usage_stats</td></tr>
+      <tr><td>05-missing-indexes.sql</td><td class="desc">Missing index recommendations</td></tr>
+      <tr><td>06-index-fragmentation.sql</td><td class="desc">Index fragmentation analysis</td></tr>
+    </table>
+    <div class="a4" style="margin-top:14px;font-size:0.8rem;color:var(--gray);">Output from these scripts is what gets pasted into the project folder in step 3 — the input Kiro reads in step 4.</div>
+  </div>
+</div>
+
+<!-- S10 : BENEFIT / RESULT -->
+<div class="slide" id="s10">
+  <div style="max-width:860px;width:100%;">
+    <div class="tag a1">3 · Benefit</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">What Used to Take <span class="hl-red">Days</span>,<br/>Now Takes <span class="accent">Hours</span></h2>
+    <div class="g2 a3">
+      <div class="card">
+        <div style="font-size:0.72rem;color:var(--lime);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">✓ Faster Root-Cause</div>
+        <div style="font-size:0.85rem;color:var(--text2);line-height:1.6;">From raw query straight to the exact code and a suggested fix — no more manual detective work across ORM layers</div>
+      </div>
+      <div class="card">
+        <div style="font-size:0.72rem;color:var(--lime);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">✓ Compounding Knowledge</div>
+        <div style="font-size:0.85rem;color:var(--text2);line-height:1.6;">Every round is documented, so today's fix informs tomorrow's analysis — and even feeds into code review</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S11 : CLOSING -->
+<div class="slide" id="s11">
+  <div style="max-width:760px;width:100%;text-align:center;">
+    <div class="tag a1">Thanks!</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">Try It <span class="accent">Yourself</span></h2>
+    <p class="a3" style="color:var(--gray);margin-bottom:24px;">Full setup instructions and demo flow are in the README.</p>
+    <div class="a4" style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <a class="link-chip" href="https://github.com/ifanzalukhu97/kiro-dotnet-sql-optimization-aws-summit-jkt-2026" target="_blank">💻 github.com/ifanzalukhu97/kiro-dotnet-sql-optimization-aws-summit-jkt-2026</a>
+      <a class="link-chip" href="https://builder.aws.com/content/2yf2sol4ZERViP1ZrJtOMHQBTat/kiro-as-ai-partner-for-ms-sql-server-optimization-on-net-core-what-used-to-take-days-now-takes-hours" target="_blank">📄 Companion article on AWS Builder Center</a>
+    </div>
+  </div>
+</div>
+
+<!-- S12 : CONTACT -->
+<div class="slide" id="s12">
+  <div style="max-width:600px;width:100%;text-align:center;">
+    <div class="tag a1">Let's Connect</div>
+    <h2 class="slide-title a2" style="margin-top:12px;">Contact</h2>
+    <div class="a3" style="text-align:left;display:inline-block;">
+      <ul class="dot-list">
+        <li>💼 <a href="https://linkedin.com/in/ifanzalukhu97" target="_blank" style="color:var(--text2);">linkedin.com/in/ifanzalukhu97</a></li>
+        <li>💻 <a href="https://github.com/ifanzalukhu97" target="_blank" style="color:var(--text2);">github.com/ifanzalukhu97</a></li>
+        <li>✍️ <a href="https://medium.com/@ifanzalukhu97" target="_blank" style="color:var(--text2);">medium.com/@ifanzalukhu97</a></li>
+        <li>🧠 <a href="https://dev.to/ifanzalukhu97" target="_blank" style="color:var(--text2);">dev.to/ifanzalukhu97</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #deck -->
+
+<div id="nav">
+  <button class="nav-btn" id="btn-prev">←</button>
+  <button class="nav-btn" id="btn-next">→</button>
+  <button class="nav-btn" id="btn-theme" title="Toggle Light/Dark (L)">☀️</button>
+</div>
+<div id="slide-info">1 / 12</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const info   = document.getElementById('slide-info');
+const bar    = document.getElementById('progress');
+const btnTheme = document.getElementById('btn-theme');
+let cur = 0, isLight = false;
+
+function goTo(n){
+  if(n < 0 || n >= slides.length) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('out');
+  const prev = cur;
+  setTimeout(()=>{ slides[prev].classList.remove('out'); }, 440);
+  cur = n;
+  slides[cur].classList.add('active');
+  info.textContent = (cur+1)+' / '+slides.length;
+  bar.style.width = ((cur+1)/slides.length*100)+'%';
+}
+
+function toggleTheme(){
+  isLight=!isLight;
+  document.body.classList.toggle('light',isLight);
+  btnTheme.textContent = isLight ? '🌙' : '☀️';
+}
+
+bar.style.width = (1/slides.length*100)+'%';
+
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight',' '].includes(e.key)){ e.preventDefault(); goTo(cur+1); }
+  if(e.key==='ArrowLeft'){ e.preventDefault(); goTo(cur-1); }
+  if(e.key.toLowerCase()==='l') toggleTheme();
+  if(e.key.toLowerCase()==='f'){
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+});
+
+document.getElementById('btn-next').onclick  = ()=>goTo(cur+1);
+document.getElementById('btn-prev').onclick  = ()=>goTo(cur-1);
+btnTheme.onclick = toggleTheme;
+
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50){ dx<0?goTo(cur+1):goTo(cur-1); }
+},{passive:true});
+</script>
+</body>
+</html>

@@ -758,12 +758,20 @@ advanced-report/
     │   ├── report-card.component.ts
     │   ├── report-card.component.html
     │   └── report-card.component.scss
-    ├── revenue-chart/
-    │   └── revenue-chart.component.ts
-    ├── ranking-table/
-    │   └── ranking-table.component.ts
-    └── trend-chart/
-        └── trend-chart.component.ts
+    ├── revenue-doughnut/
+    │   └── revenue-doughnut.component.ts
+    ├── activity-doughnut/
+    │   └── activity-doughnut.component.ts
+    ├── ranking-bar-chart/
+    │   └── ranking-bar-chart.component.ts
+    ├── sales-trend-chart/
+    │   └── sales-trend-chart.component.ts
+    ├── stock-bar-chart/
+    │   └── stock-bar-chart.component.ts
+    ├── pie-chart/
+    │   └── pie-chart.component.ts
+    └── driver-chart/
+        └── driver-chart.component.ts
 ```
 
 ### Shared Report Card Component
@@ -843,6 +851,445 @@ export class AdvancedReportService {
     return this.http.get<SalesTrend[]>(`${this.baseUrl}/sales-trend`, { params: { period } });
   }
 }
+```
+
+### Chart Visualization Design
+
+#### Chart Type Mapping
+
+Each report card uses a specific chart type chosen for data characteristics and visual clarity:
+
+| Report Card | Chart Type | Library Component | Rationale |
+|-------------|-----------|-------------------|-----------|
+| Total Revenue | Doughnut | `<canvas baseChart [type]="'doughnut'">` | Shows proportion of invoice vs order revenue; center text displays total |
+| Top 10 Customers | Horizontal Bar | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Readable long names, easy revenue comparison |
+| Top 10 Salesman | Horizontal Bar | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Same pattern as customers |
+| Top 10 Products | Horizontal Bar | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Same pattern as customers |
+| Customer Activity | Doughnut | `<canvas baseChart [type]="'doughnut'">` | Active vs inactive binary proportion |
+| Sales Trend | Line (dual axis) | `<canvas baseChart [type]="'line'">` | Time-series with revenue line + order count secondary axis |
+| Low Stock | Horizontal Bar (grouped) | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Qty on hand vs reorder level side by side |
+| High Stock | Horizontal Bar (grouped) | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Qty on hand vs target stock level side by side |
+| Top Outstanding | Horizontal Bar | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Balance amounts per customer |
+| Dormant Customers | Horizontal Bar | `<canvas baseChart [type]="'bar'" [options]="{indexAxis:'y'}">` | Days since last order with color gradient |
+| Top Stock Groups | Pie | `<canvas baseChart [type]="'pie'">` | Category distribution (5 segments max) |
+| Top Suppliers | Pie | `<canvas baseChart [type]="'pie'">` | Supplier distribution (5 segments max) |
+| Top Drivers | Bar + Line | `<canvas baseChart [type]="'bar'">` | Vertical bars for delivery count, line overlay for revenue |
+
+#### Dark Theme Chart Configuration
+
+Global chart defaults applied via `Chart.defaults` in the module initialization:
+
+```typescript
+import { Chart } from 'chart.js';
+
+// Applied once in AdvancedReportModule or component constructor
+Chart.defaults.color = '#aaa';
+Chart.defaults.borderColor = '#3a3a3a';
+Chart.defaults.plugins.tooltip.backgroundColor = '#2a2a2a';
+Chart.defaults.plugins.tooltip.titleColor = '#fff';
+Chart.defaults.plugins.tooltip.bodyColor = '#ddd';
+Chart.defaults.plugins.tooltip.borderColor = '#3a3a3a';
+Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.legend.labels.color = '#aaa';
+```
+
+#### Color Palette
+
+```typescript
+export const CHART_COLORS = [
+  '#aaff00', // primary accent (green-yellow)
+  '#00d4ff', // cyan
+  '#ff6b6b', // coral red
+  '#ffa726', // amber
+  '#ab47bc', // purple
+  '#26c6da', // teal
+  '#7e57c2', // deep purple
+  '#66bb6a', // green
+  '#ef5350', // red
+  '#42a5f5', // blue
+];
+
+export const CHART_COLORS_TRANSPARENT = CHART_COLORS.map(c => c + '33'); // 20% opacity for backgrounds
+```
+
+#### Chart Component Designs
+
+##### 1. RevenueDoughnutComponent
+
+```typescript
+@Component({
+  selector: 'app-revenue-doughnut',
+  template: `
+    <div class="doughnut-container">
+      <canvas baseChart
+        [type]="'doughnut'"
+        [data]="chartData"
+        [options]="chartOptions">
+      </canvas>
+      <div class="center-text">
+        <span class="total-label">Total</span>
+        <span class="total-value">{{ formattedTotal }}</span>
+      </div>
+    </div>
+  `
+})
+export class RevenueDoughnutComponent {
+  @Input() data!: TotalRevenue;
+  // Segments: [invoiceRevenue, orderRevenue]
+  // Colors: [#aaff00, #00d4ff]
+  // Center text overlay: totalRevenue formatted as currency
+}
+```
+
+##### 2. ActivityDoughnutComponent
+
+```typescript
+@Component({
+  selector: 'app-activity-doughnut',
+  template: `
+    <div class="doughnut-container">
+      <canvas baseChart
+        [type]="'doughnut'"
+        [data]="chartData"
+        [options]="chartOptions">
+      </canvas>
+      <div class="center-text">
+        <span class="percentage-value">{{ data.activePercentage }}%</span>
+        <span class="percentage-label">Active</span>
+      </div>
+    </div>
+    <div class="activity-stats">
+      <span class="stat"><span class="dot active"></span>Active: {{ data.activeCustomers }}</span>
+      <span class="stat"><span class="dot inactive"></span>Inactive: {{ data.inactiveCustomers }}</span>
+    </div>
+  `
+})
+export class ActivityDoughnutComponent {
+  @Input() data!: CustomerActivity;
+  // Segments: [activeCustomers, inactiveCustomers]
+  // Colors: [#aaff00, #3a3a3a]
+}
+```
+
+##### 3. RankingBarChartComponent (Reusable)
+
+```typescript
+@Component({
+  selector: 'app-ranking-bar-chart',
+  template: `
+    <canvas baseChart
+      [type]="'bar'"
+      [data]="chartData"
+      [options]="chartOptions">
+    </canvas>
+    <div class="overflow-list" *ngIf="overflowItems.length > 0">
+      <div class="overflow-item" *ngFor="let item of overflowItems; let i = index">
+        <span class="overflow-rank">{{ i + 6 }}</span>
+        <span class="overflow-name">{{ item.label }}</span>
+        <span class="overflow-value">{{ item.formattedValue }}</span>
+      </div>
+    </div>
+  `
+})
+export class RankingBarChartComponent {
+  @Input() labels!: string[];        // All item names
+  @Input() values!: number[];        // All values
+  @Input() formatType: 'currency' | 'number' | 'days' = 'currency';
+  @Input() barColor: string = '#aaff00';
+  @Input() colorGradient: boolean = false; // For dormant customers
+
+  // Chart shows top 5 items in horizontal bar
+  // Remaining items (6-10) shown in compact list below
+  chartOptions = {
+    indexAxis: 'y' as const,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#3a3a3a' }, ticks: { color: '#aaa' } },
+      y: { grid: { display: false }, ticks: { color: '#ddd' } }
+    }
+  };
+}
+```
+
+##### 4. SalesTrendChartComponent
+
+```typescript
+@Component({
+  selector: 'app-sales-trend-chart',
+  template: `
+    <canvas baseChart
+      [type]="'line'"
+      [data]="chartData"
+      [options]="chartOptions">
+    </canvas>
+  `
+})
+export class SalesTrendChartComponent {
+  @Input() data!: SalesTrend[];
+
+  // Dataset 1: Revenue (line, left y-axis, color #aaff00, filled area with 20% opacity)
+  // Dataset 2: Order Count (line, right y-axis, color #00d4ff, dashed)
+  chartOptions = {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    scales: {
+      x: { grid: { color: '#3a3a3a' }, ticks: { color: '#aaa' } },
+      y: {
+        position: 'left',
+        grid: { color: '#3a3a3a' },
+        ticks: { color: '#aaff00', callback: (v) => '$' + abbreviateNumber(v) }
+      },
+      y1: {
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: { color: '#00d4ff' }
+      }
+    },
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#aaa' } }
+    }
+  };
+}
+```
+
+##### 5. StockBarChartComponent
+
+```typescript
+@Component({
+  selector: 'app-stock-bar-chart',
+  template: `
+    <canvas baseChart
+      [type]="'bar'"
+      [data]="chartData"
+      [options]="chartOptions">
+    </canvas>
+  `
+})
+export class StockBarChartComponent {
+  @Input() data!: StockLevel[];
+  @Input() mode: 'low' | 'high' = 'low';
+
+  // For 'low' mode:
+  //   Dataset 1: QuantityOnHand (bars, color conditional: #ff6b6b if <= reorderLevel, #aaff00 otherwise)
+  //   Dataset 2: ReorderLevel (bars, color #3a3a3a with border dashed)
+  // For 'high' mode:
+  //   Dataset 1: QuantityOnHand (bars, color #aaff00)
+  //   Dataset 2: TargetStockLevel (bars, color #3a3a3a with border dashed)
+  chartOptions = {
+    indexAxis: 'y' as const,
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { color: '#aaa' } } },
+    scales: {
+      x: { grid: { color: '#3a3a3a' }, ticks: { color: '#aaa' } },
+      y: { grid: { display: false }, ticks: { color: '#ddd', font: { size: 11 } } }
+    }
+  };
+}
+```
+
+##### 6. PieChartComponent (Reusable)
+
+```typescript
+@Component({
+  selector: 'app-pie-chart',
+  template: `
+    <canvas baseChart
+      [type]="'pie'"
+      [data]="chartData"
+      [options]="chartOptions">
+    </canvas>
+  `
+})
+export class PieChartComponent {
+  @Input() labels!: string[];
+  @Input() values!: number[];
+  @Input() formatType: 'currency' | 'number' = 'currency';
+
+  // Uses first N colors from CHART_COLORS
+  // Legend positioned below
+  chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#aaa', padding: 12 } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => formatValue(ctx.raw, this.formatType)
+        }
+      }
+    }
+  };
+}
+```
+
+##### 7. DriverChartComponent
+
+```typescript
+@Component({
+  selector: 'app-driver-chart',
+  template: `
+    <canvas baseChart
+      [type]="'bar'"
+      [data]="chartData"
+      [options]="chartOptions">
+    </canvas>
+  `
+})
+export class DriverChartComponent {
+  @Input() data!: TopDriver[];
+
+  // Dataset 1: Delivery Count (vertical bars, color #aaff00, yAxisID 'y')
+  // Dataset 2: Total Revenue Delivered (line overlay, color #00d4ff, yAxisID 'y1')
+  chartOptions = {
+    responsive: true,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#ddd' } },
+      y: { position: 'left', grid: { color: '#3a3a3a' }, ticks: { color: '#aaff00' }, title: { display: true, text: 'Deliveries', color: '#aaa' } },
+      y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#00d4ff' }, title: { display: true, text: 'Revenue', color: '#aaa' } }
+    },
+    plugins: { legend: { position: 'bottom', labels: { color: '#aaa' } } }
+  };
+}
+```
+
+### Page Layout Architecture
+
+The page uses a sectioned layout instead of a flat uniform grid:
+
+```html
+<div class="page-container">
+  <div class="page-header">
+    <h1>Advanced Report</h1>
+  </div>
+
+  <!-- Section: Revenue Overview -->
+  <section class="report-section">
+    <h2 class="section-header">Revenue Overview</h2>
+    <div class="section-grid revenue-grid">
+      <!-- 1 col: Total Revenue (doughnut) -->
+      <!-- 2 col span: Sales Trend (line chart) -->
+    </div>
+  </section>
+
+  <!-- Section: Top Performers -->
+  <section class="report-section">
+    <h2 class="section-header">Top Performers</h2>
+    <div class="section-grid three-col">
+      <!-- Top Customers (horizontal bar) -->
+      <!-- Top Salesman (horizontal bar) -->
+      <!-- Top Products (horizontal bar) -->
+    </div>
+  </section>
+
+  <!-- Section: Customer Insights -->
+  <section class="report-section">
+    <h2 class="section-header">Customer Insights</h2>
+    <div class="section-grid three-col">
+      <!-- Customer Activity (doughnut) -->
+      <!-- Top Outstanding (horizontal bar) -->
+      <!-- Dormant Customers (horizontal bar) -->
+    </div>
+  </section>
+
+  <!-- Section: Inventory -->
+  <section class="report-section">
+    <h2 class="section-header">Inventory</h2>
+    <div class="section-grid two-col">
+      <!-- Low Stock (grouped horizontal bar) -->
+      <!-- High Stock (grouped horizontal bar) -->
+    </div>
+  </section>
+
+  <!-- Section: Categories & Logistics -->
+  <section class="report-section">
+    <h2 class="section-header">Categories & Logistics</h2>
+    <div class="section-grid three-col">
+      <!-- Top Stock Groups (pie) -->
+      <!-- Top Suppliers (pie) -->
+      <!-- Top Drivers (bar + line combo) -->
+    </div>
+  </section>
+</div>
+```
+
+#### Layout SCSS
+
+```scss
+.report-section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  color: #888;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+}
+
+.section-grid {
+  display: grid;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.revenue-grid {
+  grid-template-columns: 1fr 2fr;
+}
+
+.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .revenue-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .three-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .revenue-grid,
+  .three-col,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+#### ng2-charts Module Integration
+
+The `AdvancedReportModule` must import `NgChartsModule` from `ng2-charts`:
+
+```typescript
+import { NgChartsModule } from 'ng2-charts';
+
+@NgModule({
+  imports: [
+    CommonModule,
+    AdvancedReportRoutingModule,
+    SharedModule,
+    NgChartsModule  // Provides baseChart directive
+  ],
+  declarations: [
+    AdvancedReportComponent,
+    ReportCardComponent,
+    RevenueDoughnutComponent,
+    ActivityDoughnutComponent,
+    RankingBarChartComponent,
+    SalesTrendChartComponent,
+    StockBarChartComponent,
+    PieChartComponent,
+    DriverChartComponent
+  ]
+})
+export class AdvancedReportModule {}
 ```
 
 

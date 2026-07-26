@@ -200,6 +200,54 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 6. THE page layout SHALL organize the 13 report cards in a responsive grid (e.g., 2-3 columns on desktop, 1 column on mobile)
 7. THE Frontend SHALL apply the existing dark-mode theme (`#121212` background, `#aaff00` accent) consistently to all report cards
 
+### Requirement 18: Chart Visualizations for Report Cards
+
+**User Story:** As a demo audience member at the AWS Summit booth, I want to see data presented as visually appealing charts (pie charts, bar charts, line charts, doughnut charts) instead of monotonous tables and plain numbers, so that the information is more intuitive, engaging, and informative at a glance.
+
+#### Acceptance Criteria
+
+1. THE Frontend SHALL use `chart.js` (already installed as dependency) via `ng2-charts` to render chart visualizations inside report cards
+2. THE following chart type mapping SHALL be applied to each report card:
+   - **Total Revenue**: Doughnut chart showing invoice revenue vs order revenue proportion, with the total revenue as center text
+   - **Top 10 Customers**: Horizontal bar chart showing customer names on y-axis and revenue on x-axis
+   - **Top 10 Salesman**: Horizontal bar chart showing salesman names on y-axis and revenue on x-axis
+   - **Top 10 Products**: Horizontal bar chart showing product names on y-axis and revenue on x-axis
+   - **Customer Activity**: Doughnut chart showing active vs inactive customers proportion with percentage as center text
+   - **Sales Trend**: Line chart with period labels on x-axis, revenue on primary y-axis, and order count on secondary y-axis
+   - **Low Stock**: Horizontal bar chart with stock item names on y-axis, showing quantity on hand vs reorder level as stacked/grouped bars (red for critical items)
+   - **High Stock**: Horizontal bar chart with stock item names on y-axis, showing quantity on hand vs target stock level
+   - **Top Outstanding Balances**: Horizontal bar chart showing customer names and outstanding balances
+   - **Dormant Customers**: Horizontal bar chart showing customer names and days since last order (color gradient from yellow to red based on dormancy)
+   - **Top Stock Groups**: Pie chart showing revenue distribution across stock groups
+   - **Top Suppliers**: Pie chart showing revenue distribution across suppliers
+   - **Top Drivers**: Bar chart (vertical) showing driver names and delivery counts, with a line overlay for total revenue delivered
+3. ALL charts SHALL use the dark theme color palette: chart background transparent, grid lines `#3a3a3a`, label text `#aaa`, accent color `#aaff00` as primary data color, with a complementary palette for multi-segment charts (`#aaff00`, `#00d4ff`, `#ff6b6b`, `#ffa726`, `#ab47bc`, `#26c6da`, `#7e57c2`, `#66bb6a`, `#ef5350`, `#42a5f5`)
+4. CHARTS SHALL be responsive and resize correctly within their card container
+5. CHARTS SHALL include appropriate tooltips on hover showing exact values with proper formatting (currency for revenue, plain numbers for counts/quantities)
+6. THE Sales Trend line chart SHALL update dynamically when the period selector (week/month/year) changes
+7. FOR ranking charts (Top 10), only the top 5 items SHALL be shown in the chart to avoid overcrowding; the remaining items MAY be shown in a compact list below the chart
+8. THE doughnut/pie charts SHALL include a legend positioned below the chart
+
+### Requirement 19: Report Page Layout Composition
+
+**User Story:** As a demo audience member, I want the report page to have a well-structured visual hierarchy with grouped sections and varied card sizes, so that the page feels polished and professional rather than a flat uniform grid.
+
+#### Acceptance Criteria
+
+1. THE page layout SHALL group related cards into logical sections with section headers:
+   - **Revenue Overview** (row 1, full width): Total Revenue card (larger, spanning 1 column) + Sales Trend card (spanning 2 columns)
+   - **Top Performers** (row 2): Top Customers + Top Salesman + Top Products (3 equal columns)
+   - **Customer Insights** (row 3): Customer Activity (1 col) + Top Outstanding (1 col) + Dormant Customers (1 col)
+   - **Inventory** (row 4): Low Stock (1.5 col) + High Stock (1.5 col) — 2-column layout within this section
+   - **Categories & Logistics** (row 5): Top Stock Groups (1 col) + Top Suppliers (1 col) + Top Drivers (1 col)
+2. EACH section SHALL have a subtle section header (text color `#888`, font-size 12px, uppercase, letter-spacing 1px) displayed above the card group
+3. THE Sales Trend card SHALL span 2 columns on desktop to give the line chart enough horizontal space for readability
+4. THE Total Revenue card SHALL have a visually distinct treatment (slightly larger font for the total, centered doughnut chart)
+5. ON tablet (768px–1200px), the layout SHALL collapse to 2 columns while maintaining section groupings
+6. ON mobile (<768px), the layout SHALL collapse to 1 column with sections stacked vertically
+7. CARDS within the same section SHALL have equal height (CSS grid `align-items: stretch`) so the row looks uniform
+8. THERE SHALL be 32px gap between sections and 16px gap between cards within a section
+
 ### Requirement 16: Inventory Stock Ordering Bugfix
 
 **User Story:** As a user viewing the Inventory/Stock list page, I want to sort by "Quantity on Hand" column and see the data actually change order, so that I can quickly find items with low or high stock.
@@ -225,3 +273,5 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 4. THE Frontend SHALL include a Playwright E2E test verifying that sorting by Quantity on Hand on the Inventory page produces different data ordering
 5. ALL existing backend integration tests SHALL continue to pass after the changes
 6. ALL existing frontend E2E tests SHALL continue to pass after the changes
+7. THE Frontend E2E tests SHALL verify that chart canvas elements are rendered inside report cards (at least one `<canvas>` element per chart card)
+8. THE Frontend E2E tests SHALL verify that section headers are visible on the Advanced Report page

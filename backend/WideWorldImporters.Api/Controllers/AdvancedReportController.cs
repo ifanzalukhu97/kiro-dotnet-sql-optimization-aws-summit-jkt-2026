@@ -103,7 +103,8 @@ namespace WideWorldImporters.Api.Controllers
         public async Task<ActionResult<CustomerActivityDto>> GetCustomerActivity()
         {
             var totalCustomers = await _context.Customers.CountAsync();
-            var ninetyDaysAgo = DateTime.UtcNow.AddDays(-90);
+            var maxOrderDate = await _context.Orders.MaxAsync(o => o.OrderDate);
+            var ninetyDaysAgo = maxOrderDate.AddDays(-90);
             var activeCustomers = await _context.Orders
                 .Where(o => o.OrderDate >= ninetyDaysAgo)
                 .Select(o => o.CustomerID)

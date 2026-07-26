@@ -416,6 +416,13 @@ Implement 13 Advanced Report endpoints in a new `AdvancedReportController`, a ne
       "tasks": [16, 17],
       "parallel": false,
       "dependsOn": [12, 13, 14, 15]
+    },
+    {
+      "name": "Wave 6: Chart Visualizations & Layout Refactor",
+      "tasks": [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+      "parallel": false,
+      "dependsOn": [11, 16],
+      "notes": "Tasks 18-26 (chart components) can be done in parallel. Task 27 (layout refactor) and 28 (integration) depend on 18-26. Task 29 depends on 20-26. Tasks 30-31 depend on 28-29."
     }
   ]
 }
@@ -454,9 +461,202 @@ flowchart TD
     14 --> 16
     15 --> 16
     16 --> 17[Task 17: Checkpoint — All changes verified]
+
+    %% Wave 6: Chart Visualizations
+    11 --> 18[Task 18: Create chart utility and color constants]
+    18 --> 19[Task 19: Import NgChartsModule]
+    19 --> 20[Task 20: RevenueDoughnutComponent]
+    19 --> 21[Task 21: ActivityDoughnutComponent]
+    19 --> 22[Task 22: RankingBarChartComponent]
+    19 --> 23[Task 23: SalesTrendChartComponent]
+    19 --> 24[Task 24: StockBarChartComponent]
+    19 --> 25[Task 25: PieChartComponent]
+    19 --> 26[Task 26: DriverChartComponent]
+    20 --> 27[Task 27: Refactor page layout to sectioned grid]
+    21 --> 27
+    22 --> 27
+    23 --> 27
+    24 --> 27
+    25 --> 27
+    26 --> 27
+    27 --> 28[Task 28: Integrate chart components into report cards]
+    20 --> 29[Task 29: Declare components in module]
+    21 --> 29
+    22 --> 29
+    23 --> 29
+    24 --> 29
+    25 --> 29
+    26 --> 29
+    28 --> 30[Task 30: Update E2E tests for charts]
+    29 --> 30
+    30 --> 31[Task 31: Verification: Run all tests]
 ```
 
 ## Notes
+
+### Wave 6: Chart Visualizations & Layout Refactor (depends on Wave 2 completed)
+
+- [x] 18. Frontend: Create chart utility and color constants
+  - [x] 18.1 Create `frontend/src/app/pages/advanced-report/chart-config.ts`
+    - Export `CHART_COLORS` array: `['#aaff00', '#00d4ff', '#ff6b6b', '#ffa726', '#ab47bc', '#26c6da', '#7e57c2', '#66bb6a', '#ef5350', '#42a5f5']`
+    - Export `CHART_COLORS_TRANSPARENT` array (same colors with `'33'` suffix for 20% opacity backgrounds)
+    - Export `applyChartDefaults()` function that sets `Chart.defaults.color`, `borderColor`, tooltip styles for dark theme
+    - _Requirements: 18.3_
+
+- [x] 19. Frontend: Import NgChartsModule in AdvancedReportModule
+  - [x] 19.1 Add `import { NgChartsModule } from 'ng2-charts'` to `advanced-report.module.ts`
+    - Add `NgChartsModule` to the `imports` array
+    - Call `applyChartDefaults()` in the module or component constructor
+    - _Requirements: 18.1_
+
+- [x] 20. Frontend: Create RevenueDoughnutComponent
+  - [x] 20.1 Create `frontend/src/app/pages/advanced-report/components/revenue-doughnut/revenue-doughnut.component.ts`
+    - Input: `data: TotalRevenue`
+    - Doughnut chart with 2 segments: invoiceRevenue (#aaff00) and orderRevenue (#00d4ff)
+    - Center overlay text showing totalRevenue formatted as currency
+    - Chart options: cutout 70%, no legend (use center text instead), responsive
+    - Tooltip shows segment label + currency value
+    - _Requirements: 18.2 (Total Revenue), 18.5_
+
+- [x] 21. Frontend: Create ActivityDoughnutComponent
+  - [x] 21.1 Create `frontend/src/app/pages/advanced-report/components/activity-doughnut/activity-doughnut.component.ts`
+    - Input: `data: CustomerActivity`
+    - Doughnut chart with 2 segments: activeCustomers (#aaff00) and inactiveCustomers (#3a3a3a)
+    - Center overlay text showing `activePercentage%` and label "Active"
+    - Below chart: small stat line with colored dots for active/inactive counts
+    - Chart options: cutout 70%, responsive
+    - _Requirements: 18.2 (Customer Activity), 18.8_
+
+- [x] 22. Frontend: Create RankingBarChartComponent (Reusable)
+  - [x] 22.1 Create `frontend/src/app/pages/advanced-report/components/ranking-bar-chart/ranking-bar-chart.component.ts`
+    - Inputs: `labels: string[]`, `values: number[]`, `formatType: 'currency' | 'number' | 'days'`, `barColor: string`, `colorGradient: boolean`
+    - Horizontal bar chart (`indexAxis: 'y'`) showing top 5 items
+    - If more than 5 items provided, show remaining as compact overflow list below chart
+    - For `colorGradient=true` (dormant customers): bars colored from yellow (#ffa726) to red (#ff6b6b) based on value
+    - No legend (single dataset)
+    - Tooltip shows formatted value based on `formatType`
+    - Y-axis labels truncated to 20 chars with ellipsis if needed
+    - _Requirements: 18.2 (Top Customers, Top Salesman, Top Products, Top Outstanding, Dormant Customers), 18.5, 18.7_
+
+- [x] 23. Frontend: Create SalesTrendChartComponent
+  - [x] 23.1 Create `frontend/src/app/pages/advanced-report/components/sales-trend-chart/sales-trend-chart.component.ts`
+    - Input: `data: SalesTrend[]`
+    - Line chart with dual y-axes:
+      - Left axis (primary): Revenue line, color #aaff00, area fill with 20% opacity
+      - Right axis (secondary): Order Count line, color #00d4ff, dashed
+    - X-axis: periodLabel values
+    - Interaction mode: index (show both values on hover)
+    - Legend positioned at bottom
+    - Responsive, tension 0.3 for smooth curves
+    - _Requirements: 18.2 (Sales Trend), 18.5, 18.6_
+
+- [x] 24. Frontend: Create StockBarChartComponent
+  - [x] 24.1 Create `frontend/src/app/pages/advanced-report/components/stock-bar-chart/stock-bar-chart.component.ts`
+    - Inputs: `data: StockLevel[]`, `mode: 'low' | 'high'`
+    - Horizontal grouped bar chart (`indexAxis: 'y'`)
+    - For `mode='low'`:
+      - Dataset 1 (Qty on Hand): bars colored #ff6b6b if `quantityOnHand <= reorderLevel`, else #aaff00
+      - Dataset 2 (Reorder Level): bars colored #3a3a3a with dashed border
+    - For `mode='high'`:
+      - Dataset 1 (Qty on Hand): bars colored #aaff00
+      - Dataset 2 (Target Stock Level): bars colored #3a3a3a with dashed border
+    - Legend at bottom showing dataset labels
+    - Y-axis: stock item names (truncated to 20 chars)
+    - _Requirements: 18.2 (Low Stock, High Stock), 18.5_
+
+- [x] 25. Frontend: Create PieChartComponent (Reusable)
+  - [x] 25.1 Create `frontend/src/app/pages/advanced-report/components/pie-chart/pie-chart.component.ts`
+    - Inputs: `labels: string[]`, `values: number[]`, `formatType: 'currency' | 'number'`
+    - Pie chart using first N colors from CHART_COLORS
+    - Legend positioned below chart with padding 12
+    - Tooltip shows label + formatted value
+    - Responsive
+    - _Requirements: 18.2 (Top Stock Groups, Top Suppliers), 18.5, 18.8_
+
+- [x] 26. Frontend: Create DriverChartComponent
+  - [x] 26.1 Create `frontend/src/app/pages/advanced-report/components/driver-chart/driver-chart.component.ts`
+    - Input: `data: TopDriver[]`
+    - Mixed chart: vertical bars (delivery count) + line overlay (revenue delivered)
+    - Bar dataset: color #aaff00, yAxisID 'y' (left axis, label "Deliveries")
+    - Line dataset: color #00d4ff, yAxisID 'y1' (right axis, label "Revenue")
+    - X-axis: driver fullName (truncated)
+    - Legend at bottom
+    - _Requirements: 18.2 (Top Drivers), 18.5_
+
+- [x] 27. Frontend: Refactor Advanced Report page layout to sectioned grid
+  - [x] 27.1 Refactor `advanced-report.component.ts` template to use sectioned layout
+    - Replace flat `card-grid` with 5 sections: "Revenue Overview", "Top Performers", "Customer Insights", "Inventory", "Categories & Logistics"
+    - Each section wrapped in `<section class="report-section">` with `<h2 class="section-header">`
+    - Revenue Overview: `revenue-grid` (1fr 2fr) — Total Revenue (1 col) + Sales Trend (2 col span)
+    - Top Performers: `three-col` — Top Customers + Top Salesman + Top Products
+    - Customer Insights: `three-col` — Customer Activity + Top Outstanding + Dormant Customers
+    - Inventory: `two-col` — Low Stock + High Stock
+    - Categories & Logistics: `three-col` — Top Stock Groups + Top Suppliers + Top Drivers
+    - _Requirements: 19.1, 19.2, 19.3_
+  - [x] 27.2 Update SCSS to implement sectioned layout
+    - `.report-section` with `margin-bottom: 32px`
+    - `.section-header` with color #888, font-size 12px, uppercase, letter-spacing 1px
+    - `.section-grid` with `display: grid`, `gap: 16px`, `align-items: stretch`
+    - `.revenue-grid`: `grid-template-columns: 1fr 2fr`
+    - `.three-col`: `grid-template-columns: repeat(3, 1fr)`
+    - `.two-col`: `grid-template-columns: repeat(2, 1fr)`
+    - Tablet (768-1200px): revenue-grid → 1fr 1fr, three-col → repeat(2, 1fr)
+    - Mobile (<768px): all grids → 1fr
+    - _Requirements: 19.4, 19.5, 19.6, 19.7, 19.8_
+
+- [x] 28. Frontend: Integrate chart components into report cards
+  - [x] 28.1 Replace Total Revenue card content with `<app-revenue-doughnut>`
+    - Pass `[data]="totalRevenue.data"` to the doughnut component
+    - _Requirements: 18.2_
+  - [x] 28.2 Replace Top Customers/Salesman/Products card content with `<app-ranking-bar-chart>`
+    - Map data arrays to `labels` and `values` inputs
+    - Set `formatType="currency"` for revenue-based rankings
+    - _Requirements: 18.2, 18.7_
+  - [x] 28.3 Replace Customer Activity card content with `<app-activity-doughnut>`
+    - Pass `[data]="customerActivity.data"` to the doughnut component
+    - _Requirements: 18.2_
+  - [x] 28.4 Replace Sales Trend card content with `<app-sales-trend-chart>`
+    - Keep period selector buttons above the chart
+    - Pass `[data]="salesTrend.data"` to the chart component
+    - _Requirements: 18.2, 18.6_
+  - [x] 28.5 Replace Low Stock/High Stock card content with `<app-stock-bar-chart>`
+    - Pass `[data]` and `[mode]="'low'"` or `[mode]="'high'"`
+    - _Requirements: 18.2_
+  - [x] 28.6 Replace Top Outstanding card content with `<app-ranking-bar-chart>`
+    - Map to `labels` (customerName) and `values` (outstandingBalance)
+    - Set `formatType="currency"`
+    - _Requirements: 18.2_
+  - [x] 28.7 Replace Dormant Customers card content with `<app-ranking-bar-chart>`
+    - Map to `labels` (customerName) and `values` (daysSinceLastOrder)
+    - Set `formatType="days"`, `colorGradient=true`
+    - _Requirements: 18.2_
+  - [x] 28.8 Replace Top Stock Groups/Suppliers card content with `<app-pie-chart>`
+    - Map data arrays to `labels` and `values` inputs
+    - Set `formatType="currency"`
+    - _Requirements: 18.2, 18.8_
+  - [x] 28.9 Replace Top Drivers card content with `<app-driver-chart>`
+    - Pass `[data]="topDrivers.data"` to the component
+    - _Requirements: 18.2_
+
+- [x] 29. Frontend: Declare all new chart components in AdvancedReportModule
+  - [x] 29.1 Add all 7 chart components to `declarations` array in `advanced-report.module.ts`
+    - RevenueDoughnutComponent, ActivityDoughnutComponent, RankingBarChartComponent, SalesTrendChartComponent, StockBarChartComponent, PieChartComponent, DriverChartComponent
+    - _Requirements: 18.1_
+
+- [x] 30. Frontend: Update E2E tests for chart visualizations
+  - [x] 30.1 Update `frontend/e2e/advanced-report.spec.ts` to verify chart canvas elements
+    - Add test: after data loads, at least one `<canvas>` element is visible inside report cards
+    - Add test: verify section headers ("Revenue Overview", "Top Performers", etc.) are visible
+    - _Requirements: 17.7, 17.8_
+  - [x] 30.2 Update card count test if needed (cards are still 13, but layout is sectioned)
+    - Ensure existing test for "13 report cards visible" still passes with new sectioned layout
+    - _Requirements: 17.3_
+
+- [x] 31. Verification: Run all tests after chart integration
+  - [x] 31.1 Run `ng test --watch=false` — all unit tests pass
+    - _Requirements: 17.6_
+  - [x] 31.2 Run `npx playwright test` — all E2E tests pass including new chart verification tests
+    - _Requirements: 17.3, 17.6_
 
 ### Parallelism Summary
 
@@ -468,6 +668,7 @@ flowchart TD
 | 3 | 12, 13 | Yes (independent test files) |
 | 4 | 14, 15 | Yes (independent test files) |
 | 5 | 16, 17 | No (sequential verification) |
+| 6 | 18–31 | Partially (20-26 chart components in parallel after 18+19; 27+28 sequential after components; 30+31 after integration) |
 
 ### Key Implementation Notes
 
@@ -482,3 +683,9 @@ flowchart TD
 5. **Test Pattern**: Follow the existing `IClassFixture<TestWebApplicationFactory>` pattern. Each test method is independent. Use `JsonDocument.Parse` for response validation (same as existing tests).
 
 6. **No Service Layer**: Consistent with the existing architecture, the controller directly uses `WideWorldImportersContext` without an intermediate service layer for backend queries. The frontend uses a dedicated `AdvancedReportService` for HTTP calls.
+
+7. **Chart Integration (Wave 6)**: Uses `chart.js` 4.x + `ng2-charts` 5.x already in `package.json`. No new dependency needed. `NgChartsModule` provides the `baseChart` directive. Each chart component is self-contained with its own `ChartData` and `ChartOptions` computed from `@Input()` data. The `RankingBarChartComponent` and `PieChartComponent` are reusable across multiple cards.
+
+8. **Chart Responsiveness**: All chart components use `responsive: true` and `maintainAspectRatio: false` (except pie/doughnut which use default aspect ratio). Cards use `min-height` to ensure charts have sufficient render space.
+
+9. **Layout Refactor**: The flat `card-grid` is replaced with 5 semantic `<section>` elements. Each section has its own grid layout (revenue-grid, three-col, two-col). The Sales Trend card intentionally spans 2 columns to give the line chart horizontal breathing room.

@@ -31,231 +31,150 @@ interface CardState<T> {
         <h1>Advanced Report</h1>
       </div>
 
-      <div class="card-grid">
-        <!-- Total Revenue -->
-        <app-report-card
-          title="Total Revenue"
-          [loading]="totalRevenue.loading"
-          [error]="totalRevenue.error"
-          [responseTime]="totalRevenue.time">
-          <div class="revenue-content" *ngIf="totalRevenue.data">
-            <div class="big-number">{{ formatCurrency(totalRevenue.data.totalRevenue) }}</div>
-            <div class="revenue-breakdown">
-              <div class="breakdown-item">
-                <span class="breakdown-label">Invoice Revenue</span>
-                <span class="breakdown-value">{{ formatCurrency(totalRevenue.data.invoiceRevenue) }}</span>
+      <!-- Revenue Overview -->
+      <section class="report-section">
+        <h2 class="section-header">Revenue Overview</h2>
+        <div class="section-grid revenue-grid">
+          <app-report-card
+            title="Total Revenue"
+            [loading]="totalRevenue.loading"
+            [error]="totalRevenue.error"
+            [responseTime]="totalRevenue.time">
+            <app-revenue-doughnut [data]="totalRevenue.data" *ngIf="totalRevenue.data"></app-revenue-doughnut>
+          </app-report-card>
+
+          <app-report-card
+            title="Sales Trend"
+            [loading]="salesTrend.loading"
+            [error]="salesTrend.error"
+            [responseTime]="salesTrend.time">
+            <div class="trend-content" *ngIf="salesTrend.data">
+              <div class="period-selector">
+                <button
+                  *ngFor="let p of periods"
+                  class="period-btn"
+                  [class.active]="selectedPeriod === p"
+                  (click)="onPeriodChange(p)">
+                  {{ p }}
+                </button>
               </div>
-              <div class="breakdown-item">
-                <span class="breakdown-label">Order Revenue</span>
-                <span class="breakdown-value">{{ formatCurrency(totalRevenue.data.orderRevenue) }}</span>
-              </div>
+              <app-sales-trend-chart [data]="salesTrend.data!" *ngIf="salesTrend.data"></app-sales-trend-chart>
             </div>
-          </div>
-        </app-report-card>
+          </app-report-card>
+        </div>
+      </section>
 
-        <!-- Top Customers -->
-        <app-report-card
-          title="Top 10 Customers"
-          [loading]="topCustomers.loading"
-          [error]="topCustomers.error"
-          [responseTime]="topCustomers.time">
-          <div class="ranking-list" *ngIf="topCustomers.data">
-            <div class="ranking-item" *ngFor="let item of topCustomers.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.customerName }}</span>
-              <span class="metric">{{ formatCurrency(item.totalRevenue) }}</span>
-            </div>
-          </div>
-        </app-report-card>
+      <!-- Top Performers -->
+      <section class="report-section">
+        <h2 class="section-header">Top Performers</h2>
+        <div class="section-grid three-col">
+          <app-report-card
+            title="Top 10 Customers"
+            [loading]="topCustomers.loading"
+            [error]="topCustomers.error"
+            [responseTime]="topCustomers.time">
+            <app-ranking-bar-chart *ngIf="topCustomers.data" [labels]="getCustomerLabels()" [values]="getCustomerValues()" formatType="currency"></app-ranking-bar-chart>
+          </app-report-card>
 
-        <!-- Top Salesman -->
-        <app-report-card
-          title="Top 10 Salesman"
-          [loading]="topSalesman.loading"
-          [error]="topSalesman.error"
-          [responseTime]="topSalesman.time">
-          <div class="ranking-list" *ngIf="topSalesman.data">
-            <div class="ranking-item" *ngFor="let item of topSalesman.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.fullName }}</span>
-              <span class="metric">{{ formatCurrency(item.totalRevenue) }}</span>
-            </div>
-          </div>
-        </app-report-card>
+          <app-report-card
+            title="Top 10 Salesman"
+            [loading]="topSalesman.loading"
+            [error]="topSalesman.error"
+            [responseTime]="topSalesman.time">
+            <app-ranking-bar-chart *ngIf="topSalesman.data" [labels]="getSalesmanLabels()" [values]="getSalesmanValues()" formatType="currency"></app-ranking-bar-chart>
+          </app-report-card>
 
-        <!-- Top Products -->
-        <app-report-card
-          title="Top 10 Products"
-          [loading]="topProducts.loading"
-          [error]="topProducts.error"
-          [responseTime]="topProducts.time">
-          <div class="ranking-list" *ngIf="topProducts.data">
-            <div class="ranking-item" *ngFor="let item of topProducts.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.stockItemName }}</span>
-              <span class="metric">{{ formatCurrency(item.totalRevenue) }}</span>
-            </div>
-          </div>
-        </app-report-card>
+          <app-report-card
+            title="Top 10 Products"
+            [loading]="topProducts.loading"
+            [error]="topProducts.error"
+            [responseTime]="topProducts.time">
+            <app-ranking-bar-chart *ngIf="topProducts.data" [labels]="getProductLabels()" [values]="getProductValues()" formatType="currency"></app-ranking-bar-chart>
+          </app-report-card>
+        </div>
+      </section>
 
-        <!-- Customer Activity -->
-        <app-report-card
-          title="Customer Activity"
-          [loading]="customerActivity.loading"
-          [error]="customerActivity.error"
-          [responseTime]="customerActivity.time">
-          <div class="activity-content" *ngIf="customerActivity.data">
-            <div class="activity-stat">
-              <span class="stat-value">{{ customerActivity.data.totalCustomers }}</span>
-              <span class="stat-label">Total</span>
-            </div>
-            <div class="activity-stat">
-              <span class="stat-value accent">{{ customerActivity.data.activeCustomers }}</span>
-              <span class="stat-label">Active (90d)</span>
-            </div>
-            <div class="activity-stat">
-              <span class="stat-value">{{ customerActivity.data.inactiveCustomers }}</span>
-              <span class="stat-label">Inactive</span>
-            </div>
-            <div class="activity-percentage">
-              <div class="percentage-bar">
-                <div class="percentage-fill" [style.width.%]="customerActivity.data.activePercentage"></div>
-              </div>
-              <span class="percentage-text">{{ customerActivity.data.activePercentage }}% active</span>
-            </div>
-          </div>
-        </app-report-card>
+      <!-- Customer Insights -->
+      <section class="report-section">
+        <h2 class="section-header">Customer Insights</h2>
+        <div class="section-grid three-col">
+          <app-report-card
+            title="Customer Activity"
+            [loading]="customerActivity.loading"
+            [error]="customerActivity.error"
+            [responseTime]="customerActivity.time">
+            <app-activity-doughnut [data]="customerActivity.data" *ngIf="customerActivity.data"></app-activity-doughnut>
+          </app-report-card>
 
-        <!-- Sales Trend -->
-        <app-report-card
-          title="Sales Trend"
-          [loading]="salesTrend.loading"
-          [error]="salesTrend.error"
-          [responseTime]="salesTrend.time">
-          <div class="trend-content" *ngIf="salesTrend.data">
-            <div class="period-selector">
-              <button
-                *ngFor="let p of periods"
-                class="period-btn"
-                [class.active]="selectedPeriod === p"
-                (click)="onPeriodChange(p)">
-                {{ p }}
-              </button>
-            </div>
-            <div class="trend-list">
-              <div class="trend-item" *ngFor="let item of salesTrend.data">
-                <span class="trend-label">{{ item.periodLabel }}</span>
-                <span class="trend-revenue">{{ formatCurrency(item.revenue) }}</span>
-                <span class="trend-orders">{{ item.orderCount }} orders</span>
-              </div>
-            </div>
-          </div>
-        </app-report-card>
+          <app-report-card
+            title="Top Outstanding Balances"
+            [loading]="topOutstanding.loading"
+            [error]="topOutstanding.error"
+            [responseTime]="topOutstanding.time">
+            <app-ranking-bar-chart *ngIf="topOutstanding.data" [labels]="getOutstandingLabels()" [values]="getOutstandingValues()" formatType="currency"></app-ranking-bar-chart>
+          </app-report-card>
 
-        <!-- Low Stock -->
-        <app-report-card
-          title="Low Stock Items"
-          [loading]="lowStock.loading"
-          [error]="lowStock.error"
-          [responseTime]="lowStock.time">
-          <div class="stock-list" *ngIf="lowStock.data">
-            <div class="stock-item" *ngFor="let item of lowStock.data"
-                 [class.critical]="item.quantityOnHand <= item.reorderLevel">
-              <span class="stock-name">{{ item.stockItemName }}</span>
-              <span class="stock-qty">{{ item.quantityOnHand }} / {{ item.targetStockLevel }}</span>
-            </div>
-          </div>
-        </app-report-card>
+          <app-report-card
+            title="Dormant Customers"
+            [loading]="dormantCustomers.loading"
+            [error]="dormantCustomers.error"
+            [responseTime]="dormantCustomers.time">
+            <app-ranking-bar-chart *ngIf="dormantCustomers.data" [labels]="getDormantLabels()" [values]="getDormantValues()" formatType="days" [colorGradient]="true"></app-ranking-bar-chart>
+          </app-report-card>
+        </div>
+      </section>
 
-        <!-- High Stock -->
-        <app-report-card
-          title="High Stock Items"
-          [loading]="highStock.loading"
-          [error]="highStock.error"
-          [responseTime]="highStock.time">
-          <div class="stock-list" *ngIf="highStock.data">
-            <div class="stock-item" *ngFor="let item of highStock.data">
-              <span class="stock-name">{{ item.stockItemName }}</span>
-              <span class="stock-qty">{{ item.quantityOnHand }} / {{ item.targetStockLevel }}</span>
-            </div>
-          </div>
-        </app-report-card>
+      <!-- Inventory -->
+      <section class="report-section">
+        <h2 class="section-header">Inventory</h2>
+        <div class="section-grid two-col">
+          <app-report-card
+            title="Low Stock Items"
+            [loading]="lowStock.loading"
+            [error]="lowStock.error"
+            [responseTime]="lowStock.time">
+            <app-stock-bar-chart [data]="lowStock.data!" [mode]="'low'" *ngIf="lowStock.data"></app-stock-bar-chart>
+          </app-report-card>
 
-        <!-- Top Outstanding -->
-        <app-report-card
-          title="Top Outstanding Balances"
-          [loading]="topOutstanding.loading"
-          [error]="topOutstanding.error"
-          [responseTime]="topOutstanding.time">
-          <div class="ranking-list" *ngIf="topOutstanding.data">
-            <div class="ranking-item" *ngFor="let item of topOutstanding.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.customerName }}</span>
-              <span class="metric">{{ formatCurrency(item.outstandingBalance) }}</span>
-            </div>
-          </div>
-        </app-report-card>
+          <app-report-card
+            title="High Stock Items"
+            [loading]="highStock.loading"
+            [error]="highStock.error"
+            [responseTime]="highStock.time">
+            <app-stock-bar-chart [data]="highStock.data!" [mode]="'high'" *ngIf="highStock.data"></app-stock-bar-chart>
+          </app-report-card>
+        </div>
+      </section>
 
-        <!-- Dormant Customers -->
-        <app-report-card
-          title="Dormant Customers"
-          [loading]="dormantCustomers.loading"
-          [error]="dormantCustomers.error"
-          [responseTime]="dormantCustomers.time">
-          <div class="ranking-list" *ngIf="dormantCustomers.data">
-            <div class="ranking-item" *ngFor="let item of dormantCustomers.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.customerName }}</span>
-              <span class="metric">{{ item.daysSinceLastOrder }}d ago</span>
-            </div>
-          </div>
-        </app-report-card>
+      <!-- Categories & Logistics -->
+      <section class="report-section">
+        <h2 class="section-header">Categories &amp; Logistics</h2>
+        <div class="section-grid three-col">
+          <app-report-card
+            title="Top Stock Groups"
+            [loading]="topStockGroups.loading"
+            [error]="topStockGroups.error"
+            [responseTime]="topStockGroups.time">
+            <app-pie-chart *ngIf="topStockGroups.data" [labels]="getStockGroupLabels()" [values]="getStockGroupValues()" formatType="currency"></app-pie-chart>
+          </app-report-card>
 
-        <!-- Top Stock Groups -->
-        <app-report-card
-          title="Top Stock Groups"
-          [loading]="topStockGroups.loading"
-          [error]="topStockGroups.error"
-          [responseTime]="topStockGroups.time">
-          <div class="ranking-list" *ngIf="topStockGroups.data">
-            <div class="ranking-item" *ngFor="let item of topStockGroups.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.stockGroupName }}</span>
-              <span class="metric">{{ formatCurrency(item.totalRevenue) }}</span>
-            </div>
-          </div>
-        </app-report-card>
+          <app-report-card
+            title="Top Suppliers"
+            [loading]="topSuppliers.loading"
+            [error]="topSuppliers.error"
+            [responseTime]="topSuppliers.time">
+            <app-pie-chart *ngIf="topSuppliers.data" [labels]="getSupplierLabels()" [values]="getSupplierValues()" formatType="currency"></app-pie-chart>
+          </app-report-card>
 
-        <!-- Top Suppliers -->
-        <app-report-card
-          title="Top Suppliers"
-          [loading]="topSuppliers.loading"
-          [error]="topSuppliers.error"
-          [responseTime]="topSuppliers.time">
-          <div class="ranking-list" *ngIf="topSuppliers.data">
-            <div class="ranking-item" *ngFor="let item of topSuppliers.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.supplierName }}</span>
-              <span class="metric">{{ formatCurrency(item.totalRevenue) }}</span>
-            </div>
-          </div>
-        </app-report-card>
-
-        <!-- Top Drivers -->
-        <app-report-card
-          title="Top Drivers"
-          [loading]="topDrivers.loading"
-          [error]="topDrivers.error"
-          [responseTime]="topDrivers.time">
-          <div class="ranking-list" *ngIf="topDrivers.data">
-            <div class="ranking-item" *ngFor="let item of topDrivers.data; let i = index">
-              <span class="rank">{{ i + 1 }}</span>
-              <span class="name">{{ item.fullName }}</span>
-              <span class="metric">{{ item.deliveryCount }} deliveries</span>
-            </div>
-          </div>
-        </app-report-card>
-      </div>
+          <app-report-card
+            title="Top Drivers"
+            [loading]="topDrivers.loading"
+            [error]="topDrivers.error"
+            [responseTime]="topDrivers.time">
+            <app-driver-chart [data]="topDrivers.data!" *ngIf="topDrivers.data"></app-driver-chart>
+          </app-report-card>
+        </div>
+      </section>
     </div>
   `,
   styles: [`
@@ -274,146 +193,59 @@ interface CardState<T> {
       }
     }
 
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+    .report-section {
+      margin-bottom: 32px;
     }
 
-    @media (max-width: 1200px) {
-      .card-grid {
+    .section-header {
+      color: #888;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .section-grid {
+      display: grid;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .revenue-grid {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .three-col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .two-col {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 1200px) and (min-width: 769px) {
+      .revenue-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .three-col {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
     @media (max-width: 768px) {
-      .card-grid {
+      .section-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    /* Revenue card */
-    .revenue-content .big-number {
-      font-size: 28px;
-      font-weight: 700;
-      color: #aaff00;
-      margin-bottom: 12px;
-    }
-
-    .revenue-breakdown {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .breakdown-item {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-    }
-
-    .breakdown-label {
-      color: #888;
-    }
-
-    .breakdown-value {
-      color: #ddd;
-    }
-
-    /* Ranking list */
-    .ranking-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-
-    .ranking-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 4px 0;
-      font-size: 13px;
-    }
-
-    .rank {
-      width: 20px;
-      text-align: center;
-      color: #aaff00;
-      font-weight: 600;
-    }
-
-    .name {
-      flex: 1;
-      color: #ddd;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .metric {
-      color: #aaa;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    /* Activity card */
-    .activity-content {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .activity-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .stat-value {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .stat-value.accent {
-      color: #aaff00;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: #888;
-      margin-top: 2px;
-    }
-
-    .activity-percentage {
-      width: 100%;
-      margin-top: 8px;
-    }
-
-    .percentage-bar {
-      height: 6px;
-      background: #3a3a3a;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .percentage-fill {
-      height: 100%;
-      background: #aaff00;
-      border-radius: 3px;
-      transition: width 0.3s;
-    }
-
-    .percentage-text {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 4px;
-      display: block;
-    }
-
     /* Period selector */
+    .trend-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     .period-selector {
       display: flex;
       gap: 4px;
@@ -441,75 +273,6 @@ interface CardState<T> {
       background: #444;
       color: #fff;
     }
-
-    /* Trend list */
-    .trend-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-
-    .trend-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-    }
-
-    .trend-label {
-      width: 80px;
-      color: #aaa;
-    }
-
-    .trend-revenue {
-      flex: 1;
-      color: #ddd;
-    }
-
-    .trend-orders {
-      color: #888;
-      font-size: 12px;
-    }
-
-    /* Stock list */
-    .stock-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-
-    .stock-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-      font-size: 13px;
-    }
-
-    .stock-item.critical {
-      .stock-name {
-        color: #ff6b6b;
-      }
-    }
-
-    .stock-name {
-      color: #ddd;
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-right: 8px;
-    }
-
-    .stock-qty {
-      color: #aaa;
-      font-size: 12px;
-      white-space: nowrap;
-    }
   `]
 })
 export class AdvancedReportComponent implements OnInit {
@@ -528,7 +291,7 @@ export class AdvancedReportComponent implements OnInit {
   topDrivers: CardState<TopDriver[]> = { data: null, loading: true, error: null, time: null };
 
   periods = ['week', 'month', 'year'];
-  selectedPeriod = 'month';
+  selectedPeriod = 'year';
 
   constructor(private reportService: AdvancedReportService) {}
 
@@ -549,6 +312,22 @@ export class AdvancedReportComponent implements OnInit {
       maximumFractionDigits: 0
     }).format(value);
   }
+
+  // Helper methods for chart data mapping
+  getCustomerLabels(): string[] { return this.topCustomers.data?.map(c => c.customerName) ?? []; }
+  getCustomerValues(): number[] { return this.topCustomers.data?.map(c => c.totalRevenue) ?? []; }
+  getSalesmanLabels(): string[] { return this.topSalesman.data?.map(s => s.fullName) ?? []; }
+  getSalesmanValues(): number[] { return this.topSalesman.data?.map(s => s.totalRevenue) ?? []; }
+  getProductLabels(): string[] { return this.topProducts.data?.map(p => p.stockItemName) ?? []; }
+  getProductValues(): number[] { return this.topProducts.data?.map(p => p.totalRevenue) ?? []; }
+  getOutstandingLabels(): string[] { return this.topOutstanding.data?.map(o => o.customerName) ?? []; }
+  getOutstandingValues(): number[] { return this.topOutstanding.data?.map(o => o.outstandingBalance) ?? []; }
+  getDormantLabels(): string[] { return this.dormantCustomers.data?.map(d => d.customerName) ?? []; }
+  getDormantValues(): number[] { return this.dormantCustomers.data?.map(d => d.daysSinceLastOrder) ?? []; }
+  getStockGroupLabels(): string[] { return this.topStockGroups.data?.map(g => g.stockGroupName) ?? []; }
+  getStockGroupValues(): number[] { return this.topStockGroups.data?.map(g => g.totalRevenue) ?? []; }
+  getSupplierLabels(): string[] { return this.topSuppliers.data?.map(s => s.supplierName) ?? []; }
+  getSupplierValues(): number[] { return this.topSuppliers.data?.map(s => s.totalRevenue) ?? []; }
 
   private loadAllReports(): void {
     this.loadReport('totalRevenue', () => this.reportService.getTotalRevenue());

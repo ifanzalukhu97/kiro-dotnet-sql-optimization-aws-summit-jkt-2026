@@ -34,3 +34,4 @@ Thumbs.db
 *.bak
 frontend/playwright-results
 frontend/playwright-report
+scripts/audit/results

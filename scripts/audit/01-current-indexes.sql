@@ -1,4 +1,4 @@
--- 03-current-indexes.sql
+-- 01-current-indexes.sql
 -- Purpose: List existing indexes on WideWorldImporters tables
 -- Source: sys.indexes + sys.index_columns + sys.columns + sys.tables + sys.schemas
 

@@ -39,7 +39,7 @@ Data table with customer dropdown filter and date range pickers. Response time b
 │   ├── e2e/                           # Playwright E2E tests
 │   └── playwright.config.ts
 ├── scripts/
-│   ├── audit/                         # 6 DMV-based SQL audit scripts
+│   ├── audit/                         # 4 DMV-based SQL audit scripts
 │   ├── reset/                         # Demo reset script
 │   └── init/                          # Docker DB initialization
 └── docker-compose.yml                 # Local SQL Server container
@@ -192,23 +192,23 @@ npx playwright test
 
 ## Running Audit Scripts
 
-The `scripts/audit/` folder contains 6 SQL scripts designed to analyze query performance using SQL Server DMVs. Execute them in order against the WideWorldImporters database:
+The `scripts/audit/` folder contains 4 SQL scripts designed to analyze index health using SQL Server DMVs. Execute them against the WideWorldImporters database:
 
 | Script | Purpose |
 |--------|---------|
-| `01-wait-stats.sql` | Wait statistics from `sys.dm_os_wait_stats` |
-| `02-top-io-queries.sql` | Top I/O queries from `sys.dm_exec_query_stats` |
-| `03-current-indexes.sql` | Existing indexes from `sys.indexes` |
-| `04-index-usage-stats.sql` | Index usage from `sys.dm_db_index_usage_stats` |
-| `05-missing-indexes.sql` | Missing index recommendations |
-| `06-index-fragmentation.sql` | Index fragmentation analysis |
+| `01-current-indexes.sql` | Existing indexes from `sys.indexes` |
+| `02-index-usage-stats.sql` | Index usage from `sys.dm_db_index_usage_stats` |
+| `03-missing-indexes.sql` | Missing index recommendations |
+| `04-index-fragmentation.sql` | Index fragmentation analysis |
 
-Run them using any SQL client (SSMS, Azure Data Studio, sqlcmd):
+> **Note**: Slow/heavy query identification is done externally via **Performance Insights → Top SQL** (e.g., Amazon RDS Performance Insights). Copy the problematic queries from there and use Kiro AI to optimize them.
+
+Run the audit scripts using any SQL client (SSMS, Azure Data Studio, sqlcmd):
 
 ```bash
 # Example using sqlcmd
 sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -d WideWorldImporters \
-  -i scripts/audit/01-wait-stats.sql
+  -i scripts/audit/01-current-indexes.sql
 ```
 
 ## Demo Reset
@@ -230,9 +230,10 @@ The reset script:
 
 1. Start with the reset database state (run the reset script)
 2. Open the frontend and navigate between pages, noting response times
-3. Run the audit scripts to identify slow queries
-4. Use Kiro AI to analyze and fix performance issues
-5. Refresh the frontend to see improved response times via the green badges
+3. Identify slow queries from **Performance Insights → Top SQL** (copy them manually)
+4. Run the audit scripts to inspect current index state and recommendations
+5. Use Kiro AI to analyze and fix performance issues (add indexes, optimize queries)
+6. Refresh the frontend to see improved response times via the green badges
 
 ## Kiro AI Configuration
 

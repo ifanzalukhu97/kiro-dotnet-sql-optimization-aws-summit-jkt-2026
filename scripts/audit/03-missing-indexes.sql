@@ -1,4 +1,4 @@
--- 05-missing-indexes.sql
+-- 03-missing-indexes.sql
 -- Purpose: Show SQL Server's missing index recommendations for WideWorldImporters
 -- Source: sys.dm_db_missing_index_details + sys.dm_db_missing_index_groups +
 --         sys.dm_db_missing_index_group_stats (system DMVs)

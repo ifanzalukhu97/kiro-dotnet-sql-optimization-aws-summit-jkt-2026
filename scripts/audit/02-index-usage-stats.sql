@@ -1,4 +1,4 @@
--- 04-index-usage-stats.sql
+-- 02-index-usage-stats.sql
 -- Purpose: Identify underused or unused indexes that may be candidates for removal
 -- Source: sys.dm_db_index_usage_stats + sys.indexes + sys.tables + sys.schemas
 

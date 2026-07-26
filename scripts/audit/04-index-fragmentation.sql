@@ -1,4 +1,4 @@
--- 06-index-fragmentation.sql
+-- 04-index-fragmentation.sql
 -- Purpose: Identify fragmented indexes that may benefit from rebuild or reorganize
 -- Source: sys.dm_db_index_physical_stats + sys.indexes + sys.tables + sys.schemas
 

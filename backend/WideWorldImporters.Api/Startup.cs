@@ -25,7 +25,8 @@ namespace WideWorldImporters.Api
             var connectionString = ResolveConnectionString();
 
             services.AddDbContext<WideWorldImportersContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(connectionString, sqlOptions =>
+                    sqlOptions.CommandTimeout(300)));
 
             services.AddCors(options =>
             {

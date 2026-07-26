@@ -38,7 +38,14 @@ namespace WideWorldImporters.Api.Controllers
             }
             if (page < 1) page = 1;
 
-            var query = _context.StockItems.AsQueryable();
+            // Single joined query: StockItems → StockItemHoldings → Suppliers
+            var query = _context.StockItems
+                .Join(_context.StockItemHoldings,
+                    si => si.StockItemID, h => h.StockItemID,
+                    (si, h) => new { StockItem = si, Holding = h })
+                .Join(_context.Suppliers,
+                    x => x.StockItem.SupplierID, sup => sup.SupplierID,
+                    (x, sup) => new { x.StockItem, x.Holding, Supplier = sup });
 
             if (!string.IsNullOrWhiteSpace(supplierId))
             {
@@ -49,58 +56,58 @@ namespace WideWorldImporters.Api.Controllers
                     .ToList();
                 if (ids.Any())
                 {
-                    query = query.Where(s => ids.Contains(s.SupplierID));
+                    query = query.Where(x => ids.Contains(x.StockItem.SupplierID));
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                query = query.Where(s => s.StockItemName.Contains(search) || s.Supplier.SupplierName.Contains(search));
+                query = query.Where(x => x.StockItem.StockItemName.Contains(search) || x.Supplier.SupplierName.Contains(search));
             }
 
             var totalCount = await query.CountAsync();
 
-            // SELECT * pattern: load entire entities with all columns
-            var sorted = ApplySort(query, sortBy, sortDirection);
-            List<StockItem> stockItems;
+            // Apply sort (supports all original columns + quantityonhand/suppliername)
+            var desc = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+            var sorted = sortBy?.ToLowerInvariant() switch
+            {
+                "stockitemid" => desc ? query.OrderByDescending(x => x.StockItem.StockItemID) : query.OrderBy(x => x.StockItem.StockItemID),
+                "stockitemname" => desc ? query.OrderByDescending(x => x.StockItem.StockItemName) : query.OrderBy(x => x.StockItem.StockItemName),
+                "unitprice" => desc ? query.OrderByDescending(x => x.StockItem.UnitPrice) : query.OrderBy(x => x.StockItem.UnitPrice),
+                "recommendedretailprice" => desc ? query.OrderByDescending(x => x.StockItem.RecommendedRetailPrice) : query.OrderBy(x => x.StockItem.RecommendedRetailPrice),
+                "quantityonhand" => desc ? query.OrderByDescending(x => x.Holding.QuantityOnHand) : query.OrderBy(x => x.Holding.QuantityOnHand),
+                "suppliername" => desc ? query.OrderByDescending(x => x.Supplier.SupplierName) : query.OrderBy(x => x.Supplier.SupplierName),
+                _ => query.OrderBy(x => x.StockItem.StockItemName)
+            };
+
+            List<StockItemListDto> data;
             if (export)
             {
                 const int ExportRowLimit = 50_000;
                 if (totalCount > ExportRowLimit)
                     return StatusCode(413, new { error = $"Export exceeds {ExportRowLimit:N0} row limit. Apply filters to reduce the result set." });
                 _context.Database.SetCommandTimeout(120);
-                stockItems = await sorted.ToListAsync();
+                data = await sorted.Select(x => new StockItemListDto
+                {
+                    StockItemId = x.StockItem.StockItemID,
+                    StockItemName = x.StockItem.StockItemName,
+                    SupplierName = x.Supplier.SupplierName,
+                    UnitPrice = x.StockItem.UnitPrice,
+                    RecommendedRetailPrice = x.StockItem.RecommendedRetailPrice,
+                    QuantityOnHand = x.Holding.QuantityOnHand
+                }).ToListAsync();
             }
             else
             {
-                stockItems = await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            }
-
-            // Map to DTO which uses fewer than 50% of the loaded columns
-            var data = stockItems.Select(s => new StockItemListDto
-            {
-                StockItemId = s.StockItemID,
-                StockItemName = s.StockItemName,
-                SupplierName = null,
-                UnitPrice = s.UnitPrice,
-                RecommendedRetailPrice = s.RecommendedRetailPrice,
-                QuantityOnHand = 0
-            }).ToList();
-
-            // Load supplier names and holdings separately (additional queries)
-            foreach (var item in stockItems)
-            {
-                var dto = data.First(d => d.StockItemId == item.StockItemID);
-
-                var supplier = await _context.Suppliers
-                    .Where(sup => sup.SupplierID == item.SupplierID)
-                    .FirstOrDefaultAsync();
-                dto.SupplierName = supplier?.SupplierName;
-
-                var holding = await _context.StockItemHoldings
-                    .Where(h => h.StockItemID == item.StockItemID)
-                    .FirstOrDefaultAsync();
-                dto.QuantityOnHand = holding?.QuantityOnHand ?? 0;
+                data = await sorted.Skip((page - 1) * pageSize).Take(pageSize).Select(x => new StockItemListDto
+                {
+                    StockItemId = x.StockItem.StockItemID,
+                    StockItemName = x.StockItem.StockItemName,
+                    SupplierName = x.Supplier.SupplierName,
+                    UnitPrice = x.StockItem.UnitPrice,
+                    RecommendedRetailPrice = x.StockItem.RecommendedRetailPrice,
+                    QuantityOnHand = x.Holding.QuantityOnHand
+                }).ToListAsync();
             }
 
             return Ok(new PaginatedResponse<StockItemListDto>
@@ -168,20 +175,6 @@ namespace WideWorldImporters.Api.Controllers
             }).ToList();
 
             return Ok(lookup);
-        }
-
-        private static IQueryable<StockItem> ApplySort(IQueryable<StockItem> query, string sortBy, string sortDirection)
-        {
-            var desc = string.Equals(sortDirection, "desc", System.StringComparison.OrdinalIgnoreCase);
-
-            return sortBy?.ToLowerInvariant() switch
-            {
-                "stockitemid" => desc ? query.OrderByDescending(s => s.StockItemID) : query.OrderBy(s => s.StockItemID),
-                "stockitemname" => desc ? query.OrderByDescending(s => s.StockItemName) : query.OrderBy(s => s.StockItemName),
-                "unitprice" => desc ? query.OrderByDescending(s => s.UnitPrice) : query.OrderBy(s => s.UnitPrice),
-                "recommendedretailprice" => desc ? query.OrderByDescending(s => s.RecommendedRetailPrice) : query.OrderBy(s => s.RecommendedRetailPrice),
-                _ => query.OrderBy(s => s.StockItemName) // default sort
-            };
         }
     }
 }

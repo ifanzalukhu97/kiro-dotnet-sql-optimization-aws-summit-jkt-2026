@@ -33,3 +33,4 @@ Thumbs.db
 # Large database backup files (download separately, see README)
 *.bak
 frontend/playwright-results
+frontend/playwright-report

@@ -18,7 +18,7 @@ export class TimingInterceptor implements HttpInterceptor {
     const startTime = performance.now();
 
     return next.handle(req).pipe(
-      timeout(10000),
+      timeout(300000),
       tap(event => {
         if (event instanceof HttpResponse) {
           const elapsed = Math.round(performance.now() - startTime);

@@ -20,6 +20,7 @@ import { Component } from '@angular/core';
           <li><a routerLink="/deliveries" routerLinkActive="active">Deliveries</a></li>
           <li><a routerLink="/warehouse" routerLinkActive="active">Warehouse</a></li>
           <li><a routerLink="/payments" routerLinkActive="active">Payments</a></li>
+          <li><a routerLink="/advanced-report" routerLinkActive="active">Advanced Report</a></li>
         </ul>
       </nav>
       <main class="content">

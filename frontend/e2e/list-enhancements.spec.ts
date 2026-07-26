@@ -143,6 +143,24 @@ test.describe('List Page Enhancements', () => {
 
     const exportBtn = page.locator('.export-btn');
 
+    // Auto-accept any confirm dialog (large dataset warning)
+    page.on('dialog', dialog => dialog.accept());
+
+    // Intercept the export API to return a small dataset (avoid 50k row limit)
+    await page.route('**/api/orders?*export=true*', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: [
+            { orderId: 1, customerName: 'Test', orderDate: '2024-01-01', expectedDeliveryDate: '2024-01-05', status: 'Open', itemCount: 3, totalAmount: 100.00 },
+            { orderId: 2, customerName: 'Test2', orderDate: '2024-01-02', expectedDeliveryDate: '2024-01-06', status: 'Closed', itemCount: 1, totalAmount: 50.00 }
+          ],
+          page: 1, pageSize: 2, totalCount: 2
+        })
+      })
+    );
+
     // Listen for download
     const downloadPromise = page.waitForEvent('download', { timeout: 15000 });
     await exportBtn.click();

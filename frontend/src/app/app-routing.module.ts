@@ -47,6 +47,10 @@ const routes: Routes = [
     path: 'payments',
     loadChildren: () => import('./pages/payments/payments.module').then(m => m.PaymentsModule)
   },
+  {
+    path: 'advanced-report',
+    loadChildren: () => import('./pages/advanced-report/advanced-report.module').then(m => m.AdvancedReportModule)
+  },
   { path: '**', redirectTo: '/dashboard' }
 ];
 

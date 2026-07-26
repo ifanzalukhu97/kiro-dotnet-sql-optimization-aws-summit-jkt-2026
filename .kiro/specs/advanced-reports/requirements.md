@@ -40,7 +40,7 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 1. THE endpoint `GET /api/advancedreport/total-revenue` SHALL return a JSON response containing: `totalRevenue` (decimal), `invoiceRevenue` (decimal), `orderRevenue` (decimal)
 2. THE `invoiceRevenue` SHALL be calculated as `SUM(InvoiceLines.ExtendedPrice)` across all invoice lines
 3. THE `orderRevenue` SHALL be calculated as `SUM(OrderLines.Quantity * OrderLines.UnitPrice)` across all order lines
-4. THE `totalRevenue` SHALL equal `invoiceRevenue + orderRevenue`
+4. THE `totalRevenue` SHALL equal `invoiceRevenue + orderRevenue`; IF either component calculation fails or returns inconsistent data, THEN the endpoint SHALL return an HTTP 500 error rather than a partial or inconsistent response
 5. THE Frontend card SHALL display `totalRevenue` as the primary value and show `invoiceRevenue` and `orderRevenue` as a hoverable/tooltip breakdown on the graphic/chart element
 
 ### Requirement 3: Top 10 Customers Report
@@ -63,7 +63,7 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 1. THE endpoint `GET /api/advancedreport/top-salesman` SHALL return a JSON array of the top 10 salespeople ordered by total revenue descending
 2. EACH item in the array SHALL contain: `personId` (int), `fullName` (string), `totalRevenue` (decimal)
 3. THE `totalRevenue` for each salesperson SHALL be calculated as the sum of `InvoiceLines.ExtendedPrice` for all invoices where `Invoice.SalespersonPersonID` matches the person
-4. THE response SHALL contain exactly 10 items (or fewer if the database has fewer than 10 salespeople with revenue)
+4. THE response SHALL return exactly the top 10 salespeople by revenue (or fewer if the database has fewer than 10 salespeople with revenue); WHEN ties exist at the 10th position, THE system SHALL break ties arbitrarily
 
 ### Requirement 5: Top 10 Products Report
 
@@ -87,7 +87,7 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 2. THE `totalCustomers` SHALL be the total count of all customers in the database
 3. THE `activeCustomers` SHALL be the count of customers who have at least one order with `OrderDate` within the last 90 days from today
 4. THE `inactiveCustomers` SHALL equal `totalCustomers - activeCustomers`
-5. THE `activePercentage` SHALL be `(activeCustomers / totalCustomers) * 100` rounded to 2 decimal places
+5. THE `activePercentage` SHALL be `(activeCustomers / totalCustomers) * 100` rounded to 2 decimal places; IF `totalCustomers` equals zero, THEN `activePercentage` SHALL return `0.00`
 
 ### Requirement 7: Sales Trend Report (Period Comparison)
 
@@ -111,7 +111,7 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 
 1. THE endpoint `GET /api/advancedreport/low-stock` SHALL return a JSON array of the 10 stock items with the lowest `QuantityOnHand` ordered ascending
 2. EACH item SHALL contain: `stockItemId` (int), `stockItemName` (string), `quantityOnHand` (int), `reorderLevel` (int), `targetStockLevel` (int)
-3. THE items SHALL only include stock items where `QuantityOnHand <= ReorderLevel` (i.e., at or below reorder threshold), unless fewer than 10 items meet that criteria, in which case return the 10 lowest regardless
+3. THE items SHALL preferentially include stock items where `QuantityOnHand <= ReorderLevel` (i.e., at or below reorder threshold); IF fewer than 10 items meet that criteria, THEN the system SHALL fill the remaining slots with items having the lowest `QuantityOnHand` regardless of reorder level
 4. THE response SHALL contain exactly 10 items (or fewer if the database has fewer than 10 stock items)
 
 ### Requirement 9: High Stock Report (Top 10 Overstocked)
@@ -170,8 +170,8 @@ This document captures requirements for the Advanced Reports feature and a bugfi
 1. THE endpoint `GET /api/advancedreport/top-suppliers` SHALL return a JSON array of the top 5 suppliers ordered by total revenue descending
 2. EACH item SHALL contain: `supplierId` (int), `supplierName` (string), `totalRevenue` (decimal), `productCount` (int)
 3. THE `totalRevenue` for each supplier SHALL be calculated by summing `InvoiceLines.ExtendedPrice` for all invoice lines whose `StockItemID` references a stock item supplied by that supplier (`StockItem.SupplierID`)
-4. THE `productCount` SHALL be the number of distinct stock items supplied by that supplier
-5. THE response SHALL contain exactly 5 items (or fewer if the database has fewer than 5 suppliers with product sales)
+4. THE `productCount` SHALL be the number of distinct stock items supplied by that supplier that have actual sales (appear in invoice lines)
+5. THE response SHALL contain exactly 5 items (or fewer if the database has fewer than 5 suppliers with product sales); THE system SHALL only include suppliers with `totalRevenue > 0`; WHEN ties exist at the 5th position, THE system SHALL break ties by `supplierId` ascending
 
 ### Requirement 14: Top 5 Drivers by Performance Report
 

@@ -100,5 +100,78 @@ namespace WideWorldImporters.IntegrationTests.Controllers
                 Assert.True(firstItem.TryGetProperty("name", out _));
             }
         }
+
+        [Fact]
+        public async Task GetStockItems_SortByQuantityOnHand_Asc_ReturnsOrderedResults()
+        {
+            var response = await _client.GetAsync("/api/stockitems?sortBy=quantityonhand&sortDirection=asc&pageSize=10");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            Assert.True(root.TryGetProperty("data", out var dataElement));
+            Assert.Equal(JsonValueKind.Array, dataElement.ValueKind);
+
+            int prev = int.MinValue;
+            foreach (var item in dataElement.EnumerateArray())
+            {
+                Assert.True(item.TryGetProperty("quantityOnHand", out var qtyEl));
+                var qty = qtyEl.GetInt32();
+                Assert.True(qty >= prev);
+                prev = qty;
+            }
+        }
+
+        [Fact]
+        public async Task GetStockItems_SortByQuantityOnHand_Desc_ReturnsOrderedResults()
+        {
+            var response = await _client.GetAsync("/api/stockitems?sortBy=quantityonhand&sortDirection=desc&pageSize=10");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            Assert.True(root.TryGetProperty("data", out var dataElement));
+            Assert.Equal(JsonValueKind.Array, dataElement.ValueKind);
+
+            int prev = int.MaxValue;
+            foreach (var item in dataElement.EnumerateArray())
+            {
+                Assert.True(item.TryGetProperty("quantityOnHand", out var qtyEl));
+                var qty = qtyEl.GetInt32();
+                Assert.True(qty <= prev);
+                prev = qty;
+            }
+        }
+
+        [Fact]
+        public async Task GetStockItems_QuantityOnHand_IsPopulated()
+        {
+            var response = await _client.GetAsync("/api/stockitems?page=1&pageSize=5");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            Assert.True(root.TryGetProperty("data", out var dataElement));
+            Assert.Equal(JsonValueKind.Array, dataElement.ValueKind);
+            Assert.True(dataElement.GetArrayLength() > 0);
+
+            bool anyPositive = false;
+            foreach (var item in dataElement.EnumerateArray())
+            {
+                Assert.True(item.TryGetProperty("quantityOnHand", out var qtyEl));
+                if (qtyEl.GetInt32() > 0)
+                    anyPositive = true;
+            }
+            Assert.True(anyPositive, "At least one item should have quantityOnHand > 0");
+        }
     }
 }

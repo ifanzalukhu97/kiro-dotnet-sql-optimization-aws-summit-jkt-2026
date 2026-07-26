@@ -342,7 +342,22 @@ EF Core:
 ```csharp
 var invoiceRevenue = await _context.InvoiceLines.SumAsync(il => il.ExtendedPrice);
 var orderRevenue = await _context.OrderLines.SumAsync(ol => ol.Quantity * ol.UnitPrice);
+var totalRevenue = invoiceRevenue + orderRevenue;
+
+// Consistency validation: if the sum doesn't hold, return HTTP 500
+// This guards against partial computation failures or decimal overflow anomalies
+if (totalRevenue != invoiceRevenue + orderRevenue)
+    return StatusCode(500, new { error = "Revenue calculation inconsistency detected" });
+
+return Ok(new TotalRevenueDto
+{
+    TotalRevenue = totalRevenue,
+    InvoiceRevenue = invoiceRevenue,
+    OrderRevenue = orderRevenue
+});
 ```
+
+**Design Decision**: The endpoint computes `totalRevenue` as `invoiceRevenue + orderRevenue` and validates the invariant before returning. If either sub-query throws (e.g., timeout, connection failure), the exception propagates to `ExceptionHandlingMiddleware` which returns HTTP 500 — no partial response is ever sent. The explicit equality check guards against hypothetical decimal precision anomalies.
 
 #### 2. Top 10 Customers
 
@@ -380,6 +395,8 @@ var topSalesman = await _context.InvoiceLines
     .ToListAsync();
 ```
 
+**Tie-breaking**: When ties exist at the 10th position, the system breaks ties arbitrarily (determined by the database engine's non-deterministic row ordering within `OrderByDescending`). No secondary sort is applied — this is intentional per Requirement 4.4.
+
 #### 4. Top 10 Products
 
 ```csharp
@@ -416,6 +433,8 @@ var activePercentage = totalCustomers > 0
     : 0m;
 ```
 
+**Zero-division guard**: When `totalCustomers == 0`, `activePercentage` returns `0.00` (the `0m` decimal literal). This satisfies Requirement 6.5 explicitly.
+
 #### 6. Sales Trend
 
 ```csharp
@@ -451,11 +470,13 @@ var orderData = await _context.Orders
 #### 7. Low Stock
 
 ```csharp
-var lowStock = await _context.StockItemHoldings
+// Preferential logic: prioritize items at or below reorder level,
+// then fill remaining slots with lowest QuantityOnHand regardless of reorder level.
+var belowReorder = await _context.StockItemHoldings
     .Join(_context.StockItems, h => h.StockItemID, si => si.StockItemID,
         (h, si) => new { h, si })
+    .Where(x => x.h.QuantityOnHand <= x.h.ReorderLevel)
     .OrderBy(x => x.h.QuantityOnHand)
-    .Take(10)
     .Select(x => new StockLevelDto
     {
         StockItemId = x.si.StockItemID,
@@ -465,7 +486,37 @@ var lowStock = await _context.StockItemHoldings
         TargetStockLevel = x.h.TargetStockLevel
     })
     .ToListAsync();
+
+List<StockLevelDto> lowStock;
+if (belowReorder.Count >= 10)
+{
+    lowStock = belowReorder.Take(10).ToList();
+}
+else
+{
+    // Fill remaining slots from all items not already included, ordered by QuantityOnHand
+    var belowReorderIds = belowReorder.Select(x => x.StockItemId).ToHashSet();
+    var remaining = await _context.StockItemHoldings
+        .Join(_context.StockItems, h => h.StockItemID, si => si.StockItemID,
+            (h, si) => new { h, si })
+        .Where(x => !belowReorderIds.Contains(x.si.StockItemID))
+        .OrderBy(x => x.h.QuantityOnHand)
+        .Take(10 - belowReorder.Count)
+        .Select(x => new StockLevelDto
+        {
+            StockItemId = x.si.StockItemID,
+            StockItemName = x.si.StockItemName,
+            QuantityOnHand = x.h.QuantityOnHand,
+            ReorderLevel = x.h.ReorderLevel,
+            TargetStockLevel = x.h.TargetStockLevel
+        })
+        .ToListAsync();
+
+    lowStock = belowReorder.Concat(remaining).ToList();
+}
 ```
+
+**Design Decision**: Items where `QuantityOnHand <= ReorderLevel` are prioritized (these are the most critical — already at or past reorder threshold). If fewer than 10 meet that criteria, the remaining slots are filled with the lowest `QuantityOnHand` items regardless of reorder level, ensuring the report always shows the most actionable items first.
 
 #### 8. High Stock
 
@@ -557,7 +608,9 @@ var topSuppliers = await _context.InvoiceLines
         TotalRevenue = g.Sum(x => x.ExtendedPrice),
         ProductCount = g.Select(x => x.StockItemID).Distinct().Count()
     })
+    .Where(x => x.TotalRevenue > 0)
     .OrderByDescending(x => x.TotalRevenue)
+    .ThenBy(x => x.SupplierID)
     .Take(5)
     .Join(_context.Suppliers, x => x.SupplierID, s => s.SupplierID,
         (x, s) => new TopSupplierDto
@@ -569,6 +622,11 @@ var topSuppliers = await _context.InvoiceLines
         })
     .ToListAsync();
 ```
+
+**Design Decisions**:
+- `ProductCount` counts only distinct stock items that have actual sales (appear in invoice lines) — the join with `InvoiceLines` inherently ensures this since we only group items present in the invoice data.
+- `.Where(x => x.TotalRevenue > 0)` excludes suppliers with zero revenue (Requirement 13.5).
+- `.ThenBy(x => x.SupplierID)` provides deterministic tie-breaking at the 5th position by ascending supplier ID (Requirement 13.5).
 
 #### 13. Top Drivers
 
@@ -799,9 +857,9 @@ export class AdvancedReportService {
 
 ### Property 2: Total Revenue Consistency
 
-*For any* call to `GET /api/advancedreport/total-revenue`, the response SHALL satisfy `totalRevenue == invoiceRevenue + orderRevenue` (mathematical equality within decimal precision).
+*For any* call to `GET /api/advancedreport/total-revenue`, the response SHALL satisfy `totalRevenue == invoiceRevenue + orderRevenue` (mathematical equality within decimal precision). If either component calculation fails or produces inconsistent data, the endpoint SHALL return HTTP 500 rather than a partial or inconsistent response.
 
-**Validates: Requirement 2.4**
+**Validates: Requirements 2.4**
 
 ### Property 3: Top-N Ordering Guarantee
 
@@ -817,7 +875,7 @@ export class AdvancedReportService {
 
 ### Property 5: Customer Activity Arithmetic
 
-*For any* call to `GET /api/advancedreport/customer-activity`, the response SHALL satisfy: `totalCustomers == activeCustomers + inactiveCustomers` AND `activePercentage == round((activeCustomers / totalCustomers) * 100, 2)`.
+*For any* call to `GET /api/advancedreport/customer-activity`, the response SHALL satisfy: `totalCustomers == activeCustomers + inactiveCustomers` AND `activePercentage == round((activeCustomers / totalCustomers) * 100, 2)`. When `totalCustomers == 0`, `activePercentage` SHALL be `0.00`.
 
 **Validates: Requirements 6.3, 6.4, 6.5**
 
@@ -839,6 +897,18 @@ export class AdvancedReportService {
 
 **Validates: Requirements 16.4, 17.5, 17.6**
 
+### Property 9: Low Stock Preferential Inclusion
+
+*For any* call to `GET /api/advancedreport/low-stock`, items where `QuantityOnHand <= ReorderLevel` SHALL appear before any item where `QuantityOnHand > ReorderLevel`. If 10 or more items meet the reorder threshold, only those items are returned (ordered by `QuantityOnHand` ascending). If fewer than 10 meet the threshold, remaining slots are filled with the lowest `QuantityOnHand` items regardless of reorder level.
+
+**Validates: Requirements 8.3**
+
+### Property 10: Top Suppliers Revenue Filter and Tie-Breaking
+
+*For any* call to `GET /api/advancedreport/top-suppliers`, all returned suppliers SHALL have `totalRevenue > 0`. When ties exist at the 5th position on `totalRevenue`, the system SHALL break ties by `supplierId` ascending (deterministic ordering).
+
+**Validates: Requirements 13.5**
+
 ## Error Handling
 
 ### Backend Error Handling
@@ -851,8 +921,15 @@ public async Task<ActionResult<TotalRevenueDto>> GetTotalRevenue()
 {
     try
     {
-        // ... query logic
-        return Ok(result);
+        var invoiceRevenue = await _context.InvoiceLines.SumAsync(il => il.ExtendedPrice);
+        var orderRevenue = await _context.OrderLines.SumAsync(ol => ol.Quantity * ol.UnitPrice);
+        var totalRevenue = invoiceRevenue + orderRevenue;
+
+        // Explicit consistency validation — never return partial/inconsistent data
+        if (totalRevenue != invoiceRevenue + orderRevenue)
+            return StatusCode(500, new { error = "Revenue calculation inconsistency detected" });
+
+        return Ok(new TotalRevenueDto { TotalRevenue = totalRevenue, InvoiceRevenue = invoiceRevenue, OrderRevenue = orderRevenue });
     }
     catch (Exception ex)
     {
@@ -867,6 +944,8 @@ The existing `ExceptionHandlingMiddleware` handles:
 - Unhandled exceptions → HTTP 500
 
 Each endpoint is independent — a failure in one does not cascade to others.
+
+**Total Revenue specific**: If either `invoiceRevenue` or `orderRevenue` query throws (timeout, connection error), the exception propagates to middleware which returns HTTP 500. No partial response is ever sent.
 
 ### Frontend Error Handling
 
@@ -888,6 +967,13 @@ Tests per endpoint (13 × ~3 assertions = 39+ test assertions):
 - Data correctness checks (e.g., totalRevenue == invoiceRevenue + orderRevenue)
 - Top-N ordering verification (each item's metric >= next item's metric)
 - Result count <= expected limit (10 or 5)
+
+Additional targeted tests:
+- Total Revenue: verify `totalRevenue == invoiceRevenue + orderRevenue` invariant holds
+- Top Salesman: verify result is ordered descending (tie-breaking is arbitrary, not tested)
+- Customer Activity: when `totalCustomers > 0`, verify arithmetic; zero-division guard tested via mock if possible
+- Low Stock: verify items at/below reorder level appear before items above reorder level
+- Top Suppliers: verify all returned suppliers have `totalRevenue > 0`; verify ordering is descending by revenue then ascending by supplierId
 
 Sales Trend specific tests:
 - `period=month` returns entries with "YYYY-MM" format labels

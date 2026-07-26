@@ -8,8 +8,7 @@ import { test, expect } from '@playwright/test';
 const navPages = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Orders', path: '/orders' },
-  { label: 'Sales Report', path: '/sales-report' },
-  { label: 'Product Search', path: '/product-search' },
+  { label: 'Products', path: '/product-search' },
   { label: 'Customers', path: '/customers' },
   { label: 'Suppliers', path: '/suppliers' },
   { label: 'Purchase Orders', path: '/purchase-orders' },
@@ -18,6 +17,7 @@ const navPages = [
   { label: 'Deliveries', path: '/deliveries' },
   { label: 'Warehouse', path: '/warehouse' },
   { label: 'Payments', path: '/payments' },
+  { label: 'Advanced Report', path: '/advanced-report' },
 ];
 
 test.describe('Navigation', () => {

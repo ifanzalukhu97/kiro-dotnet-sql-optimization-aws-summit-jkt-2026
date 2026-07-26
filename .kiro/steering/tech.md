@@ -41,7 +41,7 @@ docker-compose down                      # Stop container (data persists in volu
 # ALWAYS run `dotnet --version` first to confirm .NET 5.0.4xx is active.
 cd backend
 dotnet build                             # Build solution
-dotnet run --project WideWorldImporters.Api  # Run API on http://localhost:5000
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project WideWorldImporters.Api --urls "http://localhost:5001"
 dotnet test                              # Run integration + property tests
 
 # Frontend
@@ -66,6 +66,30 @@ sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -d WideWorldImporters \
 - Backend connection string: set via `CONNECTION_STRING` env var, or `ConnectionStrings__DefaultConnection`, or `appsettings.Development.json`
 - Frontend API URL: configured in `src/environments/environment.ts` (gitignored; use `.example` files as templates)
 - Apple Silicon Macs: use `direnv` with `.envrc` to point to x86_64 .NET SDK (see `.envrc.example`)
+
+## CRITICAL: Local Development Setup
+
+When running locally, the following rules MUST be followed:
+
+1. **Backend MUST use `ASPNETCORE_ENVIRONMENT=Development`** — without this, the app runs in Production mode and cannot read `appsettings.Development.json` (which contains the DB connection string).
+
+2. **Backend MUST run on port 5001** — port 5000 is occupied by macOS AirPlay Receiver (`ControlCenter`) on Apple Silicon Macs. Always use `--urls "http://localhost:5001"`.
+
+3. **Frontend `environment.ts` uses `http://localhost:5001/api`** as `apiBaseUrl`.
+
+4. **Health check endpoint is `/health`** (NOT `/api/health`) — the HealthController uses `[Route("health")]` without the `api/` prefix.
+
+**Full backend start command:**
+```bash
+cd backend
+DOTNET_ROOT=$HOME/.dotnet/x86_64 ASPNETCORE_ENVIRONMENT=Development ~/.dotnet/x86_64/dotnet run --project WideWorldImporters.Api --urls "http://localhost:5001"
+```
+
+**Verify backend is running:**
+```bash
+curl http://localhost:5001/health
+# Expected: {"status":"healthy"}
+```
 
 ## CRITICAL: Build & Run Failure Recovery
 

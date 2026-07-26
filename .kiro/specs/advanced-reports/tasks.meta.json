@@ -1,0 +1,855 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `backend/WideWorldImporters.Api/Models/Dtos/AdvancedReportDtos.cs`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908953976
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908980262
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909205827
+      }
+    ],
+    "2.1 Refactor `StockItemsController.GetStockItems` to join `StockItemHoldings` and `Suppliers` early in the query": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954162
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908982251
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909207171
+      }
+    ],
+    "2.2 Update `ApplySort` in `StockItemsController` to support `quantityonhand` and `suppliername` sort columns": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954234
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909221107
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909267876
+      }
+    ],
+    "2.3 Verify existing StockItems functionality works after refactor": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954281
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909278494
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909367612
+      }
+    ],
+    "3.1 Create `backend/WideWorldImporters.Api/Controllers/AdvancedReportController.cs` with constructor injection of `WideWorldImportersContext`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954319
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909379787
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909430830
+      }
+    ],
+    "3.2 Implement `GET /api/advancedreport/total-revenue`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954377
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909444139
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909605520
+      }
+    ],
+    "3.3 Implement `GET /api/advancedreport/top-customers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954422
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909606289
+      }
+    ],
+    "3.4 Implement `GET /api/advancedreport/top-salesman`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954508
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909607184
+      }
+    ],
+    "3.5 Implement `GET /api/advancedreport/top-products`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954545
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909608109
+      }
+    ],
+    "4.1 Implement `GET /api/advancedreport/customer-activity`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954578
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909613688
+      }
+    ],
+    "4.2 Implement `GET /api/advancedreport/top-outstanding`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954612
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909614578
+      }
+    ],
+    "4.3 Implement `GET /api/advancedreport/dormant-customers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954659
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909615456
+      }
+    ],
+    "5.1 Implement `GET /api/advancedreport/sales-trend?period=month|week|year`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954700
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909616367
+      }
+    ],
+    "6.1 Implement `GET /api/advancedreport/low-stock`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954749
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909617258
+      }
+    ],
+    "6.2 Implement `GET /api/advancedreport/high-stock`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954793
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909622264
+      }
+    ],
+    "7.1 Implement `GET /api/advancedreport/top-stock-groups`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954835
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909623198
+      }
+    ],
+    "7.2 Implement `GET /api/advancedreport/top-suppliers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954885
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909624064
+      }
+    ],
+    "7.3 Implement `GET /api/advancedreport/top-drivers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908954926
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909624996
+      }
+    ],
+    "8.1 Create `frontend/src/app/pages/advanced-report/advanced-report.module.ts`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955001
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909646166
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909941918
+      }
+    ],
+    "8.2 Create `frontend/src/app/pages/advanced-report/advanced-report-routing.module.ts`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955033
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909944941
+      }
+    ],
+    "8.3 Add lazy-loaded route in app-routing module": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955067
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909943971
+      }
+    ],
+    "8.4 Add \"Advanced Report\" navigation link in sidebar/nav component": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955099
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909942986
+      }
+    ],
+    "9.1 Create `frontend/src/app/pages/advanced-report/models/advanced-report.models.ts`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955153
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909950560
+      }
+    ],
+    "9.2 Create `frontend/src/app/pages/advanced-report/advanced-report.service.ts`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955201
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909951541
+      }
+    ],
+    "10.1 Create `frontend/src/app/pages/advanced-report/components/report-card/` component": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955259
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909952233
+      }
+    ],
+    "11.1 Create `advanced-report.component.ts` with parallel loading logic": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955298
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909953201
+      }
+    ],
+    "11.2 Create `advanced-report.component.html` with responsive grid layout": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955336
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909954250
+      }
+    ],
+    "11.3 Create `advanced-report.component.scss` with dark theme styling": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955378
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909959890
+      }
+    ],
+    "11.4 Add Sales Trend period selector (week/month/year)": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955421
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909960772
+      }
+    ],
+    "12.1 Create `backend/WideWorldImporters.IntegrationTests/Controllers/AdvancedReportControllerTests.cs`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955478
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909975724
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910282516
+      }
+    ],
+    "12.2 Test `GET /api/advancedreport/total-revenue`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955536
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910283880
+      }
+    ],
+    "12.3 Test `GET /api/advancedreport/top-customers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955565
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910284438
+      }
+    ],
+    "12.4 Test `GET /api/advancedreport/top-salesman`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955598
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910285600
+      }
+    ],
+    "12.5 Test `GET /api/advancedreport/top-products`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955656
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910286645
+      }
+    ],
+    "12.6 Test `GET /api/advancedreport/customer-activity`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955702
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910294644
+      }
+    ],
+    "12.7 Test `GET /api/advancedreport/sales-trend` with period=month, week, year": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955743
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910295986
+      }
+    ],
+    "12.8 Test `GET /api/advancedreport/low-stock`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955780
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910296844
+      }
+    ],
+    "12.9 Test `GET /api/advancedreport/high-stock`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955818
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910297720
+      }
+    ],
+    "12.10 Test `GET /api/advancedreport/top-outstanding`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955910
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910299825
+      }
+    ],
+    "12.11 Test `GET /api/advancedreport/dormant-customers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908955957
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910305051
+      }
+    ],
+    "12.12 Test `GET /api/advancedreport/top-stock-groups`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956023
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910305910
+      }
+    ],
+    "12.13 Test `GET /api/advancedreport/top-suppliers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956068
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910306841
+      }
+    ],
+    "12.14 Test `GET /api/advancedreport/top-drivers`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956101
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910307757
+      }
+    ],
+    "13.1 Add test to `StockItemsControllerTests.cs`: `GetStockItems_SortByQuantityOnHand_Asc_ReturnsOrderedResults`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956133
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910314281
+      }
+    ],
+    "13.2 Add test: `GetStockItems_SortByQuantityOnHand_Desc_ReturnsOrderedResults`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956183
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910319389
+      }
+    ],
+    "13.3 Add test: `GetStockItems_QuantityOnHand_IsPopulated`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956227
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910325175
+      }
+    ],
+    "13.4 Run existing StockItems tests to verify no regression": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956267
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910330810
+      }
+    ],
+    "14.1 Create `frontend/e2e/advanced-report.spec.ts`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956308
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910342212
+      }
+    ],
+    "14.2 Test: Navigation — \"Advanced Report\" link in sidebar navigates to `/advanced-report`": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956349
+      }
+    ],
+    "14.3 Test: Page loads with 13 report cards visible": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956392
+      }
+    ],
+    "14.4 Test: Cards show data after loading (not perpetual spinner)": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956437
+      }
+    ],
+    "14.5 Test: Each card shows response time badge": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956503
+      }
+    ],
+    "14.6 Test: Error isolation — one failed endpoint shows error only on that card": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956539
+      }
+    ],
+    "14.7 Test: Sales Trend period selector works": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956572
+      }
+    ],
+    "14.8 Test: Dark theme applied to report cards": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956618
+      }
+    ],
+    "15.1 Add test to `frontend/e2e/` (new file `inventory-sort-fix.spec.ts` or add to existing)": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956671
+      }
+    ],
+    "16.1 Run `dotnet test` from `backend/` — ALL existing tests must pass": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956713
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910573651
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910667445
+      }
+    ],
+    "16.2 Run `ng test --watch=false` from `frontend/` — ALL existing unit tests must pass": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956759
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910673263
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910734170
+      }
+    ],
+    "16.3 Run `npx playwright test` from `frontend/` — ALL existing E2E tests must pass": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956811
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910741163
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784912668436
+      }
+    ],
+    "16.4 Run new tests specifically": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956866
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784912674289
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784912966665
+      }
+    ],
+    "17. Checkpoint — All changes verified": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784908956917
+      },
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784912978564
+      }
+    ],
+    "1. Backend: Create AdvancedReportDtos": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909205992
+      }
+    ],
+    "2. Backend: Fix Inventory stock ordering bug": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909367657
+      }
+    ],
+    "3. Backend: Implement AdvancedReportController — Revenue and Rankings": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909608157
+      }
+    ],
+    "4. Backend: Implement AdvancedReportController — Customer Analytics": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909615505
+      }
+    ],
+    "5. Backend: Implement AdvancedReportController — Sales Trend": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909616406
+      }
+    ],
+    "6. Backend: Implement AdvancedReportController — Inventory Reports": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909622336
+      }
+    ],
+    "7. Backend: Implement AdvancedReportController — Supplier/Group/Driver Reports": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909625035
+      }
+    ],
+    "8. Frontend: Create Advanced Report module and routing": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909944986
+      }
+    ],
+    "9. Frontend: Create Advanced Report models and service": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909951610
+      }
+    ],
+    "10. Frontend: Create shared report card component": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909952279
+      }
+    ],
+    "11. Frontend: Implement Advanced Report page component": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784909960840
+      }
+    ],
+    "12. Backend: Integration tests for AdvancedReportController": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910307812
+      }
+    ],
+    "13. Backend: Integration tests for Inventory sort fix": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784910330852
+      }
+    ],
+    "16. Run all existing tests to confirm no regressions": [
+      {
+        "executionId": "d674bc00-8273-4a22-8922-103e3c844447",
+        "chatSessionId": "sess_edc5518c-3940-46f0-83ab-01134c014340",
+        "timestamp": 1784912966720
+      }
+    ]
+  }
+}

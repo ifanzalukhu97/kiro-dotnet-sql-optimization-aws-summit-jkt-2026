@@ -35,3 +35,4 @@ Thumbs.db
 frontend/playwright-results
 frontend/playwright-report
 scripts/audit/results
+rds-query.txt

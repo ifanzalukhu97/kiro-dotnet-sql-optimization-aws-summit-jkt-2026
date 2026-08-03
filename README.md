@@ -1,20 +1,49 @@
+![Overview](docs/images/overview.png)
+
 # SQL Server Query Optimization Demo
 
 A demonstration application for AWS Summit Jakarta 2026 showcasing SQL Server query optimization on .NET Core, assisted by Kiro AI. The app features an ASP.NET Core Web API backend connected to the WideWorldImporters database and an Angular 18 frontend with a dark-mode UI that displays query performance before and after optimization.
 
+**Pain point:** database monitoring (e.g. Performance Insights → Top SQL) shows which query is slow, but only as raw SQL and wait stats — it says nothing about which controller or LINQ query produced it, and manually tracing that through an ORM-based codebase with many modules and reports can take days, before a fix is even attempted. **Architecture:** this demo pairs the app with a custom Kiro agent, [`db-perf-analyst`](.kiro/agents/db-perf-analyst.md) (see [Kiro AI Configuration](#kiro-ai-configuration)) — feed it a slow query, database info (DMV audit results), and codebase access, and it maps the query back to its source code, audits index health, and writes prioritized recommendations (composite indexes, split queries, DTO projections) to a single analysis document. **Benefit:** what used to take days of manual tracing now takes minutes, with the engineer still validating and deciding what to apply — Kiro recommends, it doesn't decide.
+
 This project is a companion demo for the article: [Kiro as AI Partner for MS SQL Server Optimization on .NET Core: What Used to Take Days Now Takes Hours](https://builder.aws.com/content/2yf2sol4ZERViP1ZrJtOMHQBTat/kiro-as-ai-partner-for-ms-sql-server-optimization-on-net-core-what-used-to-take-days-now-takes-hours)
+
+## Table of Contents
+
+- [Screenshots](#screenshots)
+- [Slides](#slides)
+- [Demo Videos](#demo-videos)
+- [Folder Structure](#folder-structure)
+- [Prerequisites](#prerequisites)
+- [Development Environment Setup](#development-environment-setup)
+- [Getting Started](#getting-started)
+- [Running Tests](#running-tests)
+- [Running Audit Scripts](#running-audit-scripts)
+- [Demo Reset](#demo-reset)
+- [Demo Flow](#demo-flow)
+- [Kiro AI Configuration](#kiro-ai-configuration)
+- [Architecture](#architecture)
+- [Contact](#contact)
+- [Access This Repository](#access-this-repository)
 
 ## Screenshots
 
 ### Dashboard
-KPI summary cards showing key business metrics with response time badge — notice "Loaded in 3362ms" indicating the intentionally naive query pattern (before optimization).
 
 ![Dashboard](docs/images/dashboard.png)
 
 ### Invoices
-Data table with customer dropdown filter and date range pickers. Response time badge shows "Loaded in 146ms" — one of the optimized endpoints for comparison.
 
 ![Invoices](docs/images/invoices.png)
+
+## Slides
+
+The talk deck for this demo is at [docs/slides/index.html](docs/slides/index.html) — open it in a browser to view.
+
+## Demo Videos
+
+- ▶️ [Quick Highlight](https://drive.google.com/file/d/1FcFGyyXuhM1izJYmYcsE0GR6xloqkAOv/preview) (click to play)
+- ▶️ [Full Demo](https://drive.google.com/file/d/1cKbbbo8VFqcmURK5oPg9DljqojBw48dy/preview) (click to play)
 
 ## Folder Structure
 
@@ -242,18 +271,22 @@ The `.kiro/` directory contains AI-assisted development configuration:
 ```
 .kiro/
 ├── steering/          # Always-on context for Kiro sessions
-│   ├── tech.md        # Tech stack, build commands, SDK verification rules
-│   ├── structure.md   # Project structure and architecture patterns
-│   ├── product.md     # Product overview and demo flow context
-│   └── ponytail.md    # Coding style (lazy senior dev — minimal, efficient)
+│   ├── tech.md         # Tech stack, build commands, SDK verification rules
+│   ├── structure.md    # Project structure and architecture patterns
+│   ├── product.md      # Product overview and demo flow context
+│   ├── e2e-testing.md  # Playwright E2E testing conventions
+│   └── ponytail.md     # Coding style (lazy senior dev — minimal, efficient)
+├── agents/            # Custom agents invoked on demand
+│   └── db-perf-analyst.md  # Analyzes slow queries + DMV audit results, writes optimization recommendations to db-optimization-log/
 └── skills/            # On-demand skills activated by request matching
-    ├── run-tests/     # Detect platform + run dotnet test correctly
+    ├── run-tests/           # Detect platform + run dotnet test correctly
     ├── code-testing-agent/  # Generate unit tests via research-plan-implement pipeline
     ├── test-gap-analysis/   # Pseudo-mutation analysis to find weak tests
-    └── dotnet-webapi/       # ASP.NET Core endpoint patterns and HTTP semantics
+    ├── dotnet-webapi/       # ASP.NET Core endpoint patterns and HTTP semantics
+    └── playwright-cli/      # Playwright CLI usage for E2E test runs
 ```
 
-**Steering** files load automatically every session to provide project context. **Skills** activate on-demand when your request matches their description (e.g., asking to "run tests" triggers the `run-tests` skill).
+**Steering** files load automatically every session to provide project context. **Agents** are invoked explicitly for a focused task — `db-perf-analyst` is the one driving the demo's core workflow (see [Demo Flow](#demo-flow)). **Skills** activate on-demand when your request matches their description (e.g., asking to "run tests" triggers the `run-tests` skill).
 
 ## Architecture
 
@@ -264,7 +297,16 @@ The `.kiro/` directory contains AI-assisted development configuration:
 
 ## Contact
 
+- [ifanzalukhu97.com](https://www.ifanzalukhu97.com/)
 - [linkedin.com/in/ifanzalukhu97](https://linkedin.com/in/ifanzalukhu97)
 - [github.com/ifanzalukhu97](https://github.com/ifanzalukhu97)
 - [medium.com/@ifanzalukhu97](https://medium.com/@ifanzalukhu97)
 - [dev.to/ifanzalukhu97](https://dev.to/ifanzalukhu97)
+
+## Access This Repository
+
+Scan the QR code or use the short link below to quickly access this repository:
+
+**Short link:** [s.id/kirofordotnet](https://s.id/kirofordotnet)
+
+![QR Code](docs/images/qr-kirofordotnet.png)
